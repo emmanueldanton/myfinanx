@@ -681,7 +681,7 @@ nav::-webkit-scrollbar { display:none; }
 
 /* Made by card */
 .drawer-made {
-  margin:12px 16px 0;
+  margin:12px 16px calc(16px + env(safe-area-inset-bottom));
   padding:12px;
   border-radius:var(--r);
   background:var(--s2);
