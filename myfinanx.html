@@ -1783,25 +1783,64 @@ function findPreviousMonthData() {
 /* ═══════════════════════════════
    GREETING
 ═══════════════════════════════ */
+function greetFinancialSub() {
+  const totalR = D.revenus.reduce((s,r) => s + r.amount, 0);
+  const depenses = D.expenses.filter(e => e.type !== 'income');
+  const totalE = depenses.reduce((s,e) => s + e.amount, 0);
+  const reste = totalR - totalE;
+  const tauxEpargne = totalR > 0 ? Math.round((reste / totalR) * 100) : 0;
+
+  // Aucune donnée saisie
+  if(totalR === 0 && totalE === 0)
+    return '💡 Commence par saisir tes revenus pour activer les conseils personnalisés.';
+
+  // Dans le rouge : dépenses > revenus
+  if(totalE > totalR && totalR > 0)
+    return `⚠️ Budget dépassé de ${fmt(totalE - totalR)} ce mois — revois tes dépenses.`;
+
+  // Postes budgétaires dépassés
+  const parCat = {};
+  depenses.forEach(e => { parCat[e.cat] = (parCat[e.cat] || 0) + e.amount; });
+  const dépassés = D.budget.filter(b => (parCat[b.name] || 0) > b.amount);
+  if(dépassés.length === 1)
+    return `⚠️ "${dépassés[0].name}" dépasse le budget — surveille tes dépenses.`;
+  if(dépassés.length > 1)
+    return `⚠️ ${dépassés.length} postes budgétaires dépassés — revois tes dépenses.`;
+
+  // Excellent taux d'épargne
+  if(tauxEpargne >= 20)
+    return `🎯 Taux d'épargne de ${tauxEpargne}% ce mois — excellent travail !`;
+
+  // Objectif presque atteint
+  const nearGoal = D.goals.find(g => g.target > 0 && g.saved / g.target >= 0.8 && g.saved < g.target);
+  if(nearGoal) {
+    const pct = Math.round((nearGoal.saved / nearGoal.target) * 100);
+    return `🏆 "${nearGoal.name}" à ${pct}% — encore un effort !`;
+  }
+
+  // Revenus saisis mais pas encore de dépenses
+  if(totalR > 0 && totalE === 0)
+    return '📋 Revenus enregistrés — pense à saisir tes dépenses du mois.';
+
+  // Reste positif
+  if(reste > 0)
+    return `💰 ${fmt(reste)} disponibles après dépenses — pense à tes objectifs d'épargne.`;
+
+  return '📊 Tes finances sont à jour — continue comme ça !';
+}
+
 function renderGreeting() {
   const wrap = document.getElementById('greet-wrap');
   if(!wrap) return;
   const hour = new Date().getHours();
-  let greet, emoji, sub;
-  if(hour >= 5 && hour < 12) {
-    greet = 'Bon matin'; emoji = '🌅';
-    sub = '☕ Bonne journée pour passer en revue ton budget !';
-  } else if(hour >= 12 && hour < 18) {
-    greet = 'Bon après-midi'; emoji = '⛅';
-    sub = '💡 À mi-journée — es-tu dans les clous de ton budget ?';
-  } else if(hour >= 18 && hour < 22) {
-    greet = 'Bonsoir'; emoji = '🌆';
-    sub = '📊 Bilan de journée — tes finances sont entre de bonnes mains.';
-  } else {
-    greet = 'Bonne nuit'; emoji = '🌙';
-    sub = '✨ Dors bien. Tes objectifs travaillent pour toi.';
-  }
+  let greet, emoji;
+  if(hour >= 5 && hour < 12)       { greet = 'Bon matin';      emoji = '🌅'; }
+  else if(hour >= 12 && hour < 18) { greet = 'Bon après-midi'; emoji = '⛅'; }
+  else if(hour >= 18 && hour < 22) { greet = 'Bonsoir';        emoji = '🌆'; }
+  else                              { greet = 'Bonne nuit';     emoji = '🌙'; }
+
   const name = localStorage.getItem(USER_KEY) || 'toi';
+  const sub  = greetFinancialSub();
   wrap.innerHTML = `
     <div class="greet-title">
       ${greet},&nbsp;<span class="greet-name" id="greet-name" onclick="editGreetName()" title="Clique pour modifier ton prénom">${esc(name)}</span>&nbsp;!&nbsp;<span class="greet-emoji">${emoji}</span>
