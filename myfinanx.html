@@ -2167,17 +2167,59 @@ async function sendAI() {
 
   const cur=getCur();
   const totalR=D.revenus.reduce((s,r)=>s+r.amount,0);
-  const revStr=D.revenus.map(r=>`${r.name}: ${fmt(r.amount)}`).join(', ');
   const totalB=D.budget.reduce((s,b)=>s+b.amount,0);
-  const totalE=D.expenses.filter(e=>e.type!=='income').reduce((s,e)=>s+e.amount,0);
-  const goalsS=D.goals.map(g=>`${g.name}: ${fmt(g.saved)}/${fmt(g.target)}`).join(', ');
+  const depenses=D.expenses.filter(e=>e.type!=='income');
+  const totalE=depenses.reduce((s,e)=>s+e.amount,0);
+  const restB=totalR-totalB;
+  const restE=totalR-totalE;
+  const tauxEpargne=totalR>0?Math.round((restE/totalR)*100):0;
+  const tauxBudget=totalR>0?Math.round((totalE/totalR)*100):0;
 
-  const sys=`Tu es un conseiller financier expert.
-Mois: ${MONTHS[M]} ${Y}. Devise d'affichage: ${cur.name} (${cur.symbol}).
-Revenus: ${revStr} → Total: ${fmt(totalR)}.
-Budget alloué: ${fmt(totalB)}. Dépenses réelles: ${fmt(totalE)}.
-Objectifs: ${goalsS}.
-Réponds en français, concis (max 150 mots), conseils actionnables et chiffrés.`;
+  // Dépenses réelles par catégorie
+  const parCat={};
+  depenses.forEach(e=>{parCat[e.cat]=(parCat[e.cat]||0)+e.amount;});
+
+  // Budget vs réel par poste
+  const budgetDetail=D.budget.map(b=>{
+    const real=parCat[b.name]||0;
+    const diff=b.amount-real;
+    const statut=diff<0?`DÉPASSÉ de ${fmt(Math.abs(diff))}`:diff===0?'exact':`reste ${fmt(diff)}`;
+    return `  • ${b.name}: budgeté ${fmt(b.amount)}, dépensé ${fmt(real)} → ${statut}`;
+  }).join('\n');
+
+  // Revenus détaillés
+  const revStr=D.revenus.map(r=>`  • ${r.name}: ${fmt(r.amount)}`).join('\n')||'  • Aucun revenu saisi';
+
+  // Objectifs détaillés
+  const goalsStr=D.goals.length?D.goals.map(g=>{
+    const pct=g.target>0?Math.round((g.saved/g.target)*100):0;
+    const dl=g.deadline?` — échéance: ${g.deadline}`:'';
+    return `  • ${g.name}: ${fmt(g.saved)} / ${fmt(g.target)} (${pct}%${dl})`;
+  }).join('\n'):'  • Aucun objectif défini';
+
+  const sys=`Tu es un conseiller financier personnel expert et bienveillant.
+Tu connais TOUTE la situation financière de l'utilisateur pour ${MONTHS[M]} ${Y}.
+Devise: ${cur.name} (${cur.symbol}).
+
+━━ REVENUS ━━
+${revStr}
+Total revenus: ${fmt(totalR)}
+
+━━ BUDGET PAR POSTE (budgeté vs réel) ━━
+${budgetDetail||'  • Aucun poste budgété'}
+Total alloué: ${fmt(totalB)} | Non alloué: ${fmt(restB)}
+
+━━ DÉPENSES RÉELLES ━━
+Total dépensé: ${fmt(totalE)} (${tauxBudget}% des revenus)
+Reste disponible: ${fmt(Math.max(0,restE))}
+Taux d'épargne implicite: ${tauxEpargne}%
+
+━━ OBJECTIFS D'ÉPARGNE ━━
+${goalsStr}
+
+INSTRUCTIONS: Réponds en français. Sois précis, chiffré et actionnable. Maximum 180 mots.
+Appuie-toi sur les données réelles ci-dessus pour personnaliser chaque conseil.
+Si l'utilisateur a des objectifs, intègre-les dans tes recommandations.`;
 
   try {
     const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},
