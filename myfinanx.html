@@ -566,7 +566,19 @@ nav::-webkit-scrollbar { display:none; }
   border-left:3px solid var(--pr); background:var(--ai-msg-bg); color:var(--pr-l);
 }
 .ai-msg.usr { border-left-color:var(--red-l); color:var(--red-l); background:var(--s2); }
-.ai-typ { color:var(--pr-l); font-size:.7rem; font-style:italic; }
+.ai-typ { display:flex; align-items:center; gap:5px; padding:12px 14px !important; }
+.ai-typ-dots { display:flex; gap:5px; align-items:center; }
+.ai-typ-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--pr-l); opacity:.9;
+  animation:typBounce .9s ease-in-out infinite;
+}
+.ai-typ-dot:nth-child(2) { animation-delay:.18s; }
+.ai-typ-dot:nth-child(3) { animation-delay:.36s; }
+@keyframes typBounce {
+  0%,80%,100% { transform:translateY(0); opacity:.4; }
+  40%         { transform:translateY(-6px); opacity:1; }
+}
 .ai-ir { display:flex; gap:6px; }
 .ai-ir input {
   flex:1; background:var(--ai-msg-bg); border:1px solid var(--ai-bdr);
@@ -2212,7 +2224,8 @@ async function sendAI() {
   renderAiMsg('user', esc(q));
   const tid='ty'+Date.now();
   const typDiv=document.createElement('div');
-  typDiv.className='ai-msg ai-typ'; typDiv.id=tid; typDiv.textContent='Analyse en cours…';
+  typDiv.className='ai-msg ai-typ'; typDiv.id=tid;
+  typDiv.innerHTML='<div class="ai-typ-dots"><div class="ai-typ-dot"></div><div class="ai-typ-dot"></div><div class="ai-typ-dot"></div></div>';
   msgs.appendChild(typDiv);
   msgs.scrollTop=msgs.scrollHeight;
 
