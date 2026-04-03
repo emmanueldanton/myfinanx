@@ -2180,10 +2180,10 @@ Objectifs: ${goalsS}.
 Réponds en français, concis (max 150 mots), conseils actionnables et chiffrés.`;
 
   try {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:q}]})});
+    const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:q,context:sys})});
     const data=await res.json();
-    const reply=data.content?.[0]?.text||'Pas de réponse.';
+    const reply=data.reply||'Pas de réponse.';
     document.getElementById(tid)?.remove();
     msgs.innerHTML+=`<div class="ai-msg">${reply.replace(/\n/g,'<br>')}</div>`;
   } catch(e) {
