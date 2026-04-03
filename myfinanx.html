@@ -666,6 +666,19 @@ nav::-webkit-scrollbar { display:none; }
 .dtdot.on { border-color:var(--dot-active); transform:scale(1.12); }
 .dtdot:active { transform:scale(0.92); }
 
+.drawer-data { display:flex; gap:8px; margin-top:12px; }
+.drawer-data-btn {
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:9px 10px; border-radius:var(--r2);
+  font-family:var(--fh); font-size:.72rem; font-weight:700;
+  cursor:pointer; border:1px solid var(--b2); background:var(--s2);
+  color:var(--muted); transition:.13s; -webkit-tap-highlight-color:transparent;
+}
+.drawer-data-btn svg { stroke:currentColor; flex-shrink:0; }
+.drawer-data-btn:hover { color:var(--text); border-color:var(--pr); background:var(--s1); }
+.drawer-data-btn:active { opacity:.7; }
+.drawer-data-btn.imp:hover { border-color:var(--green); color:var(--green); }
+
 /* ════ FAB ════ */
 .fab {
   display:none; position:fixed;
@@ -929,8 +942,20 @@ nav::-webkit-scrollbar { display:none; }
       <div class="dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
       <div class="dtdot on" data-theme="light" style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
     </div>
+    <div class="drawer-ft-lbl" style="margin-top:14px;">Données</div>
+    <div class="drawer-data">
+      <button class="drawer-data-btn" onclick="exportData()" title="Télécharger une sauvegarde JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exporter
+      </button>
+      <button class="drawer-data-btn imp" onclick="document.getElementById('import-input').click()" title="Restaurer depuis un fichier JSON">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Importer
+      </button>
+    </div>
   </div>
 </div>
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(this.files[0])">
 
 <!-- ════ TOP NAV ════ -->
 <nav id="top-nav">
@@ -2149,6 +2174,46 @@ function fmtDate(iso) {
   const [y, mo, d] = parts.map(Number);
   const MONTHS_SHORT = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
   return `${d} ${MONTHS_SHORT[mo-1]}`;
+}
+
+/* ═══════════════════════════════
+   EXPORT / IMPORT
+═══════════════════════════════ */
+function exportData() {
+  const backup = { _version:1, _date:new Date().toISOString() };
+  for(let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if(k && k.startsWith('monargent')) backup[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `myfinanx-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function importData(file) {
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if(typeof backup !== 'object' || Array.isArray(backup)) throw new Error();
+      let count = 0;
+      Object.entries(backup).forEach(([k,v]) => {
+        if(k.startsWith('monargent')) { localStorage.setItem(k, v); count++; }
+      });
+      if(count === 0) throw new Error();
+      location.reload();
+    } catch(err) {
+      alert('Fichier invalide.\nUtilise un fichier exporté depuis MyFinanx.');
+    }
+  };
+  reader.readAsText(file);
+  // Reset input pour pouvoir réimporter le même fichier
+  document.getElementById('import-input').value = '';
 }
 
 init();
