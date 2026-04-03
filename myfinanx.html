@@ -1323,9 +1323,13 @@ nav::-webkit-scrollbar { display:none; }
       </div>
       <div><h3>Conseiller financier IA</h3><p>Analyse ta situation en temps réel · Conseils personnalisés et chiffrés</p></div>
     </div>
-    <div class="ai-msgs" id="ai-msgs">
-      <div class="ai-msg">👋 Bonjour ! Je connais ta situation complète (revenus, budget, objectifs). Pose-moi n'importe quelle question sur ta gestion financière !</div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+      <button class="btn bg2 bsm" onclick="clearAiHistory()" title="Effacer la conversation">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Effacer
+      </button>
     </div>
+    <div class="ai-msgs" id="ai-msgs"></div>
     <div class="ai-ir">
       <input type="text" id="ai-q" placeholder="Ex: Comment rembourser ma dette plus vite ?" onkeydown="if(event.key==='Enter')sendAI()">
       <button class="ai-send" id="ai-btn" onclick="sendAI()">
@@ -1596,6 +1600,8 @@ function defaultData() {
 ═══════════════════════════════ */
 function key() { return `monargent_${Y}_${String(M+1).padStart(2,'0')}`; }
 const GOALS_KEY = 'monargent_goals';
+const AI_KEY    = 'monargent_ai_chat';
+let aiHistory   = [];
 
 function save() {
   // Donnees mensuelles (revenus, budget, depenses)
@@ -1680,6 +1686,9 @@ function init() {
 
   // 3. Charge les vraies données du mois (écrase le defaultData ci-dessus)
   loadMonth();
+
+  // 4. Charge l'historique de la conversation IA
+  loadAiHistory();
 }
 
 function changeMonth(d) {
@@ -2152,17 +2161,59 @@ function renderGoals() {
 }
 
 /* ═══════════════════════════════
-   AI
+   AI — HISTORIQUE
 ═══════════════════════════════ */
+const AI_WELCOME = '👋 Bonjour ! Je connais ta situation complète (revenus, budget, objectifs). Pose-moi n\'importe quelle question sur ta gestion financière !';
+
+function renderAiMsg(role, text) {
+  const msgs = document.getElementById('ai-msgs');
+  if(!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'ai-msg' + (role === 'user' ? ' usr' : '');
+  div.innerHTML = text.replace(/\n/g, '<br>');
+  msgs.appendChild(div);
+}
+
+function saveAiHistory() {
+  localStorage.setItem(AI_KEY, JSON.stringify(aiHistory));
+}
+
+function loadAiHistory() {
+  const msgs = document.getElementById('ai-msgs');
+  if(!msgs) return;
+  try {
+    const raw = localStorage.getItem(AI_KEY);
+    if(raw) {
+      aiHistory = JSON.parse(raw);
+      msgs.innerHTML = '';
+      aiHistory.forEach(m => renderAiMsg(m.role, m.text));
+      msgs.scrollTop = msgs.scrollHeight;
+      return;
+    }
+  } catch(e) { aiHistory = []; }
+  // Pas d'historique → message d'accueil
+  msgs.innerHTML = `<div class="ai-msg">${AI_WELCOME}</div>`;
+}
+
+function clearAiHistory() {
+  aiHistory = [];
+  localStorage.removeItem(AI_KEY);
+  const msgs = document.getElementById('ai-msgs');
+  if(msgs) msgs.innerHTML = `<div class="ai-msg">${AI_WELCOME}</div>`;
+}
+
 async function sendAI() {
   const inp=document.getElementById('ai-q');
   const q=inp.value.trim(); if(!q) return;
   const btn=document.getElementById('ai-btn');
   const msgs=document.getElementById('ai-msgs');
   btn.disabled=true; inp.value='';
-  msgs.innerHTML+=`<div class="ai-msg usr">${esc(q)}</div>`;
+  aiHistory.push({role:'user', text: esc(q)});
+  renderAiMsg('user', esc(q));
   const tid='ty'+Date.now();
-  msgs.innerHTML+=`<div class="ai-msg ai-typ" id="${tid}">Analyse en cours…</div>`;
+  const typDiv=document.createElement('div');
+  typDiv.className='ai-msg ai-typ'; typDiv.id=tid; typDiv.textContent='Analyse en cours…';
+  msgs.appendChild(typDiv);
   msgs.scrollTop=msgs.scrollHeight;
 
   const cur=getCur();
@@ -2227,7 +2278,9 @@ Si l'utilisateur a des objectifs, intègre-les dans tes recommandations.`;
     const data=await res.json();
     const reply=data.reply||'Pas de réponse.';
     document.getElementById(tid)?.remove();
-    msgs.innerHTML+=`<div class="ai-msg">${reply.replace(/\n/g,'<br>')}</div>`;
+    aiHistory.push({role:'ai', text: reply});
+    saveAiHistory();
+    renderAiMsg('ai', reply);
   } catch(e) {
     const el=document.getElementById(tid); if(el) el.textContent='⚠️ Erreur de connexion.';
   }
