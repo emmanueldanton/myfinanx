@@ -39,7 +39,7 @@
   --r2:  8px;
 }
 
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 html { scroll-behavior:smooth; }
 body {
   background:var(--bg); color:var(--text);
@@ -549,17 +549,19 @@ nav::-webkit-scrollbar { display:none; }
 .bnav-inner { display:flex; }
 .bnav-btn {
   flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-  padding:6px 4px; border:none; background:transparent; cursor:pointer;
+  padding:8px 4px; border:none; background:transparent; cursor:pointer;
   color:var(--muted); font-family:var(--fh); font-size:.55rem; font-weight:700;
-  transition:.14s; border-radius:var(--r2);
+  transition:.14s; border-radius:var(--r2); min-height:48px;
+  -webkit-tap-highlight-color:transparent;
 }
 .bnav-btn svg { stroke:currentColor; transition:.14s; }
 .bnav-btn.active { color:var(--pr-l); }
 .bnav-btn.active svg { filter:drop-shadow(0 0 5px var(--pr)); }
+.bnav-btn:active { opacity:.7; }
 
 /* FAB */
 .fab {
-  display:none; position:fixed; bottom:72px; right:16px; z-index:200;
+  display:none; position:fixed; bottom:calc(72px + env(safe-area-inset-bottom)); right:16px; z-index:200;
   width:46px; height:46px; border-radius:50%;
   background:var(--red); color:#fff; border:none; cursor:pointer;
   box-shadow:0 4px 18px rgba(196,58,58,.5);
@@ -567,12 +569,13 @@ nav::-webkit-scrollbar { display:none; }
 }
 .fab svg { stroke:#fff; }
 .fab:hover { transform:scale(1.08); }
+.fab:active { transform:scale(0.96); }
 
 @media(max-width:620px){
   .bottom-nav { display:block; }
   .fab { display:flex; }
   nav { display:none; }
-  .wrap { padding-bottom:82px; }
+  .wrap { padding-bottom:calc(82px + env(safe-area-inset-bottom)); }
 }
 
 /* ════ OVERVIEW DASHBOARD ════ */
@@ -690,6 +693,7 @@ nav::-webkit-scrollbar { display:none; }
 .ov-see-all:hover { background:var(--s2); }
 .ov-see-all svg { stroke:var(--pr-l); }
 
+.cur-note {
   display:inline-flex; align-items:center; gap:5px;
   font-size:.64rem; color:var(--muted); margin-top:5px;
 }
@@ -1415,13 +1419,19 @@ function changeMonth(d) {
 function goTab(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if(btn) btn.classList.add('active');
-  else document.querySelectorAll('.tab').forEach(t=>{
-    if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+id+"'")) t.classList.add('active');
-  });
+  const page = document.getElementById('page-'+id);
+  if(page) page.classList.add('active');
+  if(btn) {
+    btn.classList.add('active');
+  } else {
+    document.querySelectorAll('.tab').forEach(t=>{
+      const oc = t.getAttribute('onclick');
+      if(oc && oc.includes("'"+id+"'")) t.classList.add('active');
+    });
+  }
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
   const bn=document.getElementById('bn-'+id); if(bn) bn.classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function goTabMobile(id) { goTab(id, null); }
