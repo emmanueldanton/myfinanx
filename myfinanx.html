@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="icon.png">
 
 <!-- ═══ SEO ═══ -->
-<title>MyFinanx · Gestion de budget personnel</title>
+<title>MyFinanx — Gestion de budget personnel</title>
 <meta name="description" content="MyFinanx — Suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil. Dashboard financier personnel, gratuit et sans inscription.">
 <meta name="keywords" content="budget, finances personnelles, gestion argent, épargne, dépenses, revenus, dashboard financier">
 <meta name="author" content="Emmanuel Danton">
@@ -58,6 +58,18 @@
   --muted:   #6880aa;
   --faint:   #2a3a5c;
 
+  /* Theme-aware variables */
+  --header-bg:   rgba(9,14,26,.93);
+  --shadow-lg:   rgba(0,0,0,.5);
+  --grad1:       rgba(77,120,212,.09);
+  --grad2:       rgba(196,58,58,.055);
+  --ai-bg1:      #090f22;
+  --ai-bg2:      #0f0e2c;
+  --ai-bdr:      #1b2260;
+  --ai-msg-bg:   rgba(6,10,30,.6);
+  --ai-msg-col:  #4458a0;
+  --dot-active:  rgba(255,255,255,.7);
+
   --fh: 'Gabarito', sans-serif;
   --fb: 'DM Sans', sans-serif;
   --r:  12px;
@@ -74,8 +86,9 @@ body {
 body::before {
   content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
   background:
-    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(77,120,212,.09) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 40% at 0% 100%, rgba(196,58,58,.055) 0%, transparent 50%);
+    radial-gradient(ellipse 70% 50% at 80% 0%, var(--grad1) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 40% at 0% 100%, var(--grad2) 0%, transparent 50%);
+  transition: background .3s ease;
 }
 
 /* ─── SVG ICON HELPER ─── */
@@ -85,26 +98,25 @@ body::before {
 /* ════ HEADER ════ */
 header {
   position:sticky; top:0; z-index:100;
-  background:rgba(9,14,26,.93); backdrop-filter:blur(24px);
+  background:var(--header-bg); backdrop-filter:blur(24px);
   border-bottom:1px solid var(--b1);
   padding:0 20px; height:56px;
   display:flex; align-items:center; gap:10px;
+  transition: background .3s ease, border-color .3s ease;
 }
 .brand {
   display:flex; align-items:center; gap:8px;
   font-family:var(--fh); font-size:.97rem; font-weight:800;
-  white-space:nowrap; flex-shrink:0; margin-right:auto;
+  white-space:nowrap; flex-shrink:0; margin-right:auto; min-width:0;
 }
 .brand-ico {
   width:30px; height:30px; border-radius:9px;
-  background:linear-gradient(135deg, var(--pr), var(--pr-l));
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 0 14px rgba(77,120,212,.38); flex-shrink:0;
+  flex-shrink:0; overflow:hidden;
 }
-.brand-ico svg { stroke:#fff; }
-.brand-sep { color:var(--pr-l); opacity:.5; margin:0 1px; }
-.brand-sub { color:var(--pr-l); font-weight:600; }
-@media(max-width:400px){ .brand-sep, .brand-sub { display:none; } }
+.brand-ico img { width:30px; height:30px; object-fit:cover; border-radius:9px; display:block; }
+.brand-name { color:var(--text); }
+@media(max-width:440px){ .brand-name { display:none; } }
 
 /* Month nav */
 .month-nav { display:flex; align-items:center; gap:5px; flex-shrink:0; }
@@ -120,7 +132,8 @@ header {
   font-family:var(--fh); font-size:.8rem; font-weight:700;
   color:var(--pr-l); min-width:106px; text-align:center;
 }
-@media(max-width:360px){ #ml { min-width:72px; font-size:.72rem; } }
+@media(max-width:480px){ #ml { min-width:88px; font-size:.75rem; } }
+@media(max-width:360px){ #ml { min-width:70px; font-size:.7rem; } }
 
 /* Currency picker */
 .cur-pick {
@@ -140,7 +153,7 @@ header {
   display:none; position:absolute; top:calc(100% + 6px); right:0;
   background:var(--s1); border:1px solid var(--b1);
   border-radius:var(--r); min-width:180px;
-  box-shadow:0 12px 32px rgba(0,0,0,.5); z-index:200;
+  box-shadow:0 12px 32px var(--shadow-lg); z-index:200;
   overflow:hidden;
 }
 .cur-pick.open .cur-dropdown { display:block; animation:fadeDown .16s ease; }
@@ -160,12 +173,12 @@ header {
 
 /* Theme dots */
 .theme-dots { display:flex; gap:5px; align-items:center; flex-shrink:0; }
-@media(max-width:520px){ .theme-dots { display:none; } }
 .tdot {
   width:16px; height:16px; border-radius:50%; cursor:pointer;
   border:2px solid transparent; transition:.15s;
 }
-.tdot.on { border-color:rgba(255,255,255,.7); transform:scale(1.15); }
+.tdot.on { border-color:var(--dot-active); transform:scale(1.15); }
+@media(max-width:620px){ .theme-dots { display:none; } } /* Accessible via le drawer */
 
 /* Chip */
 .chip {
@@ -173,7 +186,13 @@ header {
   background:rgba(77,120,212,.1); color:var(--pr-l);
   border:1px solid rgba(77,120,212,.22); font-weight:500; white-space:nowrap; flex-shrink:0;
 }
-@media(max-width:460px){ .chip { display:none; } }
+@media(max-width:620px){ .chip { display:none; } }
+
+/* Currency — icône globe cachée sur mobile */
+@media(max-width:380px){
+  .cur-btn svg:first-child { display:none; }
+  .cur-btn { padding:5px 8px; }
+}
 
 /* ════ NAV TABS ════ */
 nav {
@@ -521,8 +540,9 @@ nav::-webkit-scrollbar { display:none; }
 
 /* ════ AI ════ */
 .ai-box {
-  background:linear-gradient(135deg, #090f22, #0f0e2c);
-  border:1px solid #1b2260; border-radius:var(--r); padding:20px;
+  background:linear-gradient(135deg, var(--ai-bg1), var(--ai-bg2));
+  border:1px solid var(--ai-bdr); border-radius:var(--r); padding:20px;
+  transition: background .3s ease, border-color .3s ease;
 }
 .ai-hd { display:flex; align-items:center; gap:10px; margin-bottom:13px; }
 .ai-av {
@@ -533,7 +553,7 @@ nav::-webkit-scrollbar { display:none; }
 }
 .ai-av svg { stroke:#fff; }
 .ai-hd h3 { font-family:var(--fh); font-size:.9rem; font-weight:800; color:var(--pr-l); }
-.ai-hd p { font-size:.65rem; color:#4458a0; margin-top:2px; }
+.ai-hd p { font-size:.65rem; color:var(--ai-msg-col); margin-top:2px; }
 .ai-msgs {
   min-height:110px; max-height:270px; overflow-y:auto;
   display:flex; flex-direction:column; gap:8px; margin-bottom:10px;
@@ -543,13 +563,13 @@ nav::-webkit-scrollbar { display:none; }
 .ai-msgs::-webkit-scrollbar-thumb { background:var(--b2); border-radius:99px; }
 .ai-msg {
   border-radius:9px; padding:10px 12px; font-size:.78rem; line-height:1.65;
-  border-left:3px solid var(--pr); background:rgba(6,10,30,.6); color:var(--pr-l);
+  border-left:3px solid var(--pr); background:var(--ai-msg-bg); color:var(--pr-l);
 }
-.ai-msg.usr { border-left-color:var(--red-l); color:var(--red-l); background:rgba(20,5,5,.4); }
+.ai-msg.usr { border-left-color:var(--red-l); color:var(--red-l); background:var(--s2); }
 .ai-typ { color:var(--pr-l); font-size:.7rem; font-style:italic; }
 .ai-ir { display:flex; gap:6px; }
 .ai-ir input {
-  flex:1; background:rgba(6,10,30,.55); border:1px solid #1b2260;
+  flex:1; background:var(--ai-msg-bg); border:1px solid var(--ai-bdr);
   color:var(--text); border-radius:var(--r2);
   padding:9px 12px; font-size:.82rem; font-family:var(--fb); outline:none; transition:.15s; min-width:0;
 }
@@ -564,43 +584,110 @@ nav::-webkit-scrollbar { display:none; }
 .ai-send:hover { background:var(--pr-l); }
 .ai-send:disabled { opacity:.4; cursor:not-allowed; }
 
-/* ════ BOTTOM NAV (mobile) ════ */
-.bottom-nav {
-  display:none; position:fixed; bottom:0; left:0; right:0; z-index:150;
-  background:rgba(9,14,26,.97); backdrop-filter:blur(22px);
-  border-top:1px solid var(--b1);
-  padding:5px 0 calc(5px + env(safe-area-inset-bottom));
+/* ════ HAMBURGER BUTTON ════ */
+.hbg-btn {
+  display:none; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:var(--r2);
+  background:var(--s1); border:1px solid var(--b1);
+  color:var(--text); cursor:pointer; flex-shrink:0; transition:.15s;
 }
-.bnav-inner { display:flex; }
-.bnav-btn {
-  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-  padding:8px 4px; border:none; background:transparent; cursor:pointer;
-  color:var(--muted); font-family:var(--fh); font-size:.55rem; font-weight:700;
-  transition:.14s; border-radius:var(--r2); min-height:48px;
+.hbg-btn svg { stroke:currentColor; }
+.hbg-btn:hover { background:var(--b1); }
+.hbg-btn:active { opacity:.7; }
+
+/* ════ DRAWER ════ */
+.drawer-overlay {
+  display:none; position:fixed; inset:0; z-index:300;
+  background:rgba(0,0,0,.45); backdrop-filter:blur(3px);
+  animation:none;
+}
+.drawer-overlay.open { display:block; animation:fadeIn .2s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.drawer {
+  position:fixed; top:0; left:0; bottom:0; z-index:301;
+  width:min(288px, 84vw);
+  background:var(--s0); border-right:1px solid var(--b1);
+  display:flex; flex-direction:column;
+  transform:translateX(-100%);
+  transition:transform .26s cubic-bezier(.4,0,.2,1);
+  padding-top:env(safe-area-inset-top);
+  box-shadow:4px 0 32px rgba(0,0,0,.22);
+}
+.drawer.open { transform:translateX(0); }
+
+.drawer-hd {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 16px 14px; border-bottom:1px solid var(--b1); flex-shrink:0;
+}
+.drawer-brand {
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--fh); font-size:.92rem; font-weight:800; color:var(--text);
+}
+.drawer-brand img { width:26px; height:26px; border-radius:7px; object-fit:cover; }
+.drawer-close {
+  background:none; border:none; color:var(--muted);
+  cursor:pointer; padding:5px; border-radius:6px; display:flex; transition:.12s;
+}
+.drawer-close svg { stroke:currentColor; }
+.drawer-close:hover { color:var(--text); background:var(--s2); }
+
+.drawer-nav {
+  flex:1; padding:10px 10px; display:flex; flex-direction:column; gap:3px;
+  overflow-y:auto;
+}
+.drawer-item {
+  display:flex; align-items:center; gap:13px;
+  padding:13px 14px; border-radius:var(--r2);
+  font-family:var(--fh); font-size:.84rem; font-weight:700;
+  cursor:pointer; border:none; background:transparent;
+  color:var(--muted); transition:.13s; text-align:left; width:100%;
   -webkit-tap-highlight-color:transparent;
 }
-.bnav-btn svg { stroke:currentColor; transition:.14s; }
-.bnav-btn.active { color:var(--pr-l); }
-.bnav-btn.active svg { filter:drop-shadow(0 0 5px var(--pr)); }
-.bnav-btn:active { opacity:.7; }
+.drawer-item svg { stroke:currentColor; flex-shrink:0; opacity:.8; }
+.drawer-item.active { background:var(--pr); color:#fff; }
+.drawer-item.active svg { opacity:1; }
+.drawer-item:hover:not(.active) { background:var(--s2); color:var(--text); }
+.drawer-item:active { opacity:.75; }
 
-/* FAB */
+.drawer-ft {
+  padding:14px 16px; border-top:1px solid var(--b1); flex-shrink:0;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom));
+}
+.drawer-ft-lbl {
+  font-size:.6rem; color:var(--muted); font-family:var(--fh);
+  font-weight:700; text-transform:uppercase; letter-spacing:.12em; margin-bottom:9px;
+}
+.drawer-themes { display:flex; gap:9px; align-items:center; }
+.dtdot {
+  width:22px; height:22px; border-radius:50%; cursor:pointer;
+  border:2px solid transparent; transition:.15s;
+}
+.dtdot.on { border-color:var(--dot-active); transform:scale(1.12); }
+.dtdot:active { transform:scale(0.92); }
+
+/* ════ FAB ════ */
 .fab {
-  display:none; position:fixed; bottom:calc(72px + env(safe-area-inset-bottom)); right:16px; z-index:200;
-  width:46px; height:46px; border-radius:50%;
-  background:var(--red); color:#fff; border:none; cursor:pointer;
-  box-shadow:0 4px 18px rgba(196,58,58,.5);
+  display:none; position:fixed;
+  bottom:calc(16px + env(safe-area-inset-bottom)); right:16px; z-index:200;
+  width:50px; height:50px; border-radius:50%;
+  background:var(--pr); color:#fff; border:none; cursor:pointer;
+  box-shadow:0 4px 18px rgba(77,120,212,.45);
   align-items:center; justify-content:center; transition:.15s;
+  -webkit-tap-highlight-color:transparent;
 }
 .fab svg { stroke:#fff; }
 .fab:hover { transform:scale(1.08); }
-.fab:active { transform:scale(0.96); }
+.fab:active { transform:scale(0.94); }
+
+/* ════ BOTTOM NAV (mobile) — désactivé ════ */
+.bottom-nav { display:none !important; }
 
 @media(max-width:620px){
-  .bottom-nav { display:block; }
+  .hbg-btn { display:flex; }
   .fab { display:flex; }
   nav { display:none; }
-  .wrap { padding-bottom:calc(82px + env(safe-area-inset-bottom)); }
+  .wrap { padding-bottom:calc(32px + env(safe-area-inset-bottom)); }
 }
 
 /* ════ OVERVIEW DASHBOARD ════ */
@@ -729,11 +816,14 @@ nav::-webkit-scrollbar { display:none; }
 
 <!-- ════ HEADER ════ -->
 <header>
+  <button class="hbg-btn" onclick="toggleDrawer()" aria-label="Menu">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
   <div class="brand">
     <div class="brand-ico">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <img src="icon.png" width="30" height="30" alt="MyFinanx">
     </div>
-    Mon argent <span class="brand-sep">&nbsp;·&nbsp;</span><span class="brand-sub">Dashboard</span>
+    <span class="brand-name">MyFinanx</span>
   </div>
 
   <!-- Month nav -->
@@ -790,12 +880,57 @@ nav::-webkit-scrollbar { display:none; }
 
   <!-- Theme dots -->
   <div class="theme-dots">
-    <div class="tdot on" style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')" title="Midnight Blue"></div>
-    <div class="tdot" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
+    <div class="tdot"    data-theme="blue"   style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')"   title="Midnight Blue"></div>
+    <div class="tdot"    data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
+    <div class="tdot on" data-theme="light"  style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
   </div>
 
   <div class="chip" id="chip">✓ Sauvegardé</div>
 </header>
+
+<!-- ════ DRAWER (mobile) ════ -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-hd">
+    <div class="drawer-brand">
+      <img src="icon.png" width="26" height="26" alt="MyFinanx">
+      MyFinanx
+    </div>
+    <button class="drawer-close" onclick="toggleDrawer(false)" aria-label="Fermer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-nav">
+    <button class="drawer-item active" id="di-overview" onclick="goTab('overview',null);toggleDrawer(false)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Vue globale
+    </button>
+    <button class="drawer-item" id="di-budget" onclick="goTab('budget',null);toggleDrawer(false)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Budget
+    </button>
+    <button class="drawer-item" id="di-tracker" onclick="goTab('tracker',null);toggleDrawer(false)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      Dépenses
+    </button>
+    <button class="drawer-item" id="di-goals" onclick="goTab('goals',null);toggleDrawer(false)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      Objectifs
+    </button>
+    <button class="drawer-item" id="di-ai" onclick="goTab('ai',null);toggleDrawer(false)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Conseils IA
+    </button>
+  </div>
+  <div class="drawer-ft">
+    <div class="drawer-ft-lbl">Thème</div>
+    <div class="drawer-themes">
+      <div class="dtdot" data-theme="blue"   style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')"   title="Midnight Blue"></div>
+      <div class="dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
+      <div class="dtdot on" data-theme="light" style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ════ TOP NAV ════ -->
 <nav id="top-nav">
@@ -1212,6 +1347,10 @@ function toggleCurDrop() {
 document.addEventListener('click', e => {
   if(!e.target.closest('#curPick')) document.getElementById('curPick').classList.remove('open');
 });
+// Close drawer on Escape
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') toggleDrawer(false);
+});
 
 function setCurrency(code) {
   activeCur = code;
@@ -1257,21 +1396,61 @@ const THEMES = {
     '--bg':'#090E1A','--s0':'#0f1624','--s1':'#162038','--s2':'#1c2a48',
     '--b1':'#243660','--b2':'#2e4478',
     '--pr':'#4D78D4','--pr-l':'#7BA3F0','--pr-d':'#3560b8',
+    '--text':'#e8efff','--muted':'#6880aa','--faint':'#2a3a5c',
+    '--red':'#C43A3A','--red-l':'#e87a7a',
+    '--green':'#34d399','--gold':'#f59e0b','--violet':'#a78bfa',
+    '--header-bg':'rgba(9,14,26,.93)','--shadow-lg':'rgba(0,0,0,.5)',
+    '--grad1':'rgba(77,120,212,.09)','--grad2':'rgba(196,58,58,.055)',
+    '--ai-bg1':'#090f22','--ai-bg2':'#0f0e2c','--ai-bdr':'#1b2260',
+    '--ai-msg-bg':'rgba(6,10,30,.6)','--ai-msg-col':'#4458a0',
+    '--dot-active':'rgba(255,255,255,.7)',
   },
   violet: {
     '--bg':'#0C0A10','--s0':'#130f1a','--s1':'#1c1428','--s2':'#241c34',
     '--b1':'#3a2d56','--b2':'#4a3a6a',
     '--pr':'#7A6BC4','--pr-l':'#a897e8','--pr-d':'#5a4fb0',
-  }
+    '--text':'#ede8ff','--muted':'#7868a8','--faint':'#2e2248',
+    '--red':'#C43A3A','--red-l':'#e87a7a',
+    '--green':'#34d399','--gold':'#f59e0b','--violet':'#a78bfa',
+    '--header-bg':'rgba(12,10,16,.93)','--shadow-lg':'rgba(0,0,0,.5)',
+    '--grad1':'rgba(122,107,196,.09)','--grad2':'rgba(196,58,58,.055)',
+    '--ai-bg1':'#0d0a1a','--ai-bg2':'#150d2e','--ai-bdr':'#2d1a5e',
+    '--ai-msg-bg':'rgba(10,6,24,.6)','--ai-msg-col':'#5040a0',
+    '--dot-active':'rgba(255,255,255,.7)',
+  },
+  light: {
+    '--bg':'#f0f4ff','--s0':'#e4eaf8','--s1':'#ffffff','--s2':'#f5f7ff',
+    '--b1':'#cdd5ee','--b2':'#b8c4e4',
+    '--pr':'#4D78D4','--pr-l':'#2a5bc4','--pr-d':'#1a4ab0',
+    '--text':'#1a2440','--muted':'#5a6a9a','--faint':'#c8d4f0',
+    '--red':'#b83030','--red-l':'#b83030',
+    '--green':'#1a9c6e','--gold':'#c97a00','--violet':'#7c3aed',
+    '--header-bg':'rgba(240,244,255,.95)','--shadow-lg':'rgba(80,100,180,.18)',
+    '--grad1':'rgba(77,120,212,.06)','--grad2':'rgba(196,58,58,.03)',
+    '--ai-bg1':'#eef2ff','--ai-bg2':'#f0eeff','--ai-bdr':'#c4d0f8',
+    '--ai-msg-bg':'rgba(230,236,255,.8)','--ai-msg-col':'#6070c0',
+    '--dot-active':'rgba(0,0,0,.45)',
+  },
 };
 
 function setTheme(name) {
-  const t = THEMES[name] || THEMES.blue;
+  const t = THEMES[name] || THEMES.light;
   Object.entries(t).forEach(([k,v]) => document.documentElement.style.setProperty(k, v));
-  document.querySelectorAll('.tdot').forEach((el,i) => {
-    el.classList.toggle('on', (i===0&&name==='blue')||(i===1&&name==='violet'));
+  // Sync all theme dots (header + drawer)
+  document.querySelectorAll('.tdot, .dtdot').forEach(el => {
+    el.classList.toggle('on', el.dataset.theme === name);
   });
   localStorage.setItem('monargent-theme', name);
+}
+
+function toggleDrawer(open) {
+  const overlay = document.getElementById('drawer-overlay');
+  const drawer  = document.getElementById('drawer');
+  if(!overlay || !drawer) return;
+  const isOpen = (open !== undefined) ? open : !drawer.classList.contains('open');
+  overlay.classList.toggle('open', isOpen);
+  drawer.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 }
 
 /* ═══════════════════════════════
@@ -1427,7 +1606,7 @@ function init() {
   updateCatSel();
 
   // 2. Préférences (setCurrency appelle renderAll, Y/M/D doivent être prêts)
-  setTheme(localStorage.getItem('monargent-theme') || 'blue');
+  setTheme(localStorage.getItem('monargent-theme') || 'light');
   const savedCur = localStorage.getItem('monargent-cur') || 'XOF';
   setCurrency(savedCur);
 
@@ -1454,8 +1633,10 @@ function goTab(id, btn) {
       if(oc && oc.includes("'"+id+"'")) t.classList.add('active');
     });
   }
-  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
-  const bn=document.getElementById('bn-'+id); if(bn) bn.classList.add('active');
+  // Sync drawer items
+  document.querySelectorAll('.drawer-item').forEach(el => {
+    el.classList.toggle('active', el.id === 'di-'+id);
+  });
   window.scrollTo(0, 0);
 }
 
