@@ -1487,7 +1487,7 @@ nav::-webkit-scrollbar { display:none; }
     <div id="rev-rows"></div>
     <div class="arf">
       <input class="an" type="text" id="nr-n" placeholder="Nouvelle source…">
-      <input class="aa" type="number" id="nr-a" placeholder="0" min="0" step="1" onkeydown="if(event.key==='Enter')addRev()">
+      <input class="aa" type="text" inputmode="decimal" id="nr-a" placeholder="0" onkeydown="if(event.key==='Enter')addRev()">
       <button class="btn bp bsm" onclick="addRev()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Ajouter
@@ -1513,7 +1513,7 @@ nav::-webkit-scrollbar { display:none; }
     <div id="bud-rows"></div>
     <div class="arf">
       <input type="text" id="nb-n" placeholder="Nouveau poste…" class="an">
-      <input class="aa" type="number" id="nb-a" placeholder="0" min="0" step="1" onkeydown="if(event.key==='Enter')addBud()">
+      <input class="aa" type="text" inputmode="decimal" id="nb-a" placeholder="0" onkeydown="if(event.key==='Enter')addBud()">
       <button class="btn bp bsm" onclick="addBud()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Ajouter
@@ -1562,7 +1562,7 @@ nav::-webkit-scrollbar { display:none; }
       <div class="field"><label>Catégorie</label><select id="tx-c"></select></div>
       <div class="field">
         <label>Montant (<span id="tx-cur-lbl">€</span>)</label>
-        <div class="fw"><span class="cur-sym" id="tx-cur-sym">€</span><input type="number" id="tx-a" placeholder="0.00" min="0" step="0.01" onkeydown="if(event.key==='Enter')addTx()"></div>
+        <div class="fw"><span class="cur-sym" id="tx-cur-sym">€</span><input type="text" inputmode="decimal" id="tx-a" placeholder="0.00" onkeydown="if(event.key==='Enter')addTx()"></div>
       </div>
       <div class="field"><label>Date</label><input type="date" id="tx-dt"></div>
       <button class="btn bp" onclick="addTx()">
@@ -1621,8 +1621,8 @@ nav::-webkit-scrollbar { display:none; }
     <div class="g2" style="margin-bottom:11px;">
       <div class="field"><label>Nom de l'objectif</label><input type="text" id="ng-n" placeholder="Ex: Caution appartement"></div>
       <div class="field"><label>Échéance</label><input type="text" id="ng-d" placeholder="Ex: Sept. 2026"></div>
-      <div class="field"><label>Montant cible</label><input type="number" id="ng-t" placeholder="1 800"></div>
-      <div class="field"><label>Déjà épargné</label><input type="number" id="ng-c" placeholder="0"></div>
+      <div class="field"><label>Montant cible</label><input type="text" inputmode="decimal" id="ng-t" placeholder="1 800"></div>
+      <div class="field"><label>Déjà épargné</label><input type="text" inputmode="decimal" id="ng-c" placeholder="0"></div>
     </div>
     <div style="margin-bottom:11px;">
       <div style="font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fh);margin-bottom:6px;">Couleur</div>
@@ -1864,6 +1864,10 @@ function toDisplay(eurAmount) {
 // Convert from display currency to EUR (for storage)
 function fromDisplay(amount) {
   return amount / getCur().rate;
+}
+// Parse un montant saisi (accepte virgule ou point comme séparateur décimal)
+function parseAmt(str) {
+  return parseFloat(String(str).replace(',', '.')) || 0;
 }
 
 function fmt(eurAmount) {
@@ -2345,9 +2349,9 @@ function renderRevRows() {
     return `<div class="rev-row">
       <div class="rn"><input type="text" value="${esc(r.name)}" placeholder="Source"
         oninput="D.revenus.find(x=>x.id==='${r.id}').name=this.value;save()"></div>
-      <div class="ra"><input type="number" value="${displayAmt}" min="0" step="1"
+      <div class="ra"><input type="text" inputmode="decimal" value="${displayAmt}"
         style="color:${COLS[i%COLS.length]}"
-        oninput="D.revenus.find(x=>x.id==='${r.id}').amount=fromDisplay(parseFloat(this.value)||0);recalc();save()"></div>
+        oninput="D.revenus.find(x=>x.id==='${r.id}').amount=fromDisplay(parseAmt(this.value));recalc();save()"></div>
       <div class="row-del"><button onclick="delRev('${r.id}')" title="Supprimer">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button></div>
@@ -2359,7 +2363,7 @@ function delRev(id) { D.revenus=D.revenus.filter(r=>r.id!==id); renderRevRows();
 
 function addRev() {
   const n = document.getElementById('nr-n').value.trim() || 'Revenu';
-  const a = fromDisplay(parseFloat(document.getElementById('nr-a').value)||0);
+  const a = fromDisplay(parseAmt(document.getElementById('nr-a').value));
   D.revenus.push({id:uid(), name:n, amount:a});
   document.getElementById('nr-n').value=''; document.getElementById('nr-a').value='';
   renderRevRows(); recalc(); save();
@@ -2379,8 +2383,8 @@ function renderBudRows() {
       <div class="b-ico-wrap" title="Catégorie">${ico}</div>
       <div class="bn"><input type="text" value="${esc(b.name)}" placeholder="Nom du poste"
         oninput="D.budget.find(x=>x.id==='${b.id}').name=this.value;renderBudRows();save()"></div>
-      <div class="ba"><input type="number" value="${displayAmt}" min="0" step="1"
-        oninput="D.budget.find(x=>x.id==='${b.id}').amount=fromDisplay(parseFloat(this.value)||0);recalc();save()"></div>
+      <div class="ba"><input type="text" inputmode="decimal" value="${displayAmt}"
+        oninput="D.budget.find(x=>x.id==='${b.id}').amount=fromDisplay(parseAmt(this.value));recalc();save()"></div>
       <div class="bp3">${pct}%</div>
       <div class="row-del"><button onclick="delBud('${b.id}')" title="Supprimer">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -2393,7 +2397,7 @@ function delBud(id) { D.budget=D.budget.filter(b=>b.id!==id); renderBudRows(); r
 
 function addBud() {
   const n = document.getElementById('nb-n').value.trim() || 'Nouveau poste';
-  const a = fromDisplay(parseFloat(document.getElementById('nb-a').value)||0);
+  const a = fromDisplay(parseAmt(document.getElementById('nb-a').value));
   D.budget.push({id:uid(), name:n, amount:a});
   document.getElementById('nb-n').value=''; document.getElementById('nb-a').value='';
   renderBudRows(); recalc(); save();
@@ -2618,7 +2622,7 @@ function updateCatSel() {
 function addTx() {
   const desc   = document.getElementById('tx-d').value.trim();
   const cat    = document.getElementById('tx-c').value;
-  const dispAmt= parseFloat(document.getElementById('tx-a').value);
+  const dispAmt= parseAmt(document.getElementById('tx-a').value);
   const date   = document.getElementById('tx-dt').value || new Date().toISOString().slice(0,10);
   if(!desc||!dispAmt||dispAmt<=0){
     const a=document.getElementById('tx-a');
@@ -2702,8 +2706,8 @@ function selC(el) { document.querySelectorAll('.sw').forEach(s=>s.classList.remo
 
 function addGoal() {
   const n=document.getElementById('ng-n').value.trim();
-  const t=fromDisplay(parseFloat(document.getElementById('ng-t').value)||0);
-  const s=fromDisplay(parseFloat(document.getElementById('ng-c').value)||0);
+  const t=fromDisplay(parseAmt(document.getElementById('ng-t').value));
+  const s=fromDisplay(parseAmt(document.getElementById('ng-c').value));
   const d=document.getElementById('ng-d').value.trim();
   if(!n||t<=0) return;
   D.goals.push({id:uid(),name:n,target:t,saved:s,deadline:d,color:gColor});
@@ -2714,7 +2718,7 @@ function addGoal() {
 function addToGoal(id, prefix='') {
   const inp=document.getElementById(prefix+'ga-'+id);
   if(!inp) return;
-  const a=fromDisplay(parseFloat(inp.value)||0);
+  const a=fromDisplay(parseAmt(inp.value));
   if(a<=0) return;
   const g=D.goals.find(g=>g.id===id);
   if(g){g.saved=Math.min(g.target,g.saved+a);inp.value='';}
@@ -2755,7 +2759,7 @@ function buildGoalCard(g, prefix) {
       <div class="gtgt">/ ${fmt(g.target)}</div>
     </div>
     <div class="gadd">
-      <input type="number" id="${inputId}" placeholder="Ajouter un montant…" min="0" step="1"
+      <input type="text" inputmode="decimal" id="${inputId}" placeholder="Ajouter un montant…"
              onkeydown="if(event.key==='Enter')addToGoal('${g.id}','${prefix}')">
       <button class="btn bp bsm" onclick="addToGoal('${g.id}','${prefix}')">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
