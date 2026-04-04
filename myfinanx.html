@@ -79,13 +79,14 @@
   --fb: 'DM Sans', sans-serif;
   --r:  12px;
   --r2:  8px;
+  --logo-bg: #162038;
 }
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-html { scroll-behavior:smooth; overflow-x:hidden; }
+html { scroll-behavior:smooth; overflow-x:hidden; font-size:14px; }
 body {
   background:var(--bg); color:var(--text);
-  font-family:var(--fb); font-size:14px; min-height:100vh;
+  font-family:var(--fb); font-size:13px; min-height:100vh;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
@@ -178,6 +179,7 @@ header {
 }
 .brand-ico {
   width:30px; height:30px; border-radius:9px;
+  background:var(--logo-bg);
   display:flex; align-items:center; justify-content:center;
   flex-shrink:0; overflow:hidden;
 }
@@ -1117,7 +1119,7 @@ nav::-webkit-scrollbar { display:none; }
   <button class="hbg-btn" onclick="toggleDrawer()" aria-label="Menu">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
-  <div class="brand">
+  <div class="brand" onclick="goTab('overview',null)" style="cursor:pointer">
     <div class="brand-ico">
       <img src="icon.png" width="30" height="30" alt="MyFinanx">
     </div>
@@ -1864,7 +1866,7 @@ const THEMES = {
     '--ai-bg1':'#090f22','--ai-bg2':'#0f0e2c','--ai-bdr':'#1b2260',
     '--ai-msg-bg':'rgba(6,10,30,.6)','--ai-msg-col':'#4458a0',
     '--dot-active':'rgba(255,255,255,.7)',
-    '--chat-bg':'#0c1228','--bubble-bot':'#162038',
+    '--chat-bg':'#0c1228','--bubble-bot':'#162038','--logo-bg':'#162038',
   },
   violet: {
     '--bg':'#0C0A10','--s0':'#130f1a','--s1':'#1c1428','--s2':'#241c34',
@@ -1878,7 +1880,7 @@ const THEMES = {
     '--ai-bg1':'#0d0a1a','--ai-bg2':'#150d2e','--ai-bdr':'#2d1a5e',
     '--ai-msg-bg':'rgba(10,6,24,.6)','--ai-msg-col':'#5040a0',
     '--dot-active':'rgba(255,255,255,.7)',
-    '--chat-bg':'#100b1e','--bubble-bot':'#1c1428',
+    '--chat-bg':'#100b1e','--bubble-bot':'#1c1428','--logo-bg':'#1c1428',
   },
   light: {
     '--bg':'#f0f4ff','--s0':'#e4eaf8','--s1':'#ffffff','--s2':'#f5f7ff',
@@ -1892,7 +1894,7 @@ const THEMES = {
     '--ai-bg1':'#eef2ff','--ai-bg2':'#f0eeff','--ai-bdr':'#c4d0f8',
     '--ai-msg-bg':'rgba(230,236,255,.8)','--ai-msg-col':'#6070c0',
     '--dot-active':'rgba(0,0,0,.45)',
-    '--chat-bg':'#f0f2f5','--bubble-bot':'#ffffff',
+    '--chat-bg':'#f0f2f5','--bubble-bot':'#ffffff','--logo-bg':'#f0f4ff',
   },
 };
 
