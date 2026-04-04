@@ -2711,8 +2711,9 @@ function addGoal() {
   renderGoals(); save();
 }
 
-function addToGoal(id) {
-  const inp=document.getElementById('ga-'+id);
+function addToGoal(id, prefix='') {
+  const inp=document.getElementById(prefix+'ga-'+id);
+  if(!inp) return;
   const a=fromDisplay(parseFloat(inp.value)||0);
   if(a<=0) return;
   const g=D.goals.find(g=>g.id===id);
@@ -2722,49 +2723,56 @@ function addToGoal(id) {
 
 function delGoal(id) { D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); }
 
-function renderGoals() {
-  const html=D.goals.map(g=>{
-    const pct=g.target>0?Math.min(100,Math.round((g.saved/g.target)*100)):0;
-    const done=g.saved>=g.target;
-    const badge=done
-      ?`<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
-      :`<span class="gbadge gb-p">${pct}% · En cours</span>`;
-    const clockIco=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
-    return `<div class="gc">
-      <div class="gt">
-        <div class="gt-left">
-          <div class="g-ico" style="background:${g.color}22">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-          </div>
-          <div>
-            <div class="gn">${esc(g.name)}</div>
-            ${g.deadline?`<div class="gdl">${clockIco} ${esc(g.deadline)}</div>`:''}
-          </div>
+function buildGoalCard(g, prefix) {
+  const pct=g.target>0?Math.min(100,Math.round((g.saved/g.target)*100)):0;
+  const done=g.saved>=g.target;
+  const badge=done
+    ?`<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
+    :`<span class="gbadge gb-p">${pct}% · En cours</span>`;
+  const clockIco=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const inputId=`${prefix}ga-${g.id}`;
+  return `<div class="gc">
+    <div class="gt">
+      <div class="gt-left">
+        <div class="g-ico" style="background:${g.color}22">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         </div>
-        <div class="g-ctrl">
-          ${badge}
-          <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+        <div>
+          <div class="gn">${esc(g.name)}</div>
+          ${g.deadline?`<div class="gdl">${clockIco} ${esc(g.deadline)}</div>`:''}
         </div>
       </div>
-      <div class="pt" style="height:6px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
-      <div class="gam">
-        <div class="gcur" style="color:${g.color}">${fmt(g.saved)}</div>
-        <div class="gtgt">/ ${fmt(g.target)}</div>
-      </div>
-      <div class="gadd">
-        <input type="number" id="ga-${g.id}" placeholder="Ajouter un montant…" min="0" step="1"
-               onkeydown="if(event.key==='Enter')addToGoal('${g.id}')">
-        <button class="btn bp bsm" onclick="addToGoal('${g.id}')">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Ajouter
+      <div class="g-ctrl">
+        ${badge}
+        <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-    </div>`;
-  }).join('');
-  setText2('goals-grid', html||`<div class="empty"><div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Aucun objectif. Crée le premier !</div>`);
-  setText2('ov-goals', html||`<div class="empty" style="padding:12px">Aucun objectif défini.</div>`);
+    </div>
+    <div class="pt" style="height:6px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
+    <div class="gam">
+      <div class="gcur" style="color:${g.color}">${fmt(g.saved)}</div>
+      <div class="gtgt">/ ${fmt(g.target)}</div>
+    </div>
+    <div class="gadd">
+      <input type="number" id="${inputId}" placeholder="Ajouter un montant…" min="0" step="1"
+             onkeydown="if(event.key==='Enter')addToGoal('${g.id}','${prefix}')">
+      <button class="btn bp bsm" onclick="addToGoal('${g.id}','${prefix}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderGoals() {
+  const emptyGoals=`<div class="empty"><div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Aucun objectif. Crée le premier !</div>`;
+  const emptyOv=`<div class="empty" style="padding:12px">Aucun objectif défini.</div>`;
+  // Préfixes différents pour éviter les doublons d'ID dans le DOM
+  const htmlGoals=D.goals.map(g=>buildGoalCard(g,'')).join('');
+  const htmlOv=D.goals.map(g=>buildGoalCard(g,'ov-')).join('');
+  setText2('goals-grid', htmlGoals||emptyGoals);
+  setText2('ov-goals',   htmlOv||emptyOv);
 }
 
 /* ═══════════════════════════════
