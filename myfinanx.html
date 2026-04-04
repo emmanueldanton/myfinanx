@@ -707,6 +707,79 @@ nav::-webkit-scrollbar { display:none; }
 .ai-send:active { transform:scale(0.94); }
 .ai-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 
+/* ════ PWA INSTALL POPUP ════ */
+.pwa-overlay {
+  display:none; position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
+  animation:fadeIn .25s ease;
+  align-items:flex-end; justify-content:center;
+}
+.pwa-overlay.open { display:flex; }
+.pwa-card {
+  background:var(--s0); border:1px solid var(--b1);
+  border-radius:24px 24px 0 0;
+  padding:28px 24px calc(28px + env(safe-area-inset-bottom));
+  width:100%; max-width:520px;
+  animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
+  position:relative;
+}
+@keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
+.pwa-close {
+  position:absolute; top:16px; right:16px;
+  width:32px; height:32px; border-radius:50%;
+  background:var(--s2); border:none; cursor:pointer;
+  color:var(--muted); font-size:1.1rem;
+  display:flex; align-items:center; justify-content:center;
+  transition:.15s;
+}
+.pwa-close:hover { background:var(--b1); color:var(--text); }
+.pwa-icon {
+  width:56px; height:56px; border-radius:14px;
+  background:linear-gradient(135deg,var(--pr),#7c3aed);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:16px;
+  box-shadow:0 8px 24px rgba(77,120,212,.4);
+}
+.pwa-title {
+  font-family:var(--fh); font-size:1.2rem; font-weight:800;
+  color:var(--text); margin-bottom:6px;
+}
+.pwa-sub {
+  font-size:.8rem; color:var(--muted); margin-bottom:22px; line-height:1.5;
+}
+.pwa-steps {
+  display:flex; flex-direction:column; gap:14px; margin-bottom:24px;
+}
+.pwa-step {
+  display:flex; align-items:flex-start; gap:12px;
+}
+.pwa-step-num {
+  width:26px; height:26px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--pr),#7c3aed);
+  color:#fff; font-size:.72rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.pwa-step-txt { font-size:.8rem; color:var(--text); line-height:1.5; padding-top:3px; }
+.pwa-step-txt span { color:var(--pr-l); font-weight:600; }
+.pwa-tabs {
+  display:flex; gap:8px; margin-bottom:18px;
+}
+.pwa-tab {
+  flex:1; padding:7px 0; border-radius:8px; border:1px solid var(--b1);
+  background:var(--s1); color:var(--muted); font-size:.75rem; font-weight:600;
+  cursor:pointer; transition:.15s; font-family:var(--fb);
+}
+.pwa-tab.on { background:var(--pr); border-color:var(--pr); color:#fff; }
+.pwa-os { display:none; }
+.pwa-os.on { display:flex; flex-direction:column; gap:14px; margin-bottom:24px; }
+.pwa-dismiss {
+  width:100%; padding:13px; border-radius:12px;
+  background:var(--s2); border:1px solid var(--b1);
+  color:var(--muted); font-size:.8rem; font-family:var(--fb);
+  cursor:pointer; transition:.15s;
+}
+.pwa-dismiss:hover { color:var(--text); border-color:var(--b2); }
+
 /* ════ HAMBURGER BUTTON ════ */
 .hbg-btn {
   display:none; align-items:center; justify-content:center;
@@ -1466,6 +1539,51 @@ nav::-webkit-scrollbar { display:none; }
 </div>
 
 </div><!-- /wrap -->
+
+<!-- ════ PWA INSTALL POPUP ════ -->
+<div class="pwa-overlay" id="pwa-overlay" onclick="pwaOverlayClick(event)">
+  <div class="pwa-card" id="pwa-card">
+    <button class="pwa-close" onclick="closePwaPopup()" aria-label="Fermer">✕</button>
+    <div class="pwa-icon">
+      <img src="icon.png" width="34" height="34" style="border-radius:8px;" alt="MyFinanx">
+    </div>
+    <div class="pwa-title">Installe MyFinanx 📲</div>
+    <div class="pwa-sub">Pour ne jamais perdre tes données, installe l'app sur ton écran d'accueil — c'est gratuit, rapide, et ça marche comme une vraie app !</div>
+    <div class="pwa-tabs">
+      <button class="pwa-tab on" id="pwa-tab-ios" onclick="pwaTab('ios')">🍎 iPhone / iPad</button>
+      <button class="pwa-tab" id="pwa-tab-android" onclick="pwaTab('android')">🤖 Android</button>
+    </div>
+    <div class="pwa-os on" id="pwa-ios">
+      <div class="pwa-step">
+        <div class="pwa-step-num">1</div>
+        <div class="pwa-step-txt">Appuie sur l'icône <span>Partager</span> en bas de Safari (le carré avec une flèche ↑)</div>
+      </div>
+      <div class="pwa-step">
+        <div class="pwa-step-num">2</div>
+        <div class="pwa-step-txt">Fais défiler et appuie sur <span>« Sur l'écran d'accueil »</span></div>
+      </div>
+      <div class="pwa-step">
+        <div class="pwa-step-num">3</div>
+        <div class="pwa-step-txt">Appuie sur <span>Ajouter</span> — l'icône MyFinanx apparaît sur ton bureau 🎉</div>
+      </div>
+    </div>
+    <div class="pwa-os" id="pwa-android">
+      <div class="pwa-step">
+        <div class="pwa-step-num">1</div>
+        <div class="pwa-step-txt">Dans Chrome, appuie sur le menu <span>⋮</span> en haut à droite</div>
+      </div>
+      <div class="pwa-step">
+        <div class="pwa-step-num">2</div>
+        <div class="pwa-step-txt">Appuie sur <span>« Ajouter à l'écran d'accueil »</span></div>
+      </div>
+      <div class="pwa-step">
+        <div class="pwa-step-num">3</div>
+        <div class="pwa-step-txt">Confirme — MyFinanx s'installe comme une vraie app 🚀</div>
+      </div>
+    </div>
+    <button class="pwa-dismiss" onclick="closePwaPopup()">Je le ferai plus tard</button>
+  </div>
+</div>
 
 <!-- ════ BOTTOM NAV ════ -->
 <div class="bottom-nav">
@@ -2627,6 +2745,45 @@ function importData(file) {
 }
 
 init();
+
+/* ════ PWA INSTALL POPUP ════ */
+function showPwaPopup() {
+  // Ne pas montrer si déjà installée en mode standalone (PWA lancée depuis l'écran d'accueil)
+  if(window.matchMedia('(display-mode: standalone)').matches) return;
+  if(navigator.standalone === true) return; // iOS standalone
+  // Ne montrer qu'une seule fois (sauf si l'utilisateur n'a pas encore installé)
+  if(localStorage.getItem('monargent-pwa-seen')) return;
+  // Délai de 2s pour laisser l'app se charger
+  setTimeout(() => {
+    document.getElementById('pwa-overlay')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }, 2000);
+}
+
+function closePwaPopup() {
+  document.getElementById('pwa-overlay')?.classList.remove('open');
+  document.body.style.overflow = '';
+  localStorage.setItem('monargent-pwa-seen', '1');
+}
+
+function pwaOverlayClick(e) {
+  if(e.target === document.getElementById('pwa-overlay')) closePwaPopup();
+}
+
+function pwaTab(os) {
+  document.getElementById('pwa-ios').classList.toggle('on', os === 'ios');
+  document.getElementById('pwa-android').classList.toggle('on', os === 'android');
+  document.getElementById('pwa-tab-ios').classList.toggle('on', os === 'ios');
+  document.getElementById('pwa-tab-android').classList.toggle('on', os === 'android');
+}
+
+// Détection auto du bon onglet selon l'OS
+(function() {
+  const ua = navigator.userAgent;
+  if(/android/i.test(ua)) setTimeout(() => pwaTab('android'), 2100);
+})();
+
+showPwaPopup();
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
