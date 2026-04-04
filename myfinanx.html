@@ -135,11 +135,22 @@ body::before {
   font-size: .78rem;
   color: var(--muted);
   margin-top: 6px;
-  margin-bottom: 28px;
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
+.greet-gender-pick {
+  display: flex; gap: 6px; margin-bottom: 28px;
+}
+.greet-gender-btn {
+  font-size: .7rem; font-family: var(--fb); font-weight: 600;
+  padding: 3px 12px; border-radius: 99px;
+  border: 1px solid var(--b2); background: var(--s1);
+  color: var(--muted); cursor: pointer; transition: .15s;
+}
+.greet-gender-btn.on { background: var(--pr); border-color: var(--pr); color: #fff; }
+.greet-gender-btn:hover:not(.on) { border-color: var(--pr); color: var(--pr); }
 
 /* ════ HEADER ════ */
 header {
@@ -1713,7 +1724,8 @@ function defaultData() {
 function key() { return `monargent_${Y}_${String(M+1).padStart(2,'0')}`; }
 const GOALS_KEY = 'monargent_goals';
 const AI_KEY    = 'monargent_ai_chat';
-const USER_KEY  = 'monargent-username';
+const USER_KEY    = 'monargent-username';
+const GENDER_KEY  = 'monargent-usergender';
 let aiHistory   = [];
 
 function save() {
@@ -1846,6 +1858,27 @@ function renderGreeting() {
       ${greet},&nbsp;<span class="greet-name" id="greet-name" onclick="editGreetName()" title="Clique pour modifier ton prénom">${esc(name)}</span>&nbsp;!&nbsp;<span class="greet-emoji">${emoji}</span>
     </div>
     <div class="greet-sub">${sub}</div>`;
+  showGenderPick();
+}
+
+function showGenderPick() {
+  const wrap = document.getElementById('greet-wrap');
+  if(!wrap) return;
+  const cur = localStorage.getItem(GENDER_KEY);
+  // Si genre déjà défini, n'afficher que les boutons discrets (modifiables)
+  // S'il n'y a pas de prénom saisi, ne pas afficher non plus
+  if(!localStorage.getItem(USER_KEY)) return;
+  const pick = document.createElement('div');
+  pick.className = 'greet-gender-pick';
+  ['M','F'].forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'greet-gender-btn' + (cur === g ? ' on' : '');
+    btn.textContent = g === 'M' ? 'Masculin' : 'Féminin';
+    btn.onclick = () => { localStorage.setItem(GENDER_KEY, g); renderGreeting(); };
+    pick.appendChild(btn);
+  });
+  const sub = wrap.querySelector('.greet-sub');
+  if(sub) sub.after(pick);
 }
 
 function editGreetName() {
@@ -2473,7 +2506,15 @@ async function sendAI() {
     return `  • ${g.name}: ${fmt(g.saved)} / ${fmt(g.target)} (${pct}%${dl})`;
   }).join('\n'):'  • Aucun objectif défini';
 
+  const userName = localStorage.getItem(USER_KEY);
+  const userGender = localStorage.getItem(GENDER_KEY);
+  const identityLine = userName
+    ? `Prénom de l'utilisateur : ${userName}. Genre : ${userGender === 'F' ? 'féminin' : userGender === 'M' ? 'masculin' : 'non précisé'}.
+Utilise son prénom pour t'adresser à lui/elle directement et accorde correctement les adjectifs et participes passés selon son genre.`
+    : '';
+
   const sys=`Tu es un conseiller financier personnel expert et bienveillant.
+${identityLine}
 Tu connais TOUTE la situation financière de l'utilisateur pour ${MONTHS[M]} ${Y}.
 Devise: ${cur.name} (${cur.symbol}).
 
