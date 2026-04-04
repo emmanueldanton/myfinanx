@@ -358,17 +358,30 @@ nav::-webkit-scrollbar { display:none; }
   font-family:var(--fb); outline:none; width:100%; transition:.15s;
   -webkit-appearance:none;
 }
+/* L'input dans .fw hérite de .field input — on réinitialise les propriétés gérées par .fw */
+.fw input { background:transparent; border:none; border-radius:0; width:auto; -webkit-appearance:none; appearance:none; }
 .field input:focus, .field select:focus {
   border-color:var(--pr); box-shadow:0 0 0 3px rgba(77,120,212,.14);
 }
 .field select option { background:var(--s1); }
-.fw { position:relative; }
-.fw .cur-sym {
-  position:absolute; left:10px; top:50%; transform:translateY(-50%);
-  color:var(--muted); font-family:var(--fh); font-weight:700;
-  font-size:.9rem; pointer-events:none;
+.fw {
+  display:flex; align-items:center;
+  background:var(--s2); border:1px solid var(--b2);
+  border-radius:var(--r2); overflow:hidden; transition:.15s;
 }
-.fw input { padding-left:24px; font-family:var(--fh); font-weight:700; font-size:.94rem; }
+.fw:focus-within { border-color:var(--pr); box-shadow:0 0 0 3px rgba(77,120,212,.14); }
+.fw .cur-sym {
+  padding:9px 6px 9px 11px; white-space:nowrap; flex-shrink:0;
+  color:var(--muted); font-family:var(--fh); font-weight:700;
+  font-size:.85rem; pointer-events:none; line-height:1;
+}
+.fw input {
+  flex:1; min-width:0;
+  background:transparent; border:none; outline:none;
+  padding:9px 11px 9px 4px;
+  font-family:var(--fh); font-weight:700; font-size:.94rem;
+  color:var(--text); width:100%;
+}
 
 /* ════ BUTTONS ════ */
 .btn {
