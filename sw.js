@@ -1,9 +1,9 @@
-const CACHE = 'myfinanx-v1';
+const CACHE = 'myfinanx-v2';
 const ASSETS = ['/', '/myfinanx.html', '/icon.png', '/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
+  // Ne pas appeler skipWaiting ici — on attend le signal de la page
 });
 
 self.addEventListener('activate', e => {
@@ -17,4 +17,9 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request).catch(() => caches.match(e.request))
   );
+});
+
+// La page envoie SKIP_WAITING quand elle détecte un nouveau SW installé
+self.addEventListener('message', e => {
+  if(e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
