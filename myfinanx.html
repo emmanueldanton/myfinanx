@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <!-- ═══ FAVICON ═══ -->
 <link rel="icon" type="image/png" href="icon.png">
@@ -87,6 +87,10 @@ body {
   background:var(--bg); color:var(--text);
   font-family:var(--fb); font-size:14px; min-height:100vh;
   -webkit-font-smoothing:antialiased;
+}
+/* iOS Safari zoome sur tout input < 16px — on force 16px pour bloquer ce comportement */
+input, select, textarea {
+  font-size: 16px !important;
 }
 body::before {
   content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
