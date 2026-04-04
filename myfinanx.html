@@ -3052,7 +3052,17 @@ function obNext() {
 }
 
 // ════ ADS ════
-const AD_SEEN_KEY = 'myfinanx-ad-seen';
+const AD_SEEN_KEY = 'myfinanx-ad-last';
+
+// Durées en millisecondes par fréquence
+const AD_FREQ_MS = {
+  'always'  : 0,
+  'session' : null,          // géré via sessionStorage
+  'hourly'  : 60*60*1000,
+  'daily'   : 24*60*60*1000,
+  '3days'   : 3*24*60*60*1000,
+  'weekly'  : 7*24*60*60*1000,
+};
 
 async function loadAd() {
   try {
@@ -3060,11 +3070,16 @@ async function loadAd() {
     const data = await res.json();
     if(!data.enabled || !data.ads || !data.ads.length) return;
 
-    // Fréquence : 'session' = une fois par session, 'always' = à chaque ouverture
-    const freq = data.frequency || 'session';
+    const freq = data.frequency || 'daily';
+
     if(freq === 'session') {
-      const seen = sessionStorage.getItem(AD_SEEN_KEY);
-      if(seen) return;
+      if(sessionStorage.getItem(AD_SEEN_KEY)) return;
+    } else if(freq !== 'always') {
+      const ms = AD_FREQ_MS[freq];
+      if(ms !== undefined) {
+        const last = parseInt(localStorage.getItem(AD_SEEN_KEY) || '0', 10);
+        if(Date.now() - last < ms) return;
+      }
     }
 
     const ad = data.ads[Math.floor(Math.random() * data.ads.length)];
@@ -3091,7 +3106,9 @@ function showAd(ad) {
   cta.textContent = ad.cta || 'Voir';
   cta.href = ad.url || '#';
   document.getElementById('ad-overlay').classList.add('open');
+  // Enregistrer le timestamp (localStorage) ou flag session
   sessionStorage.setItem(AD_SEEN_KEY, '1');
+  localStorage.setItem(AD_SEEN_KEY, Date.now().toString());
 }
 
 function closeAd() {

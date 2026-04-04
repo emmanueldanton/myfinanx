@@ -1,7 +1,12 @@
 {
   "enabled": false,
-  "frequency": "session",
+
+  "frequency": "daily",
+  "_frequency_options": "always | session | hourly | daily | 3days | weekly",
+
   "delay": 4000,
+  "_delay_note": "Délai en millisecondes avant l'apparition (4000 = 4 secondes)",
+
   "ads": [
     {
       "id": "ad1",
