@@ -255,6 +255,19 @@ header {
 }
 @media(max-width:620px){ .chip { display:none; } }
 
+/* Boutons export/import desktop */
+.hdr-data { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+.hdr-data-btn {
+  display:flex; align-items:center; gap:5px;
+  background:var(--s1); border:1px solid var(--b1);
+  color:var(--muted); border-radius:var(--r2);
+  padding:5px 10px; font-family:var(--fh); font-size:.68rem; font-weight:700;
+  cursor:pointer; transition:.15s; white-space:nowrap;
+}
+.hdr-data-btn svg { stroke:currentColor; flex-shrink:0; }
+.hdr-data-btn:hover { border-color:var(--pr); color:var(--pr-l); }
+@media(max-width:620px){ .hdr-data { display:none; } }
+
 /* Currency — icône globe cachée sur mobile */
 @media(max-width:380px){
   .cur-btn svg:first-child { display:none; }
@@ -1168,6 +1181,17 @@ nav::-webkit-scrollbar { display:none; }
     <div class="tdot"    data-theme="blue"   style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')"   title="Midnight Blue"></div>
     <div class="tdot"    data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
     <div class="tdot on" data-theme="light"  style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
+  </div>
+
+  <div class="hdr-data">
+    <button class="hdr-data-btn" onclick="exportData()" title="Télécharger une sauvegarde JSON">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exporter
+    </button>
+    <button class="hdr-data-btn" onclick="document.getElementById('import-input').click()" title="Restaurer depuis un fichier JSON">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Importer
+    </button>
   </div>
 
   <div class="chip" id="chip">✓ Sauvegardé</div>
