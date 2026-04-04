@@ -2771,8 +2771,6 @@ function showPwaPopup() {
   // Ne pas montrer si déjà installée en mode standalone (PWA lancée depuis l'écran d'accueil)
   if(window.matchMedia('(display-mode: standalone)').matches) return;
   if(navigator.standalone === true) return; // iOS standalone
-  // Ne montrer qu'une seule fois (sauf si l'utilisateur n'a pas encore installé)
-  if(localStorage.getItem('monargent-pwa-seen')) return;
   // Délai de 2s pour laisser l'app se charger
   setTimeout(() => {
     document.getElementById('pwa-overlay')?.classList.add('open');
@@ -2783,7 +2781,6 @@ function showPwaPopup() {
 function closePwaPopup() {
   document.getElementById('pwa-overlay')?.classList.remove('open');
   document.body.style.overflow = '';
-  localStorage.setItem('monargent-pwa-seen', '1');
 }
 
 function pwaOverlayClick(e) {
