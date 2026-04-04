@@ -586,8 +586,10 @@ nav::-webkit-scrollbar { display:none; }
 .txdl svg { stroke:currentColor; }
 .txdl:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
 @media(max-width:360px){ .txii { display:none; } .cpill { display:none; } }
-/* Sur mobile, le FAB (50px + 16px right) chevauchait le bouton supprimer — on pousse la liste */
-@media(max-width:620px){ #txl { padding-bottom:80px; } }
+/* Sur mobile, le FAB chevauchait le bouton supprimer — on pousse toutes les listes */
+@media(max-width:620px){
+  #txl, #rev-rows, #bud-rows, #goals-list { padding-bottom:100px; }
+}
 
 /* Category breakdown */
 .catrow { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
