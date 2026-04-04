@@ -1,0 +1,15 @@
+{
+  "enabled": false,
+  "frequency": "session",
+  "delay": 4000,
+  "ads": [
+    {
+      "id": "ad1",
+      "img": "https://placehold.co/600x300/4D78D4/ffffff?text=Votre+pub+ici",
+      "title": "Exemple de publicité",
+      "body": "Remplacez ceci par votre message promotionnel.",
+      "cta": "En savoir plus",
+      "url": "https://example.com"
+    }
+  ]
+}

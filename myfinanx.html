@@ -851,6 +851,52 @@ nav::-webkit-scrollbar { display:none; }
 }
 .pwa-dismiss:hover { color:var(--text); border-color:var(--b2); }
 
+/* ════ AD POPUP ════ */
+.ad-overlay {
+  display:none; position:fixed; inset:0; z-index:1100;
+  background:rgba(0,0,0,.65); backdrop-filter:blur(6px);
+  align-items:center; justify-content:center; padding:20px;
+  animation:fadeIn .25s ease;
+}
+.ad-overlay.open { display:flex; }
+.ad-card {
+  background:var(--s0); border:1px solid var(--b1);
+  border-radius:20px; width:100%; max-width:400px;
+  overflow:hidden; position:relative;
+  animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
+}
+.ad-close {
+  position:absolute; top:10px; right:10px; z-index:10;
+  width:30px; height:30px; border-radius:50%;
+  background:rgba(0,0,0,.45); border:none; cursor:pointer;
+  color:#fff; font-size:1rem;
+  display:flex; align-items:center; justify-content:center;
+  transition:.15s;
+}
+.ad-close:hover { background:rgba(0,0,0,.7); }
+.ad-img { width:100%; aspect-ratio:2/1; object-fit:cover; display:block; }
+.ad-img-placeholder {
+  width:100%; aspect-ratio:2/1;
+  background:var(--s2); display:flex; align-items:center; justify-content:center;
+  color:var(--muted); font-size:.75rem;
+}
+.ad-body { padding:18px 18px 20px; }
+.ad-title { font-family:var(--fh); font-size:.95rem; font-weight:800; color:var(--text); margin-bottom:6px; }
+.ad-txt { font-size:.78rem; color:var(--muted); line-height:1.5; margin-bottom:16px; }
+.ad-cta {
+  display:block; width:100%; padding:12px;
+  background:var(--pr); color:#fff; border:none; border-radius:11px;
+  font-family:var(--fh); font-size:.85rem; font-weight:700;
+  cursor:pointer; text-align:center; text-decoration:none; transition:.15s;
+}
+.ad-cta:hover { background:var(--pr-d); }
+.ad-skip {
+  display:block; text-align:center; margin-top:10px;
+  font-size:.72rem; color:var(--muted); cursor:pointer;
+  background:none; border:none; width:100%; padding:4px;
+}
+.ad-skip:hover { color:var(--text); }
+
 /* ════ HAMBURGER BUTTON ════ */
 .hbg-btn {
   display:none; align-items:center; justify-content:center;
@@ -1766,6 +1812,20 @@ nav::-webkit-scrollbar { display:none; }
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       IA
     </button>
+  </div>
+</div>
+
+<!-- AD POPUP -->
+<div class="ad-overlay" id="ad-overlay">
+  <div class="ad-card" id="ad-card">
+    <button class="ad-close" onclick="closeAd()">✕</button>
+    <div id="ad-img-wrap"></div>
+    <div class="ad-body">
+      <div class="ad-title" id="ad-title"></div>
+      <div class="ad-txt" id="ad-txt"></div>
+      <a class="ad-cta" id="ad-cta" href="#" target="_blank" rel="noopener">Voir</a>
+      <button class="ad-skip" onclick="closeAd()">Ignorer</button>
+    </div>
   </div>
 </div>
 
@@ -2990,6 +3050,55 @@ function obNext() {
   if(obStep === OB_TOTAL - 1)
     document.getElementById('ob-next').textContent = "C'est parti !";
 }
+
+// ════ ADS ════
+const AD_SEEN_KEY = 'myfinanx-ad-seen';
+
+async function loadAd() {
+  try {
+    const res = await fetch('/ads.json?v=' + Date.now());
+    const data = await res.json();
+    if(!data.enabled || !data.ads || !data.ads.length) return;
+
+    // Fréquence : 'session' = une fois par session, 'always' = à chaque ouverture
+    const freq = data.frequency || 'session';
+    if(freq === 'session') {
+      const seen = sessionStorage.getItem(AD_SEEN_KEY);
+      if(seen) return;
+    }
+
+    const ad = data.ads[Math.floor(Math.random() * data.ads.length)];
+    const delay = data.delay || 4000;
+    setTimeout(() => showAd(ad), delay);
+  } catch(e) {}
+}
+
+function showAd(ad) {
+  // Image ou placeholder
+  const imgWrap = document.getElementById('ad-img-wrap');
+  if(ad.img) {
+    const img = document.createElement('img');
+    img.className = 'ad-img';
+    img.src = ad.img;
+    img.alt = ad.title || '';
+    imgWrap.appendChild(img);
+  } else {
+    imgWrap.innerHTML = '<div class="ad-img-placeholder">Publicité</div>';
+  }
+  document.getElementById('ad-title').textContent = ad.title || '';
+  document.getElementById('ad-txt').textContent   = ad.body  || '';
+  const cta = document.getElementById('ad-cta');
+  cta.textContent = ad.cta || 'Voir';
+  cta.href = ad.url || '#';
+  document.getElementById('ad-overlay').classList.add('open');
+  sessionStorage.setItem(AD_SEEN_KEY, '1');
+}
+
+function closeAd() {
+  document.getElementById('ad-overlay').classList.remove('open');
+}
+
+loadAd();
 
 setTimeout(showOnboarding, 600);
 

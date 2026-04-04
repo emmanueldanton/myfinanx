@@ -1,5 +1,5 @@
 const CACHE = 'myfinanx-v2';
-const ASSETS = ['/', '/myfinanx.html', '/icon.png', '/manifest.json'];
+const ASSETS = ['/', '/myfinanx.html', '/icon.png', '/manifest.json', '/ads.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
