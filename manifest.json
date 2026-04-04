@@ -1,0 +1,14 @@
+{
+  "name": "MyFinanx",
+  "short_name": "MyFinanx",
+  "description": "Dashboard financier personnel — revenus, dépenses, objectifs",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090E1A",
+  "theme_color": "#4D78D4",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
