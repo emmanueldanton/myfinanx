@@ -2136,13 +2136,16 @@ function init() {
   document.getElementById('tx-dt').value = todayISO();
   updateCatSel();
 
-  // 2. Préférences (setCurrency appelle renderAll, Y/M/D doivent être prêts)
+  // 2. Préférences visuelles (thème uniquement — pas de renderAll déclenché)
   setTheme(localStorage.getItem('monargent-theme') || 'light');
+
+  // 3. Charge les vraies données AVANT setCurrency pour éviter que
+  //    setCurrency → renderAll → recalc → save() n'écrase le localStorage avec D vide
+  loadMonth();
+
+  // 4. Devise — renderAll s'exécute maintenant avec les vraies données dans D
   const savedCur = localStorage.getItem('monargent-cur') || 'XOF';
   setCurrency(savedCur);
-
-  // 3. Charge les vraies données du mois (écrase le defaultData ci-dessus)
-  loadMonth();
 
   // 4. Charge l'historique de la conversation IA
   loadAiHistory();
