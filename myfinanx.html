@@ -707,6 +707,31 @@ nav::-webkit-scrollbar { display:none; }
 .ai-send:active { transform:scale(0.94); }
 .ai-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 
+/* ════ ONBOARDING ════ */
+.ob-progress { display:flex; gap:6px; margin-bottom:24px; }
+.ob-dot { flex:1; height:3px; border-radius:99px; background:var(--b1); transition:.3s; }
+.ob-dot.on { background:var(--pr); }
+.ob-step { display:none; }
+.ob-step.on { display:block; animation:fadeUp .22s ease; }
+.ob-ico {
+  width:52px; height:52px; border-radius:14px;
+  background:var(--s2); border:1px solid var(--b1);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:18px; color:var(--pr);
+}
+.ob-title {
+  font-family:var(--fh); font-size:1.1rem; font-weight:800;
+  color:var(--text); margin-bottom:8px;
+}
+.ob-txt { font-size:.82rem; color:var(--muted); line-height:1.6; margin-bottom:28px; }
+.ob-next {
+  width:100%; padding:13px; border-radius:12px;
+  background:var(--pr); border:none; color:#fff;
+  font-size:.88rem; font-weight:700; font-family:var(--fb);
+  cursor:pointer; transition:.15s;
+}
+.ob-next:hover { background:var(--pr-d); }
+
 /* ════ PWA INSTALL POPUP ════ */
 .pwa-overlay {
   display:none; position:fixed; inset:0; z-index:1000;
@@ -1549,7 +1574,7 @@ nav::-webkit-scrollbar { display:none; }
       <img src="icon.png" width="34" height="34" style="border-radius:8px;" alt="MyFinanx">
     </div>
     <div class="pwa-title">Installe MyFinanx</div>
-    <div class="pwa-sub">Pour ne jamais perdre tes données, installe l'app sur ton écran d'accueil — gratuit, rapide, sans inscription.</div>
+    <div class="pwa-sub">Pour ne jamais perdre tes données, installe l'app sur ton écran d'accueil. Gratuit, rapide, sans inscription.</div>
     <div class="pwa-tabs">
       <button class="pwa-tab on" id="pwa-tab-ios" onclick="pwaTab('ios')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:5px"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -1565,7 +1590,7 @@ nav::-webkit-scrollbar { display:none; }
         <div class="pwa-step-num">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         </div>
-        <div class="pwa-step-txt">Appuie sur l'icône <span>Partager</span> en bas de Safari — le carré avec une flèche vers le haut</div>
+        <div class="pwa-step-txt">Appuie sur l'icône <span>Partager</span> en bas de Safari, le carré avec une flèche vers le haut</div>
       </div>
       <div class="pwa-step">
         <div class="pwa-step-num">
@@ -1577,7 +1602,7 @@ nav::-webkit-scrollbar { display:none; }
         <div class="pwa-step-num">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <div class="pwa-step-txt">Appuie sur <span>Ajouter</span> — l'icône MyFinanx apparaît sur ton bureau</div>
+        <div class="pwa-step-txt">Appuie sur <span>Ajouter</span> et l'icône MyFinanx apparaît sur ton bureau</div>
       </div>
     </div>
     <div class="pwa-os" id="pwa-android">
@@ -1597,10 +1622,65 @@ nav::-webkit-scrollbar { display:none; }
         <div class="pwa-step-num">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <div class="pwa-step-txt">Confirme l'installation — MyFinanx s'installe comme une vraie app</div>
+        <div class="pwa-step-txt">Confirme l'installation et MyFinanx s'installe comme une vraie app</div>
       </div>
     </div>
     <button class="pwa-dismiss" onclick="closePwaPopup()">Plus tard</button>
+  </div>
+</div>
+
+<!-- ════ ONBOARDING POPUP ════ -->
+<div class="pwa-overlay" id="ob-overlay">
+  <div class="pwa-card">
+    <div class="ob-progress">
+      <div class="ob-dot on" id="ob-d0"></div>
+      <div class="ob-dot" id="ob-d1"></div>
+      <div class="ob-dot" id="ob-d2"></div>
+      <div class="ob-dot" id="ob-d3"></div>
+      <div class="ob-dot" id="ob-d4"></div>
+    </div>
+
+    <div class="ob-step on" id="ob-s0">
+      <div class="ob-ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div class="ob-title">Tes revenus d'abord</div>
+      <div class="ob-txt">Saisis ce que tu gagnes ce mois-ci. C'est la base, sans revenus le budget ne peut pas se calculer.</div>
+    </div>
+
+    <div class="ob-step" id="ob-s1">
+      <div class="ob-ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+      </div>
+      <div class="ob-title">Pose ton budget</div>
+      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport. L'app surveille les dépassements en temps réel.</div>
+    </div>
+
+    <div class="ob-step" id="ob-s2">
+      <div class="ob-ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div class="ob-title">Note tes dépenses</div>
+      <div class="ob-txt">Chaque achat saisi te donne une vision claire de où part ton argent. Plus tu es régulier, plus c'est précis.</div>
+    </div>
+
+    <div class="ob-step" id="ob-s3">
+      <div class="ob-ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </div>
+      <div class="ob-title">Fixe tes objectifs</div>
+      <div class="ob-txt">Voyage, épargne, remboursement... Crée un objectif avec un montant et une date. L'app suit ta progression automatiquement.</div>
+    </div>
+
+    <div class="ob-step" id="ob-s4">
+      <div class="ob-ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="ob-title">Ton conseiller IA</div>
+      <div class="ob-txt">Il connaît toute ta situation financière. Pose-lui n'importe quelle question et il répond avec tes vrais chiffres.</div>
+    </div>
+
+    <button class="ob-next" id="ob-next" onclick="obNext()">Suivant</button>
   </div>
 </div>
 
@@ -1950,37 +2030,37 @@ function greetFinancialSub() {
 
   // Dans le rouge : dépenses > revenus
   if(totalE > totalR && totalR > 0)
-    return `⚠️ Budget dépassé de ${fmt(totalE - totalR)} ce mois — revois tes dépenses.`;
+    return `⚠️ Budget dépassé de ${fmt(totalE - totalR)} ce mois. Revois tes dépenses.`;
 
   // Postes budgétaires dépassés
   const parCat = {};
   depenses.forEach(e => { parCat[e.cat] = (parCat[e.cat] || 0) + e.amount; });
   const dépassés = D.budget.filter(b => (parCat[b.name] || 0) > b.amount);
   if(dépassés.length === 1)
-    return `⚠️ "${dépassés[0].name}" dépasse le budget — surveille tes dépenses.`;
+    return `⚠️ "${dépassés[0].name}" dépasse le budget. Surveille tes dépenses.`;
   if(dépassés.length > 1)
-    return `⚠️ ${dépassés.length} postes budgétaires dépassés — revois tes dépenses.`;
+    return `⚠️ ${dépassés.length} postes budgétaires dépassés. Revois tes dépenses.`;
 
   // Excellent taux d'épargne
   if(tauxEpargne >= 20)
-    return `🎯 Taux d'épargne de ${tauxEpargne}% ce mois — excellent travail !`;
+    return `🎯 Taux d'épargne de ${tauxEpargne}% ce mois, excellent travail !`;
 
   // Objectif presque atteint
   const nearGoal = D.goals.find(g => g.target > 0 && g.saved / g.target >= 0.8 && g.saved < g.target);
   if(nearGoal) {
     const pct = Math.round((nearGoal.saved / nearGoal.target) * 100);
-    return `🏆 "${nearGoal.name}" à ${pct}% — encore un effort !`;
+    return `🏆 "${nearGoal.name}" à ${pct}%, encore un effort !`;
   }
 
   // Revenus saisis mais pas encore de dépenses
   if(totalR > 0 && totalE === 0)
-    return '📋 Revenus enregistrés — pense à saisir tes dépenses du mois.';
+    return '📋 Revenus enregistrés. Pense à saisir tes dépenses du mois.';
 
   // Reste positif
   if(reste > 0)
-    return `💰 ${fmt(reste)} disponibles après dépenses — pense à tes objectifs d'épargne.`;
+    return `💰 ${fmt(reste)} disponibles après dépenses. Pense à tes objectifs d'épargne.`;
 
-  return '📊 Tes finances sont à jour — continue comme ça !';
+  return '📊 Tes finances sont à jour, continue comme ça !';
 }
 
 function renderGreeting() {
@@ -2007,9 +2087,8 @@ function showGenderPick() {
   const wrap = document.getElementById('greet-wrap');
   if(!wrap) return;
   const cur = localStorage.getItem(GENDER_KEY);
-  // Si genre déjà défini, n'afficher que les boutons discrets (modifiables)
-  // S'il n'y a pas de prénom saisi, ne pas afficher non plus
-  if(!localStorage.getItem(USER_KEY)) return;
+  // Ne pas afficher si genre déjà choisi ou si pas de prénom saisi
+  if(cur || !localStorage.getItem(USER_KEY)) return;
   const pick = document.createElement('div');
   pick.className = 'greet-gender-pick';
   ['M','F'].forEach(g => {
@@ -2800,6 +2879,37 @@ function pwaTab(os) {
 })();
 
 showPwaPopup();
+
+/* ════ ONBOARDING ════ */
+let obStep = 0;
+const OB_TOTAL = 5;
+
+function showOnboarding() {
+  if(localStorage.getItem('monargent-onboarded')) return;
+  // Si le popup PWA est affiché (navigateur, pas standalone), ne pas empiler
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if(!isStandalone) return; // sur navigateur, l'utilisateur installe d'abord
+  document.getElementById('ob-overlay')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function obNext() {
+  document.getElementById('ob-s' + obStep)?.classList.remove('on');
+  obStep++;
+  if(obStep >= OB_TOTAL) {
+    document.getElementById('ob-overlay')?.classList.remove('open');
+    document.body.style.overflow = '';
+    localStorage.setItem('monargent-onboarded', '1');
+    return;
+  }
+  document.getElementById('ob-s' + obStep)?.classList.add('on');
+  for(let i = 0; i <= obStep; i++)
+    document.getElementById('ob-d' + i)?.classList.add('on');
+  if(obStep === OB_TOTAL - 1)
+    document.getElementById('ob-next').textContent = "C'est parti !";
+}
+
+setTimeout(showOnboarding, 600);
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
