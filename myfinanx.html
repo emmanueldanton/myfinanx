@@ -326,9 +326,9 @@ nav::-webkit-scrollbar { display:none; }
 .sl:first-child { margin-top:0; }
 
 .g2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(185px,100%),1fr)); gap:11px; }
-.g3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(140px,100%),1fr)); gap:11px; }
+.g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:11px; }
 @media(max-width:420px){ .g2 { grid-template-columns:1fr; } }
-@media(max-width:420px){ .g3 { grid-template-columns:1fr 1fr; } }
+@media(max-width:360px){ .g3 { grid-template-columns:1fr 1fr; } }
 @media(max-width:300px){ .g2, .g3 { grid-template-columns:1fr; } }
 
 /* ════ KPI CARDS ════ */
@@ -591,9 +591,9 @@ nav::-webkit-scrollbar { display:none; }
 .txdl svg { stroke:currentColor; }
 .txdl:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
 @media(max-width:360px){ .txii { display:none; } .cpill { display:none; } }
-/* Sur mobile, le FAB chevauchait le bouton supprimer — espace suffisant en bas */
+/* Sur mobile, le FAB chevauchait le bouton supprimer sur les transactions et objectifs */
 @media(max-width:620px){
-  #txl, #rev-rows, #bud-rows, #goals-list { padding-bottom:70px; }
+  #txl, #goals-list { padding-bottom:70px; }
 }
 
 /* Category breakdown */
