@@ -41,6 +41,22 @@
 <meta name="twitter:image" content="https://myfinanx.vercel.app/icon.png">
 
 <script defer src="/_vercel/insights/script.js"></script>
+
+<!-- ═══ ONESIGNAL PUSH NOTIFICATIONS ═══ -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "TON_APP_ID_ICI",
+      notifyButton: { enable: false },
+      promptOptions: {
+        slidedown: { prompts: [{ type:"push", autoPrompt:false }] }
+      }
+    });
+  });
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
@@ -857,6 +873,26 @@ nav::-webkit-scrollbar { display:none; }
 }
 .pwa-dismiss:hover { color:var(--text); border-color:var(--b2); }
 
+/* ════ REMINDER BAR ════ */
+.reminder-bar {
+  display:none; align-items:center; gap:10px;
+  padding:9px 20px; font-size:.78rem; color:var(--text);
+  background:var(--s1); border-bottom:1px solid var(--b1);
+  position:sticky; top:56px; z-index:90;
+  animation:fadeDown .25s ease;
+}
+.reminder-bar.show { display:flex; }
+.reminder-bar svg { flex-shrink:0; }
+.reminder-close {
+  margin-left:auto; background:none; border:none;
+  color:var(--muted); cursor:pointer; font-size:1rem;
+  padding:2px 6px; line-height:1; transition:.12s;
+}
+.reminder-close:hover { color:var(--text); }
+.rb-warn { border-left:3px solid var(--gold); }
+.rb-good { border-left:3px solid var(--green); }
+.rb-info { border-left:3px solid var(--pr); }
+
 /* ════ AD POPUP ════ */
 .ad-overlay {
   display:none; position:fixed; inset:0; z-index:1100;
@@ -1355,6 +1391,13 @@ nav::-webkit-scrollbar { display:none; }
     <span class="tab-txt">Conseils IA</span>
   </button>
 </nav>
+
+<!-- ════ REMINDER BAR ════ -->
+<div class="reminder-bar" id="reminder-bar">
+  <svg id="reminder-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <span id="reminder-txt"></span>
+  <button class="reminder-close" onclick="closeReminder()">✕</button>
+</div>
 
 <div class="wrap">
 
@@ -2383,6 +2426,9 @@ function init() {
 
   // 5. Salutation personnalisée
   renderGreeting();
+
+  // 6. Rappels in-app (une fois par jour)
+  checkReminder();
 }
 
 function changeMonth(d) {
@@ -3142,6 +3188,10 @@ function obNext() {
     document.getElementById('ob-overlay')?.classList.remove('open');
     document.body.style.overflow = '';
     localStorage.setItem('monargent-onboarded', '1');
+    // Demander la permission push OneSignal après l'onboarding
+    if(window.OneSignalDeferred) {
+      OneSignalDeferred.push(o => o.Slidedown.promptPush());
+    }
     return;
   }
   document.getElementById('ob-s' + obStep)?.classList.add('on');
@@ -3153,6 +3203,85 @@ function obNext() {
     document.getElementById('ob-next').textContent = "Commencer";
   else
     document.getElementById('ob-next').textContent = "Suivant";
+}
+
+// ════ RAPPELS IN-APP ════
+const REMINDER_KEY = 'monargent-reminder-seen';
+
+function checkReminder() {
+  const now = Date.now();
+  const lastSeen = parseInt(localStorage.getItem(REMINDER_KEY)||'0', 10);
+  if(now - lastSeen < 24*60*60*1000) return; // une fois par jour max
+
+  const msgs = [];
+  const totalR = D.revenus.reduce((s,r)=>s+r.amount, 0);
+  const totalE = D.expenses.filter(e=>e.type!=='income').reduce((s,e)=>s+e.amount, 0);
+  const today = new Date();
+  const dom = today.getDate();
+  const dow = today.getDay(); // 0=dim, 1=lun
+
+  // Bilan hebdomadaire (lundi)
+  if(dow === 1 && totalR > 0) {
+    const pct = Math.round((totalE/totalR)*100);
+    msgs.push({ type:'info', txt:`Bilan de la semaine : ${pct}% de tes revenus utilisés ce mois-ci.` });
+  }
+  // Début de mois sans budget planifié
+  if(dom <= 5 && D.budget.length && D.budget.every(b=>b.amount===0)) {
+    msgs.push({ type:'warn', txt:`Début de ${MONTHS[M]}. Prends 5 min pour planifier ton budget.` });
+  }
+  // Fin de mois — dépenses > 80% des revenus
+  if(dom >= 25 && totalR > 0 && totalE/totalR > 0.8) {
+    msgs.push({ type:'warn', txt:`Fin de mois : ${Math.round((totalE/totalR)*100)}% de tes revenus dépensés. Reste vigilant.` });
+  }
+  // Objectif atteint
+  const doneGoal = D.goals.find(g=>g.target>0 && g.saved>=g.target);
+  if(doneGoal) {
+    msgs.push({ type:'good', txt:`Objectif "${doneGoal.name}" atteint. Félicitations !` });
+  }
+  // Objectif proche (>= 80%)
+  const nearGoal = D.goals.find(g=>g.target>0 && !( g.saved>=g.target) && g.saved/g.target>=0.8);
+  if(nearGoal) {
+    const pct = Math.round((nearGoal.saved/nearGoal.target)*100);
+    msgs.push({ type:'good', txt:`Objectif "${nearGoal.name}" à ${pct}%. Tu y es presque !` });
+  }
+  // Pas de saisie depuis 3 jours
+  if(D.expenses.length) {
+    const lastDate = D.expenses.map(e=>new Date(e.date)).sort((a,b)=>b-a)[0];
+    const daysSince = Math.floor((now - lastDate.getTime())/(1000*60*60*24));
+    if(daysSince >= 3) {
+      msgs.push({ type:'warn', txt:`Aucune saisie depuis ${daysSince} jours. Des dépenses sont peut-être manquantes.` });
+    }
+  }
+  // Pas de revenus après le 3
+  if(totalR === 0 && dom > 3) {
+    msgs.push({ type:'warn', txt:`Pas de revenus saisis pour ${MONTHS[M]}. Commence par là pour activer ton budget.` });
+  }
+
+  if(!msgs.length) return;
+  const msg = msgs[0];
+  showReminder(msg.type, msg.txt);
+  localStorage.setItem(REMINDER_KEY, now.toString());
+}
+
+function showReminder(type, txt) {
+  const bar  = document.getElementById('reminder-bar');
+  const span = document.getElementById('reminder-txt');
+  const ico  = document.getElementById('reminder-ico');
+  if(!bar||!span||!ico) return;
+  const icoMap = {
+    warn: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+    good: '<polyline points="20 6 9 17 4 12"/>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  };
+  const colMap = { warn:'var(--gold)', good:'var(--green)', info:'var(--pr-l)' };
+  bar.className = 'reminder-bar show rb-' + type;
+  span.textContent = txt;
+  ico.innerHTML = icoMap[type]||icoMap.info;
+  ico.setAttribute('stroke', colMap[type]||colMap.info);
+}
+
+function closeReminder() {
+  document.getElementById('reminder-bar')?.classList.remove('show');
 }
 
 // ════ ADS ════

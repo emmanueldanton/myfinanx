@@ -1,4 +1,6 @@
-const CACHE = 'myfinanx-v2';
+importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
+
+const CACHE = 'myfinanx-v3';
 const ASSETS = ['/', '/myfinanx.html', '/icon.png', '/manifest.json', '/ads.json'];
 
 self.addEventListener('install', e => {
