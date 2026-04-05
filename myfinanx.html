@@ -1744,55 +1744,128 @@ nav::-webkit-scrollbar { display:none; }
 <!-- ════ ONBOARDING POPUP ════ -->
 <div class="pwa-overlay" id="ob-overlay">
   <div class="pwa-card">
-    <div class="ob-progress">
+    <div class="ob-progress" id="ob-progress-bar">
       <div class="ob-dot on" id="ob-d0"></div>
       <div class="ob-dot" id="ob-d1"></div>
       <div class="ob-dot" id="ob-d2"></div>
       <div class="ob-dot" id="ob-d3"></div>
       <div class="ob-dot" id="ob-d4"></div>
+      <div class="ob-dot" id="ob-d5"></div>
+      <div class="ob-dot" id="ob-d6"></div>
     </div>
 
+    <!-- Étape 0 : Bienvenue -->
     <div class="ob-step on" id="ob-s0">
+      <div class="ob-ico" style="width:64px;height:64px;border-radius:18px;">
+        <img src="/icon.png" width="40" height="40" alt="MyFinanx" style="border-radius:10px;">
+      </div>
+      <div class="ob-title" style="font-size:1.25rem;">Bienvenue sur MyFinanx</div>
+      <div class="ob-txt">Ton espace personnel pour prendre le contrôle de ton argent. Gratuit, sans compte, sans inscription. Tes données restent sur ton téléphone.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="font-size:.78rem;color:var(--text);">Suivi des revenus et dépenses</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="font-size:.78rem;color:var(--text);">Budget mensuel et objectifs d'épargne</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="font-size:.78rem;color:var(--text);">Conseiller IA qui connait ta situation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 1 : Revenus -->
+    <div class="ob-step" id="ob-s1">
       <div class="ob-ico">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       </div>
-      <div class="ob-title">Tes revenus d'abord</div>
-      <div class="ob-txt">Saisis ce que tu gagnes ce mois-ci. C'est la base, sans revenus le budget ne peut pas se calculer.</div>
+      <div class="ob-title">Commence par tes revenus</div>
+      <div class="ob-txt">Salaire, freelance, commerce, tontine... Saisis toutes tes sources de revenus du mois. Sans cette base, ton budget ne peut pas se calculer.</div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--green);">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Astuce</div>
+        <div style="font-size:.78rem;color:var(--text);">Tes revenus se reportent automatiquement d'un mois à l'autre. Tu n'as à les saisir qu'une seule fois.</div>
+      </div>
     </div>
 
-    <div class="ob-step" id="ob-s1">
+    <!-- Étape 2 : Budget -->
+    <div class="ob-step" id="ob-s2">
       <div class="ob-ico">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
       </div>
-      <div class="ob-title">Pose ton budget</div>
-      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport. L'app surveille les dépassements en temps réel.</div>
-    </div>
-
-    <div class="ob-step" id="ob-s2">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <div class="ob-title">Planifie ton budget</div>
+      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport, épargne. L'app te prévient en temps réel si tu dépasses un poste.</div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Bonne habitude</div>
+        <div style="font-size:.78rem;color:var(--text);">Prends 5 minutes en début de mois pour fixer ton budget. C'est la clé pour ne jamais être à court.</div>
       </div>
-      <div class="ob-title">Note tes dépenses</div>
-      <div class="ob-txt">Chaque achat saisi te donne une vision claire de où part ton argent. Plus tu es régulier, plus c'est précis.</div>
     </div>
 
+    <!-- Étape 3 : Dépenses -->
     <div class="ob-step" id="ob-s3">
+      <div class="ob-ico">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <div class="ob-title">Note chaque dépense</div>
+      <div class="ob-txt">Courses, transport, sorties... Chaque saisie te montre exactement où part ton argent. Le bouton + en bas de l'écran est là pour ça.</div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--gold);">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Discipline = liberté</div>
+        <div style="font-size:.78rem;color:var(--text);">30 secondes après chaque achat pour le noter. En 21 jours, c'est un réflexe automatique.</div>
+      </div>
+    </div>
+
+    <!-- Étape 4 : Objectifs -->
+    <div class="ob-step" id="ob-s4">
       <div class="ob-ico">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       </div>
       <div class="ob-title">Fixe tes objectifs</div>
-      <div class="ob-txt">Voyage, épargne, remboursement... Crée un objectif avec un montant et une date. L'app suit ta progression automatiquement.</div>
+      <div class="ob-txt">Voyage, épargne de précaution, remboursement de dette... Crée un objectif avec un montant cible et une échéance. Alimente-le chaque mois et regarde la barre progresser.</div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--violet);">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Motivation</div>
+        <div style="font-size:.78rem;color:var(--text);">Un objectif visible chaque jour avance 3 fois plus vite qu'un objectif vague dans ta tête.</div>
+      </div>
     </div>
 
-    <div class="ob-step" id="ob-s4">
+    <!-- Étape 5 : IA -->
+    <div class="ob-step" id="ob-s5">
       <div class="ob-ico">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
       <div class="ob-title">Ton conseiller IA</div>
-      <div class="ob-txt">Il connaît toute ta situation financière. Pose-lui n'importe quelle question et il répond avec tes vrais chiffres.</div>
+      <div class="ob-txt">Il connait tes revenus, ton budget, tes dépenses et tes objectifs. Demande-lui un conseil, une analyse ou un plan d'épargne. Il répond avec tes vrais chiffres.</div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Exemple</div>
+        <div style="font-size:.78rem;color:var(--text);font-style:italic;">"Est-ce que je peux me permettre une sortie ce week-end ?" ou "Comment réduire mes dépenses ce mois-ci ?"</div>
+      </div>
     </div>
 
-    <button class="ob-next" id="ob-next" onclick="obNext()">Suivant</button>
+    <!-- Étape 6 : Go -->
+    <div class="ob-step" id="ob-s6">
+      <div class="ob-ico" style="width:64px;height:64px;border-radius:18px;background:rgba(77,120,212,.15);color:var(--pr);">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ob-title">Tu es prêt.</div>
+      <div class="ob-txt">Ceux qui notent leurs finances progressent en moyenne 40% plus vite vers leurs objectifs. Un regard par jour suffit.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span style="font-size:.77rem;color:var(--text);">1 minute le matin pour vérifier ton solde</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span style="font-size:.77rem;color:var(--text);">30 secondes après chaque achat</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span style="font-size:.77rem;color:var(--text);">5 minutes en fin de mois pour faire le bilan</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
   </div>
 </div>
 
@@ -3051,7 +3124,7 @@ showPwaPopup();
 
 /* ════ ONBOARDING ════ */
 let obStep = 0;
-const OB_TOTAL = 5;
+const OB_TOTAL = 7;
 
 function showOnboarding() {
   if(localStorage.getItem('monargent-onboarded')) return;
@@ -3075,7 +3148,11 @@ function obNext() {
   for(let i = 0; i <= obStep; i++)
     document.getElementById('ob-d' + i)?.classList.add('on');
   if(obStep === OB_TOTAL - 1)
-    document.getElementById('ob-next').textContent = "C'est parti !";
+    document.getElementById('ob-next').textContent = "C'est parti, j'y vais !";
+  else if(obStep === 0)
+    document.getElementById('ob-next').textContent = "Commencer";
+  else
+    document.getElementById('ob-next').textContent = "Suivant";
 }
 
 // ════ ADS ════
