@@ -1501,7 +1501,7 @@ nav::-webkit-scrollbar { display:none; }
     </div>
   </div>
 
-  <div class="sl">Postes de dépenses budgétées</div>
+  <div class="sl">Planification budgétaire</div>
   <div class="bud-tbl">
     <div class="tbl-th">
       <span style="width:20px;flex-shrink:0"></span>
@@ -2012,7 +2012,6 @@ const CAT_ICONS = {
   'Dette':        '<line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 5 5 12"/>',
   'Logement':     '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
   'Matériel':     '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
-  'Caméra':       '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
   'Business':     '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',
   'Marketing':    '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
   'Imprévu':      '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
@@ -2041,7 +2040,7 @@ const CAT_ICONS = {
 const CAT_COLORS = {
   'Alimentation':'#e87a7a','Transport':'#7BA3F0','Téléphone':'#a78bfa',
   'Dette':'#C43A3A','Logement':'#4D78D4','Matériel':'#38bdf8',
-  'Caméra':'#fbbf24','Business':'#34d399','Marketing':'#f472b6',
+  'Business':'#34d399','Marketing':'#f472b6',
   'Imprévu':'#6b84ad','Loisirs':'#e879f9','Santé':'#34d399',
   'Salaire':'#34d399','Stage':'#4D78D4','Freelance':'#a78bfa',
   'Commerce':'#f59e0b','Loyers':'#4D78D4','Dividendes':'#34d399',
@@ -2051,7 +2050,7 @@ const CAT_COLORS = {
   'Cérémonie':'#fb923c','Autre':'#6b84ad'
 };
 
-const CATS_E = ['Alimentation','Transport','Logement','Santé','Téléphone','Abonnements','Dette','Scolarité','Famille','Cérémonie','Matériel','Business','Marketing','Caméra','Loisirs','Imprévu','Autre'];
+const CATS_E = ['Alimentation','Transport','Logement','Santé','Téléphone','Abonnements','Dette','Scolarité','Famille','Cérémonie','Matériel','Business','Marketing','Loisirs','Imprévu','Autre'];
 const CATS_I = ['Salaire','Freelance','Commerce','Business','Loyers','Tontine','Aide famille','Agriculture','Dividendes','Bourse','Pension','Allocations','Stage','Autre'];
 const COLS   = ['#7BA3F0','#4D78D4','#34d399','#a78bfa','#f59e0b','#e87a7a','#e879f9'];
 
@@ -2136,7 +2135,7 @@ function loadMonth() {
       D.goals = goals;
     }
   } else {
-    // Nouveau mois : reprend revenus et budget du mois precedent si disponible
+    // Nouveau mois : reprend revenus et budget du mois précédent si disponible
     const prev = findPreviousMonthData();
     D = {
       revenus:  prev ? prev.revenus : defaultData().revenus,
@@ -2144,6 +2143,15 @@ function loadMonth() {
       expenses: [],
       goals,
     };
+  }
+  // Si le budget est vide, on récupère automatiquement celui du mois précédent
+  // (couvre aussi les mois existants dont le budget aurait été vidé)
+  if(!D.budget.length) {
+    const prev = findPreviousMonthData();
+    if(prev && Array.isArray(prev.budget) && prev.budget.length) {
+      D.budget = prev.budget.map(b => ({ ...b, id: uid() }));
+      save();
+    }
   }
   renderAll();
 }
