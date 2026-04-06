@@ -57,6 +57,20 @@
   });
 </script>
 
+<script>
+// Applique le thème AVANT le premier paint pour éviter le flash
+(function(){
+  const t=localStorage.getItem('monargent-theme')||'light';
+  const THEMES_MINI={
+    blue:{'--bg':'#000000','--s0':'#080c14','--s1':'#0f1520','--s2':'#161e2e','--b1':'#202840','--b2':'#2c3a58','--text':'#edeff5','--muted':'#6878a0','--faint':'#1a2238','--header-bg':'rgba(0,0,0,.88)','--logo-bg':'#0f1520','--chat-bg':'#06080f','--bubble-bot':'#0f1520','--ai-bg1':'#06080f','--ai-bg2':'#0a0810','--ai-bdr':'#1a2238'},
+    violet:{'--bg':'#050408','--s0':'#0c0a12','--s1':'#131020','--s2':'#1a1628','--b1':'#26203c','--b2':'#342c50','--text':'#eceaff','--muted':'#7870a8','--faint':'#1e1830','--header-bg':'rgba(5,4,8,.90)','--logo-bg':'#131020','--chat-bg':'#08060e','--bubble-bot':'#131020','--ai-bg1':'#07050e','--ai-bg2':'#0c0914','--ai-bdr':'#201a38'},
+    light:{'--bg':'#ffffff','--s0':'#fafafa','--s1':'#ffffff','--s2':'#f5f5f5','--b1':'#e8e8e8','--b2':'#d4d4d4','--text':'#111111','--muted':'#737373','--faint':'#f0f0f0','--header-bg':'rgba(255,255,255,.90)','--logo-bg':'#f5f5f5','--chat-bg':'#fafafa','--bubble-bot':'#ffffff','--ai-bg1':'#fafafa','--ai-bg2':'#f5f5f5','--ai-bdr':'#e8e8e8'},
+  };
+  const vars=THEMES_MINI[t]||THEMES_MINI.light;
+  const r=document.documentElement.style;
+  Object.entries(vars).forEach(([k,v])=>r.setProperty(k,v));
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
@@ -583,7 +597,7 @@ nav::-webkit-scrollbar { display:none; }
 .txi {
   display:flex; align-items:center; padding:11px 14px;
   border-bottom:1px solid var(--b1); gap:10px; transition:.12s;
-  animation:slideIn .2s ease;
+  animation:slideIn .2s ease; flex-wrap:wrap;
 }
 .txi:last-child { border-bottom:none; }
 .txi:hover { background:var(--s2); }
@@ -601,13 +615,26 @@ nav::-webkit-scrollbar { display:none; }
 }
 .txdt { font-size:.62rem; color:var(--faint); }
 .txam { font-family:var(--fh); font-size:.88rem; font-weight:800; min-width:70px; text-align:right; flex-shrink:0; }
-.txdl {
+.txdl, .txed {
   background:none; border:none; color:var(--faint);
   cursor:pointer; padding:4px; border-radius:5px;
   display:flex; transition:.12s; flex-shrink:0;
 }
-.txdl svg { stroke:currentColor; }
+.txdl svg, .txed svg { stroke:currentColor; }
 .txdl:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
+.txed:hover { color:var(--pr-l); background:rgba(77,120,212,.1); }
+.tx-edit-form {
+  grid-column:1/-1; margin-top:10px; padding-top:10px;
+  border-top:1px solid var(--b1);
+  display:flex; flex-wrap:wrap; gap:8px;
+}
+.tx-edit-form input, .tx-edit-form select {
+  flex:1; min-width:100px; padding:7px 10px; border-radius:var(--r2);
+  background:var(--s2); border:1px solid var(--b1); color:var(--text);
+  font-family:var(--fb); font-size:.8rem;
+}
+.tx-edit-actions { display:flex; gap:8px; width:100%; }
+.tx-edit-actions .btn { flex:1; padding:8px; font-size:.75rem; }
 @media(max-width:360px){ .txii { display:none; } .cpill { display:none; } }
 /* Sur mobile, le FAB chevauchait le bouton supprimer sur les transactions et objectifs */
 @media(max-width:620px){
@@ -642,11 +669,23 @@ nav::-webkit-scrollbar { display:none; }
 .gb-p { background:rgba(77,120,212,.14); color:var(--pr-l); border:1px solid rgba(77,120,212,.28); }
 .gb-d { background:rgba(52,211,153,.12); color:var(--green); border:1px solid rgba(52,211,153,.24); }
 .g-ctrl { display:flex; gap:4px; align-items:center; }
-.g-del {
+.g-del, .g-ed {
   background:none; border:none; color:var(--faint);
   cursor:pointer; padding:4px; border-radius:5px;
   display:flex; transition:.12s;
 }
+.g-ed svg { stroke:currentColor; }
+.g-ed:hover { color:var(--pr-l); background:rgba(77,120,212,.1); }
+.g-edit-form {
+  margin-top:12px; padding-top:12px; border-top:1px solid var(--b1);
+  display:flex; flex-direction:column; gap:8px;
+}
+.g-edit-row { display:flex; gap:8px; }
+.g-edit-row input { flex:1; min-width:0; padding:8px 10px; border-radius:var(--r2);
+  background:var(--s2); border:1px solid var(--b1); color:var(--text);
+  font-family:var(--fb); font-size:.8rem; }
+.g-edit-actions { display:flex; gap:8px; }
+.g-edit-actions .btn { flex:1; padding:9px; font-size:.75rem; }
 .g-del svg { stroke:currentColor; }
 .g-del:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
 .gam { display:flex; justify-content:space-between; align-items:baseline; margin-top:5px; }
@@ -1784,7 +1823,7 @@ nav::-webkit-scrollbar { display:none; }
   <div class="ngform">
     <div class="g2" style="margin-bottom:11px;">
       <div class="field"><label>Nom de l'objectif</label><input type="text" id="ng-n" placeholder="Ex: Caution appartement"></div>
-      <div class="field"><label>Échéance</label><input type="text" id="ng-d" placeholder="Ex: Sept. 2026"></div>
+      <div class="field"><label>Échéance</label><input type="date" id="ng-d"></div>
       <div class="field"><label>Montant cible</label><input type="text" inputmode="decimal" id="ng-t" placeholder="1 800"></div>
       <div class="field"><label>Déjà épargné</label><input type="text" inputmode="decimal" id="ng-c" placeholder="0"></div>
     </div>
@@ -2354,13 +2393,15 @@ const USER_KEY    = 'monargent-username';
 const GENDER_KEY  = 'monargent-usergender';
 let aiHistory   = [];
 
+let _saveTimer = null;
 function save() {
-  // Donnees mensuelles (revenus, budget, depenses)
-  const monthData = { revenus: D.revenus, budget: D.budget, expenses: D.expenses };
-  localStorage.setItem(key(), JSON.stringify(monthData));
-  // Objectifs sauvegardes globalement (independants du mois)
-  localStorage.setItem(GOALS_KEY, JSON.stringify(D.goals));
-  setText('chip', '✓ Sauvegardé');
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    const monthData = { revenus: D.revenus, budget: D.budget, expenses: D.expenses };
+    localStorage.setItem(key(), JSON.stringify(monthData));
+    localStorage.setItem(GOALS_KEY, JSON.stringify(D.goals));
+    setText('chip', '✓ Sauvegardé');
+  }, 300);
 }
 
 function loadGoals() {
@@ -2549,8 +2590,9 @@ function init() {
   document.getElementById('tx-dt').value = todayISO();
   updateCatSel();
 
-  // 2. Préférences visuelles (thème uniquement — pas de renderAll déclenché)
-  setTheme(localStorage.getItem('monargent-theme') || 'light');
+  // 2. Préférences visuelles — appliqué en tout premier pour éviter le flash de thème
+  const savedTheme = localStorage.getItem('monargent-theme') || 'light';
+  setTheme(savedTheme);
 
   // 3. Charge les vraies données AVANT setCurrency pour éviter que
   //    setCurrency → renderAll → recalc → save() n'écrase le localStorage avec D vide
@@ -2571,8 +2613,13 @@ function init() {
 }
 
 function changeMonth(d) {
-  M += d;
-  if(M<0){M=11;Y--;} if(M>11){M=0;Y++;}
+  const now = new Date();
+  const newM = M + d;
+  const newY = newM < 0 ? Y - 1 : newM > 11 ? Y + 1 : Y;
+  const adjM = ((newM % 12) + 12) % 12;
+  // Bloquer au mois courant
+  if(newY > now.getFullYear() || (newY === now.getFullYear() && adjM > now.getMonth())) return;
+  M = adjM; Y = newY;
   loadMonth();
 }
 
@@ -2650,7 +2697,8 @@ function renderBudRows() {
     return `<div class="bud-row">
       <div class="b-ico-wrap" title="Catégorie">${ico}</div>
       <div class="bn"><input type="text" value="${esc(b.name)}" placeholder="Nom du poste"
-        oninput="D.budget.find(x=>x.id==='${b.id}').name=this.value;renderBudRows();save()"></div>
+        oninput="D.budget.find(x=>x.id==='${b.id}').name=this.value;save()"
+        onblur="renderBudRows()"></div>
       <div class="ba"><input type="text" inputmode="decimal" value="${displayAmt}"
         oninput="D.budget.find(x=>x.id==='${b.id}').amount=fromDisplay(parseAmt(this.value));recalc();save()"></div>
       <div class="bp3">${pct}%</div>
@@ -2698,7 +2746,7 @@ function recalc() {
   setText('ov-rev2', fmt(totalR));
   setText('ov-dep',  fmt(totalE));
   const restEl=document.getElementById('ov-rest');
-  if(restEl){ restEl.textContent=fmt(Math.max(0,restE)); }
+  if(restEl){ restEl.textContent=(restE<0?'−':'')+fmt(Math.abs(restE)); restEl.style.color=restE<0?'var(--red-l)':''; }
   const naEl=document.getElementById('ov-na');
   if(naEl){ naEl.textContent=(restB>=0?'+':'')+fmt(Math.abs(restB)); }
 
@@ -2843,7 +2891,7 @@ function renderBudgetLines(totalR) {
 function renderRecentTxs() {
   const el = document.getElementById('ov-recent-txs');
   if(!el) return;
-  const recent = D.expenses.slice(0,5);
+  const recent = [...D.expenses].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
   if(!recent.length){
     el.innerHTML=`<div class="empty" style="padding:18px;"><div class="empty-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction ce mois-ci</div>`;
     return;
@@ -2905,7 +2953,39 @@ function addTx() {
   renderExpenses(); recalc(); save();
 }
 
-function delTx(id) { D.expenses=D.expenses.filter(e=>e.id!==id); renderExpenses(); recalc(); save(); }
+function delTx(id) {
+  const tx = D.expenses.find(e=>e.id===id);
+  if(!tx) return;
+  if(!confirm(`Supprimer "${tx.desc}" (${fmt(tx.amount)}) ?`)) return;
+  D.expenses=D.expenses.filter(e=>e.id!==id); renderExpenses(); recalc(); save();
+}
+
+function openEditTx(id) {
+  // Ferme tout autre formulaire ouvert
+  document.querySelectorAll('.tx-edit-form').forEach(f=>f.style.display='none');
+  const form = document.getElementById('txef-'+id);
+  if(form) form.style.display='block';
+}
+
+function closeEditTx(id) {
+  const form = document.getElementById('txef-'+id);
+  if(form) form.style.display='none';
+}
+
+function saveEditTx(id) {
+  const tx = D.expenses.find(e=>e.id===id);
+  if(!tx) return;
+  const form = document.getElementById('txef-'+id);
+  if(!form) return;
+  const desc = form.querySelector('.tx-edit-desc').value.trim();
+  const cat  = form.querySelector('.tx-edit-cat').value;
+  const amt  = fromDisplay(parseAmt(form.querySelector('.tx-edit-amt').value));
+  const date = form.querySelector('.tx-edit-date').value;
+  if(!desc || amt <= 0) return;
+  tx.desc = desc; tx.cat = cat; tx.amount = amt;
+  if(date) tx.date = date;
+  renderExpenses(); recalc(); save();
+}
 
 function renderExpenses() {
   const list=document.getElementById('txl');
@@ -2918,8 +2998,9 @@ function renderExpenses() {
     const col=isE?'var(--red-l)':'var(--green)';
     const ibg=isE?'rgba(196,58,58,.14)':'rgba(52,211,153,.12)';
     const sign=isE?'−':'+';
-    const df = fmtDate(e.date);    const ico=catIco(e.cat,14);
-    return `<div class="txi">
+    const df = fmtDate(e.date); const ico=catIco(e.cat,14);
+    const catsOpts=(isE?CATS_E:CATS_I).map(c=>`<option value="${c}"${c===e.cat?' selected':''}>${c}</option>`).join('');
+    return `<div class="txi" id="txi-${e.id}">
       <div class="txii" style="background:${ibg};color:${col}">${ico}</div>
       <div class="txif">
         <div class="txid">${esc(e.desc)}</div>
@@ -2929,9 +3010,22 @@ function renderExpenses() {
         </div>
       </div>
       <div class="txam" style="color:${col}">${sign} ${fmt(e.amount)}</div>
+      <button class="txed" onclick="openEditTx('${e.id}')" title="Modifier">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
       <button class="txdl" onclick="delTx('${e.id}')" title="Supprimer">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
+      <div class="tx-edit-form" id="txef-${e.id}" style="display:none;">
+        <input type="text" class="tx-edit-desc" value="${esc(e.desc)}" placeholder="Description">
+        <select class="tx-edit-cat">${catsOpts}</select>
+        <input type="text" inputmode="decimal" class="tx-edit-amt" value="${toDisplay(e.amount).toFixed(getCur().code==='XOF'||getCur().code==='MAD'?0:2)}" placeholder="Montant">
+        <input type="date" class="tx-edit-date" value="${e.date}">
+        <div class="tx-edit-actions">
+          <button class="btn bp bsm" onclick="saveEditTx('${e.id}')">Enregistrer</button>
+          <button class="btn bsm" onclick="closeEditTx('${e.id}')">Annuler</button>
+        </div>
+      </div>
     </div>`;
   }).join('');
   renderCatBk(D.expenses.filter(e=>e.type!=='income'));
@@ -2995,6 +3089,26 @@ function addToGoal(id, prefix='') {
 
 function delGoal(id) { D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); }
 
+function toggleEditGoal(id, prefix) {
+  const form = document.getElementById('gef-'+prefix+id);
+  if(!form) return;
+  form.style.display = form.style.display==='none' ? 'block' : 'none';
+}
+
+function saveEditGoal(id, prefix) {
+  const g = D.goals.find(g=>g.id===id);
+  if(!g) return;
+  const form = document.getElementById('gef-'+prefix+id);
+  if(!form) return;
+  const name   = form.querySelector('.g-edit-name').value.trim();
+  const target = fromDisplay(parseAmt(form.querySelector('.g-edit-target').value));
+  const saved  = fromDisplay(parseAmt(form.querySelector('.g-edit-saved').value));
+  const dl     = form.querySelector('.g-edit-dl').value;
+  if(!name || target <= 0) return;
+  g.name = name; g.target = target; g.saved = Math.min(saved, target); g.deadline = dl;
+  renderGoals(); save();
+}
+
 function buildGoalCard(g, prefix) {
   const pct=g.target>0?Math.min(100,Math.round((g.saved/g.target)*100)):0;
   const done=g.saved>=g.target;
@@ -3011,11 +3125,14 @@ function buildGoalCard(g, prefix) {
         </div>
         <div>
           <div class="gn">${esc(g.name)}</div>
-          ${g.deadline?`<div class="gdl">${clockIco} ${esc(g.deadline)}</div>`:''}
+          ${g.deadline?`<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>`:''}
         </div>
       </div>
       <div class="g-ctrl">
         ${badge}
+        <button class="g-ed" onclick="toggleEditGoal('${g.id}','${prefix}')" title="Modifier">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
         <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -3033,6 +3150,20 @@ function buildGoalCard(g, prefix) {
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Ajouter
       </button>
+    </div>
+    <div class="g-edit-form" id="gef-${prefix}${g.id}" style="display:none;">
+      <div class="g-edit-row">
+        <input type="text" class="g-edit-name" value="${esc(g.name)}" placeholder="Nom de l'objectif">
+        <input type="date" class="g-edit-dl" value="${g.deadline||''}">
+      </div>
+      <div class="g-edit-row">
+        <input type="text" inputmode="decimal" class="g-edit-target" value="${toDisplay(g.target).toFixed(0)}" placeholder="Montant cible">
+        <input type="text" inputmode="decimal" class="g-edit-saved" value="${toDisplay(g.saved).toFixed(0)}" placeholder="Déjà épargné">
+      </div>
+      <div class="g-edit-actions">
+        <button class="btn bp bsm" onclick="saveEditGoal('${g.id}','${prefix}')">Enregistrer</button>
+        <button class="btn bsm" onclick="toggleEditGoal('${g.id}','${prefix}')">Annuler</button>
+      </div>
     </div>
   </div>`;
 }
@@ -3107,7 +3238,7 @@ async function sendAI() {
   const q=inp.value.trim(); if(!q) return;
   const btn=document.getElementById('ai-btn');
   const msgs=document.getElementById('ai-msgs');
-  btn.disabled=true; inp.value='';
+  btn.disabled=true; inp.disabled=true; inp.value='';
   aiHistory.push({role:'user', text: esc(q)});
   renderAiMsg('user', esc(q));
   const tid='ty'+Date.now();
@@ -3187,9 +3318,12 @@ INSTRUCTIONS: Réponds en français. Sois précis, chiffré et actionnable. Maxi
 Appuie-toi sur les données réelles ci-dessus pour personnaliser chaque conseil.
 Si l'utilisateur a des objectifs, intègre-les dans tes recommandations.`;
 
+  // Historique conversationnel (max 10 derniers échanges pour limiter la taille)
+  const history = aiHistory.slice(-10).map(m=>({ role: m.role==='user'?'user':'assistant', content: m.text }));
+
   try {
     const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question:q,context:sys})});
+      body:JSON.stringify({question:q,context:sys,history})});
     const data=await res.json();
     const reply=data.reply||'Pas de réponse.';
     document.getElementById(tid)?.remove();
@@ -3199,7 +3333,7 @@ Si l'utilisateur a des objectifs, intègre-les dans tes recommandations.`;
   } catch(e) {
     const el=document.getElementById(tid); if(el) el.textContent='⚠️ Erreur de connexion.';
   }
-  btn.disabled=false; msgs.scrollTop=msgs.scrollHeight;
+  btn.disabled=false; inp.disabled=false; inp.focus(); msgs.scrollTop=msgs.scrollHeight;
 }
 
 /* ═══════════════════════════════
