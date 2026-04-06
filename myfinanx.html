@@ -1033,6 +1033,80 @@ nav::-webkit-scrollbar { display:none; }
 .drawer-data-btn:hover { color:var(--text); border-color:var(--pr); background:var(--s1); }
 .drawer-data-btn:active { opacity:.7; }
 .drawer-data-btn.imp:hover { border-color:var(--green); color:var(--green); }
+.drawer-data-btn.rst:hover { border-color:var(--red-l); color:var(--red-l); }
+.hdr-data-btn.rst:hover { border-color:var(--red-l); color:var(--red-l); }
+
+/* ════ RESET MODAL ════ */
+.reset-overlay {
+  display:none; position:fixed; inset:0; z-index:400;
+  background:rgba(0,0,0,.62); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.reset-overlay.open { display:flex; animation:fadeIn .2s ease; }
+.reset-card {
+  background:var(--s1); border:1px solid var(--b1); border-radius:var(--r);
+  padding:24px; max-width:340px; width:100%; animation:slideUp .25s ease;
+}
+.reset-ico {
+  width:44px; height:44px; border-radius:50%; margin-bottom:14px;
+  display:flex; align-items:center; justify-content:center;
+}
+.reset-ico.warn { background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.3); }
+.reset-ico.warn svg { stroke:var(--gold); }
+.reset-ico.danger { background:rgba(196,58,58,.12); border:1px solid rgba(196,58,58,.3); }
+.reset-ico.danger svg { stroke:var(--red-l); }
+.reset-title { font-family:var(--fh); font-size:1rem; font-weight:800; color:var(--text); margin-bottom:8px; }
+.reset-body { font-size:.78rem; color:var(--muted); line-height:1.55; margin-bottom:20px; }
+.reset-hint {
+  font-size:.72rem; color:var(--muted); background:var(--s2); border:1px solid var(--b1);
+  border-radius:var(--r2); padding:10px 12px; margin-bottom:18px; line-height:1.5;
+}
+.reset-hint strong { color:var(--text); font-family:var(--fh); }
+.reset-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.reset-btn-cancel {
+  flex:1; padding:9px 12px; border-radius:var(--r2); min-width:80px;
+  font-family:var(--fh); font-size:.73rem; font-weight:700;
+  border:1px solid var(--b2); background:var(--s2); color:var(--muted); cursor:pointer; transition:.13s;
+}
+.reset-btn-cancel:hover { color:var(--text); border-color:var(--b1); }
+.reset-btn-export {
+  flex:1.4; padding:9px 12px; border-radius:var(--r2); min-width:110px;
+  font-family:var(--fh); font-size:.73rem; font-weight:700;
+  border:1px solid var(--pr); background:rgba(77,120,212,.1); color:var(--pr-l); cursor:pointer; transition:.13s;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+.reset-btn-export svg { stroke:currentColor; flex-shrink:0; }
+.reset-btn-export:hover { background:rgba(77,120,212,.2); }
+.reset-btn-next {
+  flex:1; padding:9px 12px; border-radius:var(--r2); min-width:90px;
+  font-family:var(--fh); font-size:.73rem; font-weight:700;
+  border:1px solid var(--b2); background:var(--s2); color:var(--muted); cursor:pointer; transition:.13s;
+}
+.reset-btn-next:hover { color:var(--text); }
+.reset-btn-confirm {
+  flex:1.4; padding:9px 12px; border-radius:var(--r2); min-width:120px;
+  font-family:var(--fh); font-size:.73rem; font-weight:700;
+  border:1px solid rgba(196,58,58,.5); background:rgba(196,58,58,.12); color:var(--red-l); cursor:pointer; transition:.13s;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+.reset-btn-confirm svg { stroke:currentColor; flex-shrink:0; }
+.reset-btn-confirm:hover { background:rgba(196,58,58,.22); border-color:var(--red-l); }
+
+/* ════ DESKTOP MADE-BY FOOTER ════ */
+.desktop-made { display:none; }
+@media(min-width:621px) {
+  .desktop-made {
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    padding:16px 24px; border-top:1px solid var(--b1);
+    background:var(--s0);
+  }
+}
+.desktop-made-pp {
+  width:30px; height:30px; border-radius:50%;
+  object-fit:cover; flex-shrink:0; border:2px solid var(--pr);
+}
+.desktop-made-txt { font-size:.67rem; color:var(--muted); line-height:1.4; }
+.desktop-made-txt strong { color:var(--text); font-family:var(--fh); }
 
 /* Made by card */
 .drawer-made {
@@ -1294,6 +1368,10 @@ nav::-webkit-scrollbar { display:none; }
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Importer
     </button>
+    <button class="hdr-data-btn rst" onclick="openResetModal()" title="Réinitialiser toutes les données">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Réinitialiser
+    </button>
   </div>
 
   <div class="chip" id="chip">✓ Sauvegardé</div>
@@ -1350,6 +1428,10 @@ nav::-webkit-scrollbar { display:none; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Importer
       </button>
+      <button class="drawer-data-btn rst" onclick="openResetModal()" title="Effacer toutes les données">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Réinitialiser
+      </button>
     </div>
   </div>
 
@@ -1367,6 +1449,44 @@ nav::-webkit-scrollbar { display:none; }
   </div>
 </div>
 <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(this.files[0])">
+
+<!-- ════ RESET MODAL ════ -->
+<div class="reset-overlay" id="reset-overlay" onclick="resetOverlayClick(event)">
+  <div class="reset-card">
+    <!-- Étape 1 : suggestion export -->
+    <div id="reset-s1">
+      <div class="reset-ico warn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="reset-title">Sauvegarder d'abord ?</div>
+      <div class="reset-body">Avant de réinitialiser, tu peux télécharger une copie de toutes tes données. Tu pourras les restaurer plus tard via "Importer".</div>
+      <div class="reset-hint"><strong>Conseil :</strong> exporte si tu veux garder un historique ou changer d'appareil.</div>
+      <div class="reset-actions">
+        <button class="reset-btn-cancel" onclick="closeResetModal()">Annuler</button>
+        <button class="reset-btn-export" onclick="exportData()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exporter
+        </button>
+        <button class="reset-btn-next" onclick="resetStep2()">Continuer →</button>
+      </div>
+    </div>
+    <!-- Étape 2 : confirmation -->
+    <div id="reset-s2" style="display:none">
+      <div class="reset-ico danger">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="reset-title">Tout effacer ?</div>
+      <div class="reset-body">Revenus, dépenses, budget, objectifs et historique IA — tout sera supprimé définitivement. L'application repartira de zéro.</div>
+      <div class="reset-actions">
+        <button class="reset-btn-cancel" onclick="closeResetModal()">Annuler</button>
+        <button class="reset-btn-confirm" onclick="confirmReset()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          Tout effacer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ════ TOP NAV ════ -->
 <nav id="top-nav">
@@ -1918,6 +2038,18 @@ nav::-webkit-scrollbar { display:none; }
     </div>
 
     <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
+  </div>
+</div>
+
+<!-- ════ DESKTOP MADE-BY FOOTER ════ -->
+<div class="desktop-made">
+  <img src="pp.png" alt="Emmanuel Danton" class="desktop-made-pp">
+  <div class="desktop-made-txt">
+    Hey les curieux 👋 je suis <strong>Emmanuel</strong>, le concepteur de MyFinanx.
+    <a href="https://www.linkedin.com/in/emmanueldanton/" target="_blank" rel="noopener" class="drawer-made-li" style="margin-top:0;margin-left:8px;font-size:.63rem;">
+      <svg width="11" height="11" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      Suivez-moi sur LinkedIn
+    </a>
   </div>
 </div>
 
@@ -3140,6 +3272,39 @@ function importData(file) {
 }
 
 init();
+
+/* ════ RESET ════ */
+function openResetModal() {
+  toggleDrawer(false);
+  document.getElementById('reset-s1').style.display = '';
+  document.getElementById('reset-s2').style.display = 'none';
+  document.getElementById('reset-overlay')?.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeResetModal() {
+  document.getElementById('reset-overlay')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function resetOverlayClick(e) {
+  if(e.target === document.getElementById('reset-overlay')) closeResetModal();
+}
+
+function resetStep2() {
+  document.getElementById('reset-s1').style.display = 'none';
+  document.getElementById('reset-s2').style.display = '';
+}
+
+function confirmReset() {
+  const keys = [];
+  for(let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if(k && k.startsWith('monargent')) keys.push(k);
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+  window.location.reload();
+}
 
 /* ════ PWA INSTALL POPUP ════ */
 function showPwaPopup() {
