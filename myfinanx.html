@@ -856,6 +856,18 @@ nav::-webkit-scrollbar { display:none; }
   animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
   position:relative;
 }
+/* Onboarding : centré + scrollable sur petits écrans */
+#ob-overlay {
+  align-items:center;
+  padding:16px;
+}
+#ob-overlay .pwa-card {
+  border-radius:20px;
+  max-height:92svh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:28px;
+}
 @keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
 .pwa-close {
   position:absolute; top:16px; right:16px;
@@ -3584,15 +3596,10 @@ function launchConfetti() {
 
 function showOnboarding() {
   if(localStorage.getItem('monargent-onboarded')) return;
-  // Afficher l'onboarding en standalone ET en navigateur (première visite)
-  // En navigateur : on montre quand même si le PWA popup n'est pas visible
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  const pwaOpen = document.getElementById('pwa-overlay')?.classList.contains('open');
-  if(!isStandalone && pwaOpen) return; // ne pas empiler sur le popup PWA
+  // Ne pas empiler sur le popup PWA si déjà ouvert
+  if(document.getElementById('pwa-overlay')?.classList.contains('open')) return;
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
-  // Attendre 2 frames pour que l'overlay soit peint avant de lancer les confettis
-  requestAnimationFrame(() => requestAnimationFrame(launchConfetti));
 }
 
 function obNext() {
@@ -3602,6 +3609,8 @@ function obNext() {
     document.getElementById('ob-overlay')?.classList.remove('open');
     document.body.style.overflow = '';
     localStorage.setItem('monargent-onboarded', '1');
+    // Confettis de fin d'onboarding
+    requestAnimationFrame(() => requestAnimationFrame(launchConfetti));
     // Demander la permission push OneSignal après l'onboarding
     if(window.OneSignalDeferred) {
       OneSignalDeferred.push(o => o.Slidedown.promptPush());
@@ -3766,7 +3775,7 @@ function closeAd() {
 
 loadAd();
 
-setTimeout(showOnboarding, 1200);
+setTimeout(showOnboarding, 900);
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
