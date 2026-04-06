@@ -3308,16 +3308,10 @@ function confirmReset() {
 }
 
 /* ════ PWA INSTALL POPUP ════ */
-// Migration : supprimer l'ancienne clé localStorage qui bloquait le popup
-localStorage.removeItem('monargent-pwa-dismissed');
-
 function showPwaPopup() {
   // Ne pas montrer si déjà installée en mode standalone (PWA lancée depuis l'écran d'accueil)
   if(window.matchMedia('(display-mode: standalone)').matches) return;
   if(navigator.standalone === true) return; // iOS standalone
-  // Ne pas re-montrer si déjà vu/fermé dans cette session de navigation
-  if(sessionStorage.getItem('pwa-seen')) return;
-  // Délai de 2s pour laisser l'app se charger
   setTimeout(() => {
     document.getElementById('pwa-overlay')?.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -3327,7 +3321,6 @@ function showPwaPopup() {
 function closePwaPopup() {
   document.getElementById('pwa-overlay')?.classList.remove('open');
   document.body.style.overflow = '';
-  sessionStorage.setItem('pwa-seen', '1');
 }
 
 function pwaOverlayClick(e) {
