@@ -3584,9 +3584,11 @@ function launchConfetti() {
 
 function showOnboarding() {
   if(localStorage.getItem('monargent-onboarded')) return;
-  // Si le popup PWA est affiché (navigateur, pas standalone), ne pas empiler
+  // Afficher l'onboarding en standalone ET en navigateur (première visite)
+  // En navigateur : on montre quand même si le PWA popup n'est pas visible
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  if(!isStandalone) return; // sur navigateur, l'utilisateur installe d'abord
+  const pwaOpen = document.getElementById('pwa-overlay')?.classList.contains('open');
+  if(!isStandalone && pwaOpen) return; // ne pas empiler sur le popup PWA
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
   // Attendre 2 frames pour que l'overlay soit peint avant de lancer les confettis
@@ -3764,7 +3766,7 @@ function closeAd() {
 
 loadAd();
 
-setTimeout(showOnboarding, 600);
+setTimeout(showOnboarding, 1200);
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
