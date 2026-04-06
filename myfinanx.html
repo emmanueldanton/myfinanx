@@ -297,6 +297,7 @@ header {
   font-size:.62rem; padding:3px 9px; border-radius:99px;
   background:rgba(77,120,212,.1); color:var(--pr-l);
   border:1px solid rgba(77,120,212,.22); font-weight:500; white-space:nowrap; flex-shrink:0;
+  opacity:0; transition:opacity .3s ease;
 }
 @media(max-width:620px){ .chip { display:none; } }
 
@@ -1399,7 +1400,11 @@ nav::-webkit-scrollbar { display:none; }
   <div class="hdr-data">
     <button class="hdr-data-btn" onclick="exportData()" title="Télécharger une sauvegarde JSON">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Exporter
+      JSON
+    </button>
+    <button class="hdr-data-btn" onclick="exportCSV()" title="Exporter les transactions en CSV (Excel)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      CSV
     </button>
     <button class="hdr-data-btn" onclick="document.getElementById('import-input').click()" title="Restaurer depuis un fichier JSON">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1457,9 +1462,13 @@ nav::-webkit-scrollbar { display:none; }
     </div>
     <div class="drawer-ft-lbl" style="margin-top:14px;">Données</div>
     <div class="drawer-data">
-      <button class="drawer-data-btn" onclick="exportData()" title="Télécharger une sauvegarde JSON">
+      <button class="drawer-data-btn" onclick="exportData()" title="Sauvegarde JSON complète">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Exporter
+        JSON
+      </button>
+      <button class="drawer-data-btn" onclick="exportCSV()" title="Transactions CSV (Excel)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        CSV
       </button>
       <button class="drawer-data-btn imp" onclick="document.getElementById('import-input').click()" title="Restaurer depuis un fichier JSON">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -2394,13 +2403,20 @@ const GENDER_KEY  = 'monargent-usergender';
 let aiHistory   = [];
 
 let _saveTimer = null;
+let _chipTimer = null;
 function save() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     const monthData = { revenus: D.revenus, budget: D.budget, expenses: D.expenses };
     localStorage.setItem(key(), JSON.stringify(monthData));
     localStorage.setItem(GOALS_KEY, JSON.stringify(D.goals));
-    setText('chip', '✓ Sauvegardé');
+    const chip = document.getElementById('chip');
+    if(chip) {
+      chip.textContent = '✓ Sauvegardé';
+      chip.style.opacity = '1';
+      clearTimeout(_chipTimer);
+      _chipTimer = setTimeout(() => { chip.style.opacity = '0'; }, 2000);
+    }
   }, 300);
 }
 
@@ -3370,13 +3386,45 @@ function exportData() {
   const backup = { _version:1, _date:new Date().toISOString() };
   for(let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if(k && k.startsWith('monargent')) backup[k] = localStorage.getItem(k);
+    if(k && (k.startsWith('monargent') || k.startsWith('myfinanx'))) backup[k] = localStorage.getItem(k);
   }
   const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href = url;
   a.download = `myfinanx-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function exportCSV() {
+  const cur = getCur();
+  const rows = [['Date','Description','Catégorie','Type','Montant ('+cur.symbol+')','Mois']];
+  // Collecte toutes les clés mensuelles triées
+  const monthKeys = [];
+  for(let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if(k && k.match(/^monargent_\d{4}_\d{2}$/)) monthKeys.push(k);
+  }
+  monthKeys.sort().forEach(k => {
+    try {
+      const p = JSON.parse(localStorage.getItem(k));
+      const label = k.replace('monargent_','').replace('_','/');
+      if(Array.isArray(p.expenses)) {
+        p.expenses.forEach(e => {
+          const amt = toDisplay(e.amount).toFixed(cur.code==='XOF'||cur.code==='MAD'?0:2);
+          const type = e.type==='income' ? 'Revenu' : 'Dépense';
+          rows.push([e.date, e.desc, e.cat, type, amt, label]);
+        });
+      }
+    } catch(e) {}
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `myfinanx-transactions-${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
@@ -3434,9 +3482,10 @@ function confirmReset() {
   const keys = [];
   for(let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if(k && k.startsWith('monargent')) keys.push(k);
+    if(k && (k.startsWith('monargent') || k.startsWith('myfinanx'))) keys.push(k);
   }
   keys.forEach(k => localStorage.removeItem(k));
+  sessionStorage.clear();
   window.location.reload();
 }
 
@@ -3478,25 +3527,35 @@ const OB_TOTAL = 7;
 
 function launchConfetti() {
   const canvas = document.createElement('canvas');
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10001;';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:10001;';
   document.body.appendChild(canvas);
+
+  // Dimensions après insertion dans le DOM pour avoir les vraies valeurs mobile
+  function resize() {
+    canvas.width  = window.innerWidth  || document.documentElement.clientWidth;
+    canvas.height = window.innerHeight || document.documentElement.clientHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
   const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
   const colors = ['#4D78D4','#7C5CBF','#22c55e','#F5A623','#ef4444','#06b6d4','#f472b6'];
-  const particles = Array.from({length: 90}, () => ({
+  const particles = Array.from({length: 110}, () => ({
     x: Math.random() * canvas.width,
-    y: -15 - Math.random() * 40,
+    y: -20 - Math.random() * 60,
     r: Math.random() * 7 + 3,
     color: colors[Math.floor(Math.random() * colors.length)],
-    vx: (Math.random() - 0.5) * 4,
-    vy: Math.random() * 3 + 2,
+    vx: (Math.random() - 0.5) * 5,
+    vy: Math.random() * 3 + 1.5,
     rot: Math.random() * 360,
     rotV: (Math.random() - 0.5) * 8,
     rect: Math.random() > 0.4
   }));
+
   let frame = 0;
-  const total = 160;
+  const total = 180;
+  let rafId;
+
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => {
@@ -3508,13 +3567,19 @@ function launchConfetti() {
       if(p.rect) ctx.fillRect(-p.r, -p.r * .45, p.r * 2, p.r * .9);
       else { ctx.beginPath(); ctx.arc(0, 0, p.r * .55, 0, Math.PI * 2); ctx.fill(); }
       ctx.restore();
-      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.rot += p.rotV;
+      p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.rot += p.rotV;
     });
     frame++;
-    if(frame < total) requestAnimationFrame(draw);
-    else canvas.remove();
+    if(frame < total) {
+      rafId = requestAnimationFrame(draw);
+    } else {
+      window.removeEventListener('resize', resize);
+      canvas.remove();
+    }
   }
-  draw();
+
+  // Démarrer au prochain frame pour s'assurer que le DOM est peint
+  rafId = requestAnimationFrame(draw);
 }
 
 function showOnboarding() {
@@ -3524,7 +3589,8 @@ function showOnboarding() {
   if(!isStandalone) return; // sur navigateur, l'utilisateur installe d'abord
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(launchConfetti, 300);
+  // Attendre 2 frames pour que l'overlay soit peint avant de lancer les confettis
+  requestAnimationFrame(() => requestAnimationFrame(launchConfetti));
 }
 
 function obNext() {
