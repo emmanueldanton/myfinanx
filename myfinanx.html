@@ -863,7 +863,8 @@ nav::-webkit-scrollbar { display:none; }
 }
 #ob-overlay .pwa-card {
   border-radius:20px;
-  max-height:92svh;
+  max-height:88vh; /* fallback universel */
+  max-height:88svh; /* iOS 15.4+ / Chrome 108+ */
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   padding-bottom:28px;
@@ -3596,8 +3597,18 @@ function launchConfetti() {
 
 function showOnboarding() {
   if(localStorage.getItem('monargent-onboarded')) return;
-  // Ne pas empiler sur le popup PWA si déjà ouvert
-  if(document.getElementById('pwa-overlay')?.classList.contains('open')) return;
+  // Si c'est la première visite, fermer le popup PWA s'il est ouvert (priorité à l'onboarding)
+  const pwaOverlay = document.getElementById('pwa-overlay');
+  if(pwaOverlay?.classList.contains('open')) {
+    pwaOverlay.classList.remove('open');
+  }
+  // Reset état onboarding au cas où
+  obStep = 0;
+  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.ob-dot').forEach(d => d.classList.remove('on'));
+  document.getElementById('ob-s0')?.classList.add('on');
+  document.getElementById('ob-d0')?.classList.add('on');
+  document.getElementById('ob-next').textContent = 'Commencer';
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3775,7 +3786,7 @@ function closeAd() {
 
 loadAd();
 
-setTimeout(showOnboarding, 900);
+setTimeout(showOnboarding, 1000);
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
