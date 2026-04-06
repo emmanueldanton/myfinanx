@@ -64,12 +64,12 @@
    DESIGN TOKENS — MIDNIGHT BLUE
 ═══════════════════════════════════════════ */
 :root {
-  --bg:      #090E1A;
-  --s0:      #0f1624;
-  --s1:      #162038;
-  --s2:      #1c2a48;
-  --b1:      #243660;
-  --b2:      #2e4478;
+  --bg:      #000000;
+  --s0:      #080c14;
+  --s1:      #0f1520;
+  --s2:      #161e2e;
+  --b1:      #202840;
+  --b2:      #2c3a58;
 
   --pr:      #4D78D4;
   --pr-l:    #7BA3F0;
@@ -82,27 +82,27 @@
   --gold:    #f59e0b;
   --violet:  #a78bfa;
 
-  --text:    #e8efff;
-  --muted:   #6880aa;
-  --faint:   #2a3a5c;
+  --text:    #edeff5;
+  --muted:   #6878a0;
+  --faint:   #1a2238;
 
   /* Theme-aware variables */
-  --header-bg:   rgba(9,14,26,.93);
-  --shadow-lg:   rgba(0,0,0,.5);
-  --grad1:       rgba(77,120,212,.09);
-  --grad2:       rgba(196,58,58,.055);
-  --ai-bg1:      #090f22;
-  --ai-bg2:      #0f0e2c;
-  --ai-bdr:      #1b2260;
-  --ai-msg-bg:   rgba(6,10,30,.6);
-  --ai-msg-col:  #4458a0;
+  --header-bg:   rgba(0,0,0,.88);
+  --shadow-lg:   rgba(0,0,0,.6);
+  --grad1:       rgba(77,120,212,.08);
+  --grad2:       rgba(196,58,58,.04);
+  --ai-bg1:      #06080f;
+  --ai-bg2:      #0a0810;
+  --ai-bdr:      #1a2238;
+  --ai-msg-bg:   rgba(6,8,20,.6);
+  --ai-msg-col:  #3050a0;
   --dot-active:  rgba(255,255,255,.7);
 
   --fh: 'Gabarito', sans-serif;
   --fb: 'DM Sans', sans-serif;
   --r:  12px;
   --r2:  8px;
-  --logo-bg: #162038;
+  --logo-bg: #0f1520;
 }
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -2062,46 +2062,46 @@ function setCurrency(code) {
 ═══════════════════════════════ */
 const THEMES = {
   blue: {
-    '--bg':'#090E1A','--s0':'#0f1624','--s1':'#162038','--s2':'#1c2a48',
-    '--b1':'#243660','--b2':'#2e4478',
+    '--bg':'#000000','--s0':'#080c14','--s1':'#0f1520','--s2':'#161e2e',
+    '--b1':'#202840','--b2':'#2c3a58',
     '--pr':'#4D78D4','--pr-l':'#7BA3F0','--pr-d':'#3560b8',
-    '--text':'#e8efff','--muted':'#6880aa','--faint':'#2a3a5c',
+    '--text':'#edeff5','--muted':'#6878a0','--faint':'#1a2238',
     '--red':'#C43A3A','--red-l':'#e87a7a',
     '--green':'#34d399','--gold':'#f59e0b','--violet':'#a78bfa',
-    '--header-bg':'rgba(9,14,26,.93)','--shadow-lg':'rgba(0,0,0,.5)',
-    '--grad1':'rgba(77,120,212,.09)','--grad2':'rgba(196,58,58,.055)',
-    '--ai-bg1':'#090f22','--ai-bg2':'#0f0e2c','--ai-bdr':'#1b2260',
-    '--ai-msg-bg':'rgba(6,10,30,.6)','--ai-msg-col':'#4458a0',
+    '--header-bg':'rgba(0,0,0,.88)','--shadow-lg':'rgba(0,0,0,.6)',
+    '--grad1':'rgba(77,120,212,.08)','--grad2':'rgba(196,58,58,.04)',
+    '--ai-bg1':'#06080f','--ai-bg2':'#0a0810','--ai-bdr':'#1a2238',
+    '--ai-msg-bg':'rgba(6,8,20,.6)','--ai-msg-col':'#3050a0',
     '--dot-active':'rgba(255,255,255,.7)',
-    '--chat-bg':'#0c1228','--bubble-bot':'#162038','--logo-bg':'#162038',
+    '--chat-bg':'#06080f','--bubble-bot':'#0f1520','--logo-bg':'#0f1520',
   },
   violet: {
-    '--bg':'#0C0A10','--s0':'#130f1a','--s1':'#1c1428','--s2':'#241c34',
-    '--b1':'#3a2d56','--b2':'#4a3a6a',
+    '--bg':'#050408','--s0':'#0c0a12','--s1':'#131020','--s2':'#1a1628',
+    '--b1':'#26203c','--b2':'#342c50',
     '--pr':'#7A6BC4','--pr-l':'#a897e8','--pr-d':'#5a4fb0',
-    '--text':'#ede8ff','--muted':'#7868a8','--faint':'#2e2248',
+    '--text':'#eceaff','--muted':'#7870a8','--faint':'#1e1830',
     '--red':'#C43A3A','--red-l':'#e87a7a',
     '--green':'#34d399','--gold':'#f59e0b','--violet':'#a78bfa',
-    '--header-bg':'rgba(12,10,16,.93)','--shadow-lg':'rgba(0,0,0,.5)',
-    '--grad1':'rgba(122,107,196,.09)','--grad2':'rgba(196,58,58,.055)',
-    '--ai-bg1':'#0d0a1a','--ai-bg2':'#150d2e','--ai-bdr':'#2d1a5e',
-    '--ai-msg-bg':'rgba(10,6,24,.6)','--ai-msg-col':'#5040a0',
+    '--header-bg':'rgba(5,4,8,.90)','--shadow-lg':'rgba(0,0,0,.6)',
+    '--grad1':'rgba(122,107,196,.08)','--grad2':'rgba(196,58,58,.04)',
+    '--ai-bg1':'#07050e','--ai-bg2':'#0c0914','--ai-bdr':'#201a38',
+    '--ai-msg-bg':'rgba(8,6,18,.6)','--ai-msg-col':'#5040a0',
     '--dot-active':'rgba(255,255,255,.7)',
-    '--chat-bg':'#100b1e','--bubble-bot':'#1c1428','--logo-bg':'#1c1428',
+    '--chat-bg':'#08060e','--bubble-bot':'#131020','--logo-bg':'#131020',
   },
   light: {
-    '--bg':'#f0f4ff','--s0':'#e4eaf8','--s1':'#ffffff','--s2':'#f5f7ff',
-    '--b1':'#cdd5ee','--b2':'#b8c4e4',
+    '--bg':'#ffffff','--s0':'#fafafa','--s1':'#ffffff','--s2':'#f5f5f5',
+    '--b1':'#e8e8e8','--b2':'#d4d4d4',
     '--pr':'#4D78D4','--pr-l':'#2a5bc4','--pr-d':'#1a4ab0',
-    '--text':'#1a2440','--muted':'#5a6a9a','--faint':'#c8d4f0',
+    '--text':'#111111','--muted':'#737373','--faint':'#f0f0f0',
     '--red':'#b83030','--red-l':'#b83030',
     '--green':'#1a9c6e','--gold':'#c97a00','--violet':'#7c3aed',
-    '--header-bg':'rgba(240,244,255,.95)','--shadow-lg':'rgba(80,100,180,.18)',
-    '--grad1':'rgba(77,120,212,.06)','--grad2':'rgba(196,58,58,.03)',
-    '--ai-bg1':'#eef2ff','--ai-bg2':'#f0eeff','--ai-bdr':'#c4d0f8',
-    '--ai-msg-bg':'rgba(230,236,255,.8)','--ai-msg-col':'#6070c0',
-    '--dot-active':'rgba(0,0,0,.45)',
-    '--chat-bg':'#f0f2f5','--bubble-bot':'#ffffff','--logo-bg':'#f0f4ff',
+    '--header-bg':'rgba(255,255,255,.90)','--shadow-lg':'rgba(0,0,0,.08)',
+    '--grad1':'rgba(0,0,0,.03)','--grad2':'rgba(0,0,0,.01)',
+    '--ai-bg1':'#fafafa','--ai-bg2':'#f5f5f5','--ai-bdr':'#e8e8e8',
+    '--ai-msg-bg':'rgba(245,245,245,.8)','--ai-msg-col':'#5070c0',
+    '--dot-active':'rgba(0,0,0,.5)',
+    '--chat-bg':'#fafafa','--bubble-bot':'#ffffff','--logo-bg':'#f5f5f5',
   },
 };
 
