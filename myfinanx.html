@@ -1021,7 +1021,8 @@ nav::-webkit-scrollbar { display:none; }
 .dtdot.on { border-color:var(--dot-active); transform:scale(1.12); }
 .dtdot:active { transform:scale(0.92); }
 
-.drawer-data { display:flex; gap:8px; margin-top:12px; }
+.drawer-data { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.drawer-data-btn.rst { flex-basis:100%; }
 .drawer-data-btn {
   flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
   padding:9px 10px; border-radius:var(--r2);
