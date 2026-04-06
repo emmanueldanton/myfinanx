@@ -3308,6 +3308,9 @@ function confirmReset() {
 }
 
 /* ════ PWA INSTALL POPUP ════ */
+// Migration : supprimer l'ancienne clé localStorage qui bloquait le popup
+localStorage.removeItem('monargent-pwa-dismissed');
+
 function showPwaPopup() {
   // Ne pas montrer si déjà installée en mode standalone (PWA lancée depuis l'écran d'accueil)
   if(window.matchMedia('(display-mode: standalone)').matches) return;
