@@ -805,10 +805,9 @@ nav::-webkit-scrollbar { display:none; }
 .pwa-overlay {
   display:none; position:fixed; inset:0; z-index:1000;
   background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
-  animation:fadeIn .25s ease;
   align-items:flex-end; justify-content:center;
 }
-.pwa-overlay.open { display:flex; }
+.pwa-overlay.open { display:flex; animation:fadeIn .25s ease; }
 .pwa-card {
   background:var(--s0); border:1px solid var(--b1);
   border-radius:24px 24px 0 0;
@@ -879,9 +878,8 @@ nav::-webkit-scrollbar { display:none; }
   padding:9px 20px; font-size:.78rem; color:var(--text);
   background:var(--s1); border-bottom:1px solid var(--b1);
   position:sticky; top:56px; z-index:90;
-  animation:fadeDown .25s ease;
 }
-.reminder-bar.show { display:flex; }
+.reminder-bar.show { display:flex; animation:fadeDown .25s ease; }
 .reminder-bar svg { flex-shrink:0; }
 .reminder-close {
   margin-left:auto; background:none; border:none;
@@ -898,9 +896,8 @@ nav::-webkit-scrollbar { display:none; }
   display:none; position:fixed; inset:0; z-index:1100;
   background:rgba(0,0,0,.65); backdrop-filter:blur(6px);
   align-items:center; justify-content:center; padding:20px;
-  animation:fadeIn .25s ease;
 }
-.ad-overlay.open { display:flex; }
+.ad-overlay.open { display:flex; animation:fadeIn .25s ease; }
 .ad-card {
   background:var(--s0); border:1px solid var(--b1);
   border-radius:20px; width:100%; max-width:400px;
@@ -2081,7 +2078,7 @@ nav::-webkit-scrollbar { display:none; }
 </div>
 
 <!-- AD POPUP -->
-<div class="ad-overlay" id="ad-overlay">
+<div class="ad-overlay" id="ad-overlay" onclick="if(event.target===this)closeAd()">
   <div class="ad-card" id="ad-card">
     <button class="ad-close" onclick="closeAd()">✕</button>
     <div id="ad-img-wrap"></div>
@@ -3272,6 +3269,8 @@ function importData(file) {
   document.getElementById('import-input').value = '';
 }
 
+showPwaPopup();
+
 init();
 
 /* ════ RESET ════ */
@@ -3309,13 +3308,18 @@ function confirmReset() {
 
 /* ════ PWA INSTALL POPUP ════ */
 function showPwaPopup() {
-  // Ne pas montrer si déjà installée en mode standalone (PWA lancée depuis l'écran d'accueil)
+  // Ne pas montrer si déjà installée en mode standalone
   if(window.matchMedia('(display-mode: standalone)').matches) return;
   if(navigator.standalone === true) return; // iOS standalone
+
+  // Détection OS synchrone avant affichage
+  const isAndroid = /android/i.test(navigator.userAgent);
+  if(isAndroid) pwaTab('android');
+
   setTimeout(() => {
     document.getElementById('pwa-overlay')?.classList.add('open');
     document.body.style.overflow = 'hidden';
-  }, 2000);
+  }, 800);
 }
 
 function closePwaPopup() {
@@ -3333,14 +3337,6 @@ function pwaTab(os) {
   document.getElementById('pwa-tab-ios').classList.toggle('on', os === 'ios');
   document.getElementById('pwa-tab-android').classList.toggle('on', os === 'android');
 }
-
-// Détection auto du bon onglet selon l'OS
-(function() {
-  const ua = navigator.userAgent;
-  if(/android/i.test(ua)) setTimeout(() => pwaTab('android'), 2100);
-})();
-
-showPwaPopup();
 
 /* ════ ONBOARDING ════ */
 let obStep = 0;
@@ -3555,6 +3551,7 @@ function showAd(ad) {
   cta.textContent = ad.cta || 'Voir';
   cta.href = ad.url || '#';
   document.getElementById('ad-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
   // Enregistrer le timestamp (localStorage) ou flag session
   sessionStorage.setItem(AD_SEEN_KEY, '1');
   localStorage.setItem(AD_SEEN_KEY, Date.now().toString());
@@ -3562,6 +3559,7 @@ function showAd(ad) {
 
 function closeAd() {
   document.getElementById('ad-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 loadAd();
