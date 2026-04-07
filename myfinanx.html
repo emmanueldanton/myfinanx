@@ -2671,6 +2671,7 @@ function init() {
   D = defaultData();
 
   document.getElementById('tx-dt').value = todayISO();
+  document.getElementById('ng-d').value  = todayISO();
   updateCatSel();
 
   // 2. Préférences visuelles — appliqué en tout premier pour éviter le flash de thème
@@ -3159,7 +3160,8 @@ function addGoal() {
   const d=document.getElementById('ng-d').value.trim();
   if(!n||t<=0) return;
   D.goals.push({id:uid(),name:n,target:t,saved:s,deadline:d,color:gColor});
-  ['ng-n','ng-t','ng-c','ng-d'].forEach(i=>document.getElementById(i).value='');
+  ['ng-n','ng-t','ng-c'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('ng-d').value = todayISO();
   renderGoals(); save();
 }
 
