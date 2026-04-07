@@ -860,28 +860,14 @@ nav::-webkit-scrollbar { display:none; }
   animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
   position:relative;
 }
-/* ════ ONBOARDING BOTTOM SHEET ════ */
-.ob-overlay {
-  display:none; position:fixed; inset:0; z-index:1001;
-  background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
-  align-items:flex-end; justify-content:center;
-}
-.ob-overlay.open { display:flex; animation:fadeIn .25s ease; }
-.ob-card {
-  background:var(--s0); border:1px solid var(--b1);
-  border-radius:24px 24px 0 0;
-  width:100%; max-width:520px;
-  max-height:85vh; max-height:85svh;
+/* ════ ONBOARDING (centré, réutilise .pwa-overlay/.pwa-card) ════ */
+#ob-overlay { align-items:center; padding:16px; }
+#ob-overlay .pwa-card {
+  border-radius:20px;
+  max-height:88vh; max-height:88svh;
   overflow-y:auto; -webkit-overflow-scrolling:touch;
-  animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
-  padding:28px 24px 0;
+  padding-bottom:28px;
 }
-.ob-btn-wrap {
-  position:sticky; bottom:0;
-  background:var(--s0);
-  padding:12px 0 calc(24px + env(safe-area-inset-bottom));
-}
-.ob-next { touch-action:manipulation; }
 @keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
 .pwa-close {
   position:absolute; top:16px; right:16px;
@@ -1977,8 +1963,8 @@ nav::-webkit-scrollbar { display:none; }
 </div>
 
 <!-- ════ ONBOARDING POPUP ════ -->
-<div class="ob-overlay" id="ob-overlay">
-  <div class="ob-card">
+<div class="pwa-overlay" id="ob-overlay">
+  <div class="pwa-card">
     <div class="ob-progress" id="ob-progress-bar">
       <div class="ob-dot on" id="ob-d0"></div>
       <div class="ob-dot" id="ob-d1"></div>
@@ -2108,9 +2094,7 @@ nav::-webkit-scrollbar { display:none; }
       </div>
     </div>
 
-    <div class="ob-btn-wrap">
-      <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
-    </div>
+    <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
   </div>
 </div>
 
@@ -3673,6 +3657,7 @@ function obNext() {
   if(obStep >= OB_TOTAL) {
     closeTutorial();
     localStorage.setItem('monargent-onboarded', '1');
+    requestAnimationFrame(() => requestAnimationFrame(launchConfetti));
     if(window.OneSignalDeferred) {
       OneSignalDeferred.push(o => o.Slidedown.promptPush());
     }
