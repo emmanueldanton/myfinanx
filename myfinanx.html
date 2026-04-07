@@ -355,6 +355,10 @@ nav::-webkit-scrollbar { display:none; }
   letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
   margin:24px 0 10px; display:flex; align-items:center; gap:8px;
 }
+.page-ttl {
+  font-family:var(--fh); font-size:1.15rem; font-weight:700;
+  color:var(--text); padding:18px 0 2px; letter-spacing:-.01em;
+}
 .sl::after { content:''; flex:1; height:1px; background:var(--b1); }
 .sl:first-child { margin-top:0; }
 
@@ -1483,6 +1487,10 @@ nav::-webkit-scrollbar { display:none; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         Réinitialiser
       </button>
+      <button class="drawer-data-btn" onclick="toggleDrawer(false);localStorage.removeItem('monargent-onboarded');showOnboarding();" title="Revoir le tutoriel de démarrage">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Tutoriel
+      </button>
     </div>
   </div>
 
@@ -1693,6 +1701,7 @@ nav::-webkit-scrollbar { display:none; }
 
 <!-- ─── BUDGET ─── -->
 <div id="page-budget" class="page">
+  <div class="page-ttl">Mes budgets</div>
   <div class="sl">Sources de revenus</div>
   <div class="rev-tbl">
     <div class="tbl-th">
@@ -1762,6 +1771,7 @@ nav::-webkit-scrollbar { display:none; }
 
 <!-- ─── TRACKER ─── -->
 <div id="page-tracker" class="page">
+  <div class="page-ttl">Mes transactions</div>
   <div class="sl">Ajouter une transaction</div>
   <div class="tx-panel">
     <div class="tygt">
@@ -1833,6 +1843,7 @@ nav::-webkit-scrollbar { display:none; }
 
 <!-- ─── GOALS ─── -->
 <div id="page-goals" class="page">
+  <div class="page-ttl">Mes objectifs</div>
   <div class="sl">Nouvel objectif</div>
   <div class="ngform">
     <div class="g2" style="margin-bottom:11px;">
