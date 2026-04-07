@@ -356,8 +356,8 @@ nav::-webkit-scrollbar { display:none; }
   margin:24px 0 10px; display:flex; align-items:center; gap:8px;
 }
 .page-ttl {
-  font-family:var(--fh); font-size:1.15rem; font-weight:700;
-  color:var(--text); padding:18px 0 2px; letter-spacing:-.01em;
+  font-family:'Playfair Display', serif; font-size:1.45rem; font-weight:800;
+  color:var(--text); padding:18px 0 2px;
 }
 .sl::after { content:''; flex:1; height:1px; background:var(--b1); }
 .sl:first-child { margin-top:0; }
@@ -867,11 +867,23 @@ nav::-webkit-scrollbar { display:none; }
 }
 #ob-overlay .pwa-card {
   border-radius:20px;
-  max-height:88vh; /* fallback universel */
-  max-height:88svh; /* iOS 15.4+ / Chrome 108+ */
+  max-height:88vh;
+  max-height:88svh;
+  display:flex;
+  flex-direction:column;
+  padding-bottom:0;
+  overflow:hidden;
+}
+.ob-body {
+  flex:1;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
-  padding-bottom:28px;
+  padding-bottom:8px;
+}
+#ob-overlay .ob-next {
+  flex-shrink:0;
+  margin:16px 0 0;
+  touch-action:manipulation;
 }
 @keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
 .pwa-close {
@@ -1970,6 +1982,7 @@ nav::-webkit-scrollbar { display:none; }
 <!-- ════ ONBOARDING POPUP ════ -->
 <div class="pwa-overlay" id="ob-overlay">
   <div class="pwa-card">
+    <div class="ob-body">
     <div class="ob-progress" id="ob-progress-bar">
       <div class="ob-dot on" id="ob-d0"></div>
       <div class="ob-dot" id="ob-d1"></div>
@@ -2099,6 +2112,7 @@ nav::-webkit-scrollbar { display:none; }
       </div>
     </div>
 
+    </div><!-- /ob-body -->
     <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
   </div>
 </div>
@@ -3165,7 +3179,7 @@ function addGoal() {
   D.goals.push({id:uid(),name:n,target:t,saved:s,deadline:d,color:gColor});
   ['ng-n','ng-t','ng-c'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('ng-d').value = todayISO();
-  renderGoals(); save();
+  renderGoals(); save(); scheduleAiGreeting();
 }
 
 function addToGoal(id, prefix='') {
@@ -3175,10 +3189,10 @@ function addToGoal(id, prefix='') {
   if(a<=0) return;
   const g=D.goals.find(g=>g.id===id);
   if(g){g.saved=Math.min(g.target,g.saved+a);inp.value='';}
-  renderGoals(); save();
+  renderGoals(); save(); scheduleAiGreeting();
 }
 
-function delGoal(id) { D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); }
+function delGoal(id) { D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); scheduleAiGreeting(); }
 
 function toggleEditGoal(id, prefix) {
   const form = document.getElementById('gef-'+prefix+id);
@@ -3197,7 +3211,7 @@ function saveEditGoal(id, prefix) {
   const dl     = form.querySelector('.g-edit-dl').value;
   if(!name || target <= 0) return;
   g.name = name; g.target = target; g.saved = Math.min(saved, target); g.deadline = dl;
-  renderGoals(); save();
+  renderGoals(); save(); scheduleAiGreeting();
 }
 
 function buildGoalCard(g, prefix) {
