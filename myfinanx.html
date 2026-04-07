@@ -851,7 +851,8 @@ nav::-webkit-scrollbar { display:none; }
   background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
   align-items:flex-end; justify-content:center;
 }
-.pwa-overlay.open { display:flex; animation:fadeIn .25s ease; }
+.pwa-overlay.open { display:flex; animation:fadeIn .25s ease; touch-action:none; }
+.ob-body { touch-action:pan-y; overscroll-behavior:contain; }
 .pwa-card {
   background:var(--s0); border:1px solid var(--b1);
   border-radius:24px 24px 0 0;
@@ -3646,6 +3647,13 @@ function showOnboarding() {
   if(localStorage.getItem('monargent-onboarded')) return;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   if(!isStandalone) return;
+  // Reset état des étapes
+  obStep = 0;
+  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.ob-dot').forEach(d => d.classList.remove('on'));
+  document.getElementById('ob-s0')?.classList.add('on');
+  document.getElementById('ob-d0')?.classList.add('on');
+  document.getElementById('ob-next').textContent = 'Commencer';
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
