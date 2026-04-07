@@ -2506,10 +2506,15 @@ function greetFinancialSub() {
   const totalE = depenses.reduce((s,e) => s + e.amount, 0);
   const reste = totalR - totalE;
   const tauxEpargne = totalR > 0 ? Math.round((reste / totalR) * 100) : 0;
+  const hasRevSources = D.revenus.length > 0;
 
-  // Aucune donnée saisie
-  if(totalR === 0 && totalE === 0)
-    return '💡 Commence par saisir tes revenus pour activer les conseils personnalisés.';
+  // Aucune source de revenu créée
+  if(!hasRevSources && totalE === 0)
+    return '💡 Commence par saisir tes revenus dans l\'onglet Budget pour activer les conseils personnalisés.';
+
+  // Sources créées mais montants à 0
+  if(hasRevSources && totalR === 0 && totalE === 0)
+    return '📝 Sources de revenus créées. Renseigne les montants pour activer l\'analyse.';
 
   // Dans le rouge : dépenses > revenus
   if(totalE > totalR && totalR > 0)
@@ -2518,7 +2523,7 @@ function greetFinancialSub() {
   // Postes budgétaires dépassés
   const parCat = {};
   depenses.forEach(e => { parCat[e.cat] = (parCat[e.cat] || 0) + e.amount; });
-  const dépassés = D.budget.filter(b => (parCat[b.name] || 0) > b.amount);
+  const dépassés = D.budget.filter(b => b.amount > 0 && (parCat[b.name] || 0) > b.amount);
   if(dépassés.length === 1)
     return `⚠️ "${dépassés[0].name}" dépasse le budget. Surveille tes dépenses.`;
   if(dépassés.length > 1)
@@ -2537,7 +2542,7 @@ function greetFinancialSub() {
 
   // Revenus saisis mais pas encore de dépenses
   if(totalR > 0 && totalE === 0)
-    return '📋 Revenus enregistrés. Pense à saisir tes dépenses du mois.';
+    return `📋 ${fmt(totalR)} de revenus enregistrés. Saisis tes dépenses du mois pour suivre ton budget.`;
 
   // Reste positif
   if(reste > 0)
@@ -2833,6 +2838,10 @@ function recalc() {
   else if(restB>100) al+=`<div class="alert ag">${infoIco} <strong>${fmt(restB)}</strong> non alloués — affecte-les à tes priorités.</div>`;
   if(pct>90&&totalR>0) al+=`<div class="alert ab">${warnIco} Plus de 90% de tes revenus dépensés ce mois !</div>`;
   ['bud-al','ov-al'].forEach(id=>setText2(id,al));
+
+  /* ── GREETING SUB ── */
+  const greetSub = document.querySelector('#greet-wrap .greet-sub');
+  if(greetSub) greetSub.textContent = greetFinancialSub();
 
   save();
 }
