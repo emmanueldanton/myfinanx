@@ -851,8 +851,7 @@ nav::-webkit-scrollbar { display:none; }
   background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
   align-items:flex-end; justify-content:center;
 }
-.pwa-overlay.open { display:flex; animation:fadeIn .25s ease; touch-action:none; }
-.ob-body { touch-action:pan-y; overscroll-behavior:contain; }
+.pwa-overlay.open { display:flex; animation:fadeIn .25s ease; }
 .pwa-card {
   background:var(--s0); border:1px solid var(--b1);
   border-radius:24px 24px 0 0;
@@ -878,6 +877,7 @@ nav::-webkit-scrollbar { display:none; }
   flex:1;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
   padding-bottom:8px;
 }
 #ob-overlay .ob-next {
@@ -3830,6 +3830,16 @@ function closeAd() {
 loadAd();
 
 setTimeout(showOnboarding, 600);
+
+// Bloque le scroll du fond quand l'overlay onboarding est ouvert,
+// sans bloquer les taps/clicks sur les boutons (passive:false requis sur iOS)
+(function() {
+  const overlay = document.getElementById('ob-overlay');
+  if (!overlay) return;
+  overlay.addEventListener('touchmove', function(e) {
+    if (!e.target.closest('.ob-body')) e.preventDefault();
+  }, { passive: false });
+})();
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
