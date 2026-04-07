@@ -2553,7 +2553,7 @@ async function fetchAiGreetingSub() {
   depenses.forEach(e => { parCat[e.cat] = (parCat[e.cat] || 0) + e.amount; });
   const dépassés = D.budget.filter(b => b.amount > 0 && (parCat[b.name] || 0) > b.amount).map(b => b.name);
 
-  const ctx = `Tu es un conseiller financier bienveillant et direct. Réponds uniquement en français. Pas d'humour. Pas d'emoji.`;
+  const ctx = `Tu es un conseiller financier bienveillant et direct. Réponds uniquement en français. Pas d'humour.`;
   const question = `${identityLine}
 Situation de ${MONTHS[M]} ${Y} :
 - Revenus: ${fmt(totalR)} (${D.revenus.length} source${D.revenus.length>1?'s':''}: ${D.revenus.map(r=>r.name).join(', ')})
@@ -2561,7 +2561,7 @@ Situation de ${MONTHS[M]} ${Y} :
 - Taux d'épargne: ${tauxEpargne}%${dépassés.length ? `\n- Postes dépassés: ${dépassés.join(', ')}` : ''}
 - Objectifs: ${goalsStr}
 
-Écris UNE seule phrase courte et percutante (max 18 mots) qui pointe le fait le plus important ou urgent de cette situation. Pas de salutation. Pas d'introduction. Commence directement par l'observation.`;
+Écris UNE seule phrase courte et percutante (max 18 mots) qui pointe le fait le plus important ou urgent de cette situation. Commence par UN seul émoji adapté à la situation, puis l'observation directement. Pas de salutation, pas d'introduction.`;
 
   try {
     const res = await fetch('/api/ai', {
@@ -2570,7 +2570,7 @@ Situation de ${MONTHS[M]} ${Y} :
       body: JSON.stringify({question, context: ctx, history: []})
     });
     const data = await res.json();
-    const msg = (data.reply || '').trim().replace(/^["'«»]|["'«»]$/g, '').replace(/\.$/, '').trim();
+    const msg = (data.reply || '').trim().replace(/^["'«»]|["'«»]$/g, '').trim();
     if(msg) {
       try { localStorage.setItem(GREETING_CACHE_KEY, JSON.stringify({hash, msg})); } catch(e) {}
       return msg;
