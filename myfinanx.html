@@ -3597,18 +3597,8 @@ function launchConfetti() {
 
 function showOnboarding() {
   if(localStorage.getItem('monargent-onboarded')) return;
-  // Si c'est la première visite, fermer le popup PWA s'il est ouvert (priorité à l'onboarding)
-  const pwaOverlay = document.getElementById('pwa-overlay');
-  if(pwaOverlay?.classList.contains('open')) {
-    pwaOverlay.classList.remove('open');
-  }
-  // Reset état onboarding au cas où
-  obStep = 0;
-  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.ob-dot').forEach(d => d.classList.remove('on'));
-  document.getElementById('ob-s0')?.classList.add('on');
-  document.getElementById('ob-d0')?.classList.add('on');
-  document.getElementById('ob-next').textContent = 'Commencer';
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if(!isStandalone) return;
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3620,8 +3610,6 @@ function obNext() {
     document.getElementById('ob-overlay')?.classList.remove('open');
     document.body.style.overflow = '';
     localStorage.setItem('monargent-onboarded', '1');
-    // Confettis de fin d'onboarding
-    requestAnimationFrame(() => requestAnimationFrame(launchConfetti));
     // Demander la permission push OneSignal après l'onboarding
     if(window.OneSignalDeferred) {
       OneSignalDeferred.push(o => o.Slidedown.promptPush());
@@ -3786,7 +3774,7 @@ function closeAd() {
 
 loadAd();
 
-setTimeout(showOnboarding, 1000);
+setTimeout(showOnboarding, 600);
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
