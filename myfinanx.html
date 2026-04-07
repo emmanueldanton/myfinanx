@@ -872,19 +872,16 @@ nav::-webkit-scrollbar { display:none; }
   border-radius:24px 24px 0 0;
   width:100%; max-width:520px;
   max-height:85vh; max-height:85svh;
-  display:flex; flex-direction:column; overflow:hidden;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
   animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
+  padding:28px 24px 0;
 }
-.ob-scroll {
-  flex:1; overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
-  padding:28px 24px 8px;
+.ob-btn-wrap {
+  position:sticky; bottom:0;
+  background:var(--s0);
+  padding:12px 0 calc(24px + env(safe-area-inset-bottom));
 }
-.ob-footer {
-  flex-shrink:0;
-  padding:12px 24px calc(24px + env(safe-area-inset-bottom));
-}
+.ob-next { touch-action:manipulation; }
 @keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
 .pwa-close {
   position:absolute; top:16px; right:16px;
@@ -1982,7 +1979,6 @@ nav::-webkit-scrollbar { display:none; }
 <!-- ════ ONBOARDING POPUP ════ -->
 <div class="ob-overlay" id="ob-overlay">
   <div class="ob-card">
-    <div class="ob-scroll">
     <div class="ob-progress" id="ob-progress-bar">
       <div class="ob-dot on" id="ob-d0"></div>
       <div class="ob-dot" id="ob-d1"></div>
@@ -2112,8 +2108,7 @@ nav::-webkit-scrollbar { display:none; }
       </div>
     </div>
 
-    </div><!-- /ob-scroll -->
-    <div class="ob-footer">
+    <div class="ob-btn-wrap">
       <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
     </div>
   </div>
