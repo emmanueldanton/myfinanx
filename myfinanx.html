@@ -860,30 +860,30 @@ nav::-webkit-scrollbar { display:none; }
   animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
   position:relative;
 }
-/* Onboarding : centré + scrollable sur petits écrans */
-#ob-overlay {
-  align-items:flex-end;
+/* ════ ONBOARDING BOTTOM SHEET ════ */
+.ob-overlay {
+  display:none; position:fixed; inset:0; z-index:1001;
+  background:rgba(0,0,0,.6); backdrop-filter:blur(6px);
+  align-items:flex-end; justify-content:center;
 }
-#ob-overlay .pwa-card {
+.ob-overlay.open { display:flex; animation:fadeIn .25s ease; }
+.ob-card {
+  background:var(--s0); border:1px solid var(--b1);
   border-radius:24px 24px 0 0;
-  max-height:85vh;
-  max-height:85svh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  padding-bottom:calc(28px + env(safe-area-inset-bottom));
+  width:100%; max-width:520px;
+  max-height:85vh; max-height:85svh;
+  display:flex; flex-direction:column; overflow:hidden;
+  animation:slideUp .3s cubic-bezier(.22,.68,0,1.2);
 }
-.ob-body {
-  flex:1;
-  overflow-y:auto;
+.ob-scroll {
+  flex:1; overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
-  padding-bottom:8px;
+  padding:28px 24px 8px;
 }
-#ob-overlay .ob-next {
+.ob-footer {
   flex-shrink:0;
-  margin:16px 0 0;
-  touch-action:manipulation;
+  padding:12px 24px calc(24px + env(safe-area-inset-bottom));
 }
 @keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
 .pwa-close {
@@ -1499,7 +1499,7 @@ nav::-webkit-scrollbar { display:none; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         Réinitialiser
       </button>
-      <button class="drawer-data-btn" onclick="toggleDrawer(false);localStorage.removeItem('monargent-onboarded');showOnboarding();" title="Revoir le tutoriel de démarrage">
+      <button class="drawer-data-btn" onclick="toggleDrawer(false);localStorage.removeItem('monargent-onboarded');openTutorial();" title="Revoir le tutoriel de démarrage">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Tutoriel
       </button>
@@ -1980,9 +1980,9 @@ nav::-webkit-scrollbar { display:none; }
 </div>
 
 <!-- ════ ONBOARDING POPUP ════ -->
-<div class="pwa-overlay" id="ob-overlay">
-  <div class="pwa-card">
-    <div class="ob-body">
+<div class="ob-overlay" id="ob-overlay">
+  <div class="ob-card">
+    <div class="ob-scroll">
     <div class="ob-progress" id="ob-progress-bar">
       <div class="ob-dot on" id="ob-d0"></div>
       <div class="ob-dot" id="ob-d1"></div>
@@ -2112,8 +2112,10 @@ nav::-webkit-scrollbar { display:none; }
       </div>
     </div>
 
-    </div><!-- /ob-body -->
-    <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
+    </div><!-- /ob-scroll -->
+    <div class="ob-footer">
+      <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
+    </div>
   </div>
 </div>
 
@@ -3643,29 +3645,39 @@ function launchConfetti() {
   rafId = requestAnimationFrame(draw);
 }
 
-function showOnboarding() {
-  if(localStorage.getItem('monargent-onboarded')) return;
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  if(!isStandalone) return;
-  // Reset état des étapes
+// Ouvre le tuto (sans garde) — appelé par le bouton Tutoriel du drawer
+function openTutorial() {
   obStep = 0;
   document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.ob-dot').forEach(d => d.classList.remove('on'));
   document.getElementById('ob-s0')?.classList.add('on');
   document.getElementById('ob-d0')?.classList.add('on');
-  document.getElementById('ob-next').textContent = 'Commencer';
+  const btn = document.getElementById('ob-next');
+  if(btn) btn.textContent = 'Commencer';
   document.getElementById('ob-overlay')?.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+// Ferme le tuto
+function closeTutorial() {
+  document.getElementById('ob-overlay')?.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Première visite — uniquement en mode standalone (app installée sur écran d'accueil)
+function showOnboarding() {
+  if(localStorage.getItem('monargent-onboarded')) return;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if(!isStandalone) return;
+  openTutorial();
 }
 
 function obNext() {
   document.getElementById('ob-s' + obStep)?.classList.remove('on');
   obStep++;
   if(obStep >= OB_TOTAL) {
-    document.getElementById('ob-overlay')?.classList.remove('open');
-    document.body.style.overflow = '';
+    closeTutorial();
     localStorage.setItem('monargent-onboarded', '1');
-    // Demander la permission push OneSignal après l'onboarding
     if(window.OneSignalDeferred) {
       OneSignalDeferred.push(o => o.Slidedown.promptPush());
     }
@@ -3674,12 +3686,10 @@ function obNext() {
   document.getElementById('ob-s' + obStep)?.classList.add('on');
   for(let i = 0; i <= obStep; i++)
     document.getElementById('ob-d' + i)?.classList.add('on');
-  if(obStep === OB_TOTAL - 1)
-    document.getElementById('ob-next').textContent = "C'est parti, j'y vais !";
-  else if(obStep === 0)
-    document.getElementById('ob-next').textContent = "Commencer";
-  else
-    document.getElementById('ob-next').textContent = "Suivant";
+  const btn = document.getElementById('ob-next');
+  if(!btn) return;
+  if(obStep === OB_TOTAL - 1) btn.textContent = "C'est parti, j'y vais !";
+  else btn.textContent = "Suivant";
 }
 
 // ════ RAPPELS IN-APP ════
@@ -3831,15 +3841,6 @@ loadAd();
 
 setTimeout(showOnboarding, 600);
 
-// Bloque le scroll du fond quand l'overlay onboarding est ouvert,
-// sans bloquer les taps/clicks sur les boutons (passive:false requis sur iOS)
-(function() {
-  const overlay = document.getElementById('ob-overlay');
-  if (!overlay) return;
-  overlay.addEventListener('touchmove', function(e) {
-    if (!e.target.closest('.ob-body')) e.preventDefault();
-  }, { passive: false });
-})();
 
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
