@@ -1215,7 +1215,7 @@ nav::-webkit-scrollbar { display:none; }
 }
 .bnav-inner {
   display:flex; height:62px; align-items:center;
-  overflow:visible;
+  overflow:visible; position:relative;
 }
 .bnav-btn {
   flex:1; display:flex; flex-direction:column;
@@ -1229,26 +1229,20 @@ nav::-webkit-scrollbar { display:none; }
 }
 .bnav-btn svg { stroke:currentColor; flex-shrink:0; width:21px; height:21px; }
 .bnav-btn.active { color:var(--pr); }
-/* Centre élevé */
-.bnav-center {
-  position:relative;
-  justify-content:flex-end;
-  padding-bottom:9px;
-  gap:0;
-}
-.bnav-center-ico {
+/* Indicateur animé */
+.bnav-indicator {
   position:absolute;
-  top:-22px; left:50%; transform:translateX(-50%);
   width:52px; height:52px; border-radius:50%;
   background:var(--pr);
+  top:-22px; left:10%;
+  transform:translateX(-50%);
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 4px 18px rgba(77,120,212,.55);
   border:3px solid var(--s0);
-  transition:background .15s, transform .15s;
-  touch-action:manipulation;
+  transition:left .35s cubic-bezier(.22,.68,0,1.2);
+  pointer-events:none; z-index:1;
 }
-.bnav-center-ico svg { stroke:#fff !important; width:22px; height:22px; }
-.bnav-center:active .bnav-center-ico { transform:translateX(-50%) scale(.93); }
+.bnav-indicator svg { stroke:#fff; width:22px; height:22px; }
 
 /* ════ PLUS PANEL ════ */
 .plus-overlay {
@@ -2200,10 +2194,8 @@ nav::-webkit-scrollbar { display:none; }
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Budget
     </button>
-    <button class="bnav-btn bnav-center" id="bn-tracker" onclick="goTabMobile('tracker')">
-      <div class="bnav-center-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      </div>
+    <button class="bnav-btn" id="bn-tracker" onclick="goTabMobile('tracker')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Dépenses
     </button>
     <button class="bnav-btn" id="bn-goals" onclick="goTabMobile('goals')">
@@ -2214,6 +2206,9 @@ nav::-webkit-scrollbar { display:none; }
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
       Plus
     </button>
+    <div class="bnav-indicator" id="bnav-indicator">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </div>
   </div>
 </div>
 
@@ -2874,10 +2869,25 @@ function goTabMobile(id) {
   goTab(id, null);
 }
 
+const BNAV_ORDER = ['overview','budget','tracker','goals','plus'];
+const BNAV_SVGS = {
+  overview: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`,
+  budget:   `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+  tracker:  `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  goals:    `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  plus:     `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>`
+};
+
 function syncBnavActive(id) {
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  const btnId = id === 'ai' ? 'bn-plus' : ('bn-' + id);
-  document.getElementById(btnId)?.classList.add('active');
+  const navId = id === 'ai' ? 'plus' : id;
+  document.getElementById('bn-' + navId)?.classList.add('active');
+  const idx = BNAV_ORDER.indexOf(navId);
+  const indicator = document.getElementById('bnav-indicator');
+  if(indicator && idx >= 0) {
+    indicator.style.left = ((2 * idx + 1) * 10) + '%';
+    if(BNAV_SVGS[navId]) indicator.innerHTML = BNAV_SVGS[navId];
+  }
 }
 
 function openPlusPanel() {
