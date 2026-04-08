@@ -1214,7 +1214,7 @@ nav::-webkit-scrollbar { display:none; }
   overflow:visible;
 }
 .bnav-inner {
-  display:flex; height:72px; align-items:center; padding:0 10px;
+  display:flex; height:82px; align-items:center; padding:0 10px;
   overflow:visible; position:relative;
 }
 /* Inactif : zone flexible, icône centrée */
@@ -1226,10 +1226,10 @@ nav::-webkit-scrollbar { display:none; }
   font-size:.75rem; font-weight:700; cursor:pointer;
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
-  height:44px; padding:0; position:relative;
+  height:52px; padding:0; position:relative;
   border-radius:99px; transition:color .15s;
 }
-.bnav-btn svg { stroke:currentColor; flex-shrink:0; width:22px; height:22px; }
+.bnav-btn svg { stroke:currentColor; flex-shrink:0; width:26px; height:26px; }
 .bnav-btn .bnav-lbl { display:none; white-space:nowrap; letter-spacing:-.01em; }
 /* Actif : shrink to content + padding symétrique */
 .bnav-btn.active {
@@ -1282,9 +1282,9 @@ nav::-webkit-scrollbar { display:none; }
 @media(max-width:620px){
   .hbg-btn { display:none !important; }
   .bottom-nav { display:block; }
-  .fab { display:flex; bottom:calc(10px + 72px + 20px + env(safe-area-inset-bottom)); }
+  .fab { display:flex; bottom:calc(10px + 82px + 20px + env(safe-area-inset-bottom)); }
   nav { display:none; }
-  .wrap { padding-bottom:calc(10px + 72px + 20px + env(safe-area-inset-bottom)); }
+  .wrap { padding-bottom:calc(10px + 82px + 20px + env(safe-area-inset-bottom)); }
 }
 
 /* ════ OVERVIEW DASHBOARD ════ */
