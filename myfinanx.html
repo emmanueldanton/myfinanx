@@ -697,9 +697,8 @@ nav::-webkit-scrollbar { display:none; }
   margin-bottom:3px;
 }
 .g-edit-field { display:flex; flex-direction:column; }
-.g-edit-row { display:flex; gap:8px; flex-wrap:wrap; }
-.g-edit-row .g-edit-field { flex:1; min-width:120px; }
-.g-edit-row input { width:100%; padding:10px 12px; border-radius:var(--r2);
+.g-edit-row { display:contents; }
+.g-edit-field input, .g-edit-field select { width:100%; padding:10px 12px; border-radius:var(--r2);
   background:var(--s2); border:1px solid var(--b1); color:var(--text);
   font-family:var(--fb); font-size:.85rem; box-sizing:border-box; }
 .g-edit-actions { display:flex; gap:8px; }
