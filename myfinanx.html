@@ -2731,6 +2731,18 @@ Situation de ${MONTHS[M]} ${Y} :
   return null;
 }
 
+// Effet typewriter — écrit le texte caractère par caractère
+let _twTimer = null;
+function typeWriter(el, text, speed = 18) {
+  if(_twTimer) clearInterval(_twTimer);
+  el.textContent = '';
+  let i = 0;
+  _twTimer = setInterval(() => {
+    el.textContent += text[i++];
+    if(i >= text.length) { clearInterval(_twTimer); _twTimer = null; }
+  }, speed);
+}
+
 // Planifie un appel IA avec debounce (évite les appels en rafale pendant la saisie)
 function scheduleAiGreeting() {
   clearTimeout(_greetAiTimer);
@@ -2738,7 +2750,7 @@ function scheduleAiGreeting() {
     const aiMsg = await fetchAiGreetingSub();
     if(aiMsg) {
       const sub = document.querySelector('#greet-wrap .greet-sub');
-      if(sub) sub.textContent = aiMsg;
+      if(sub) typeWriter(sub, aiMsg);
     }
   }, 1500);
 }
