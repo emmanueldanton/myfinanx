@@ -1630,6 +1630,24 @@ nav::-webkit-scrollbar { display:none; }
   </div>
 </div>
 
+<!-- ════ CONFIRM DELETE MODAL ════ -->
+<div class="reset-overlay" id="del-overlay" onclick="if(event.target===this)_delCancel()">
+  <div class="reset-card">
+    <div class="reset-ico danger">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </div>
+    <div class="reset-title" id="del-title">Supprimer ?</div>
+    <div class="reset-body" id="del-body"></div>
+    <div class="reset-actions">
+      <button class="reset-btn-cancel" onclick="_delCancel()">Annuler</button>
+      <button class="reset-btn-confirm" onclick="_delConfirm()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════ TOP NAV ════ -->
 <nav id="top-nav">
   <button class="tab active" onclick="goTab('overview',this)">
@@ -2935,8 +2953,9 @@ function renderRevRows() {
 function delRev(id) {
   const r = D.revenus.find(r=>r.id===id);
   if(!r) return;
-  if(!confirm(`Supprimer la source "${r.name}" ?`)) return;
-  D.revenus=D.revenus.filter(r=>r.id!==id); renderRevRows(); recalc(); save();
+  confirmDelete('Supprimer ce revenu ?', `"${r.name}" sera supprimé définitivement.`, () => {
+    D.revenus=D.revenus.filter(r=>r.id!==id); renderRevRows(); recalc(); save();
+  });
 }
 
 function addRev() {
@@ -2975,8 +2994,9 @@ function renderBudRows() {
 function delBud(id) {
   const b = D.budget.find(b=>b.id===id);
   if(!b) return;
-  if(!confirm(`Supprimer le poste "${b.name}" ?`)) return;
-  D.budget=D.budget.filter(b=>b.id!==id); renderBudRows(); recalc(); save();
+  confirmDelete('Supprimer ce poste budget ?', `"${b.name}" sera supprimé définitivement.`, () => {
+    D.budget=D.budget.filter(b=>b.id!==id); renderBudRows(); recalc(); save();
+  });
 }
 
 function addBud() {
@@ -3227,8 +3247,9 @@ function addTx() {
 function delTx(id) {
   const tx = D.expenses.find(e=>e.id===id);
   if(!tx) return;
-  if(!confirm(`Supprimer "${tx.desc}" (${fmt(tx.amount)}) ?`)) return;
-  D.expenses=D.expenses.filter(e=>e.id!==id); renderExpenses(); recalc(); save();
+  confirmDelete('Supprimer cette dépense ?', `"${tx.desc}" (${fmt(tx.amount)}) sera supprimée définitivement.`, () => {
+    D.expenses=D.expenses.filter(e=>e.id!==id); renderExpenses(); recalc(); save();
+  });
 }
 
 function openEditTx(id) {
@@ -3374,8 +3395,9 @@ function addToGoal(id, prefix='') {
 function delGoal(id) {
   const g = D.goals.find(g=>g.id===id);
   if(!g) return;
-  if(!confirm(`Supprimer l'objectif "${g.name}" ?`)) return;
-  D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); scheduleAiGreeting();
+  confirmDelete('Supprimer cet objectif ?', `"${g.name}" sera supprimé définitivement.`, () => {
+    D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); scheduleAiGreeting();
+  });
 }
 
 function toggleEditGoal(id, prefix) {
@@ -3528,10 +3550,12 @@ function loadAiHistory() {
 }
 
 function clearAiHistory() {
-  aiHistory = [];
-  localStorage.removeItem(AI_KEY);
-  const msgs = document.getElementById('ai-msgs');
-  if(msgs) { msgs.innerHTML = ''; renderAiMsg('ai', AI_WELCOME); }
+  confirmDelete('Effacer la conversation ?', 'Tout l\'historique de la conversation IA sera supprimé définitivement.', () => {
+    aiHistory = [];
+    localStorage.removeItem(AI_KEY);
+    const msgs = document.getElementById('ai-msgs');
+    if(msgs) { msgs.innerHTML = ''; renderAiMsg('ai', AI_WELCOME); }
+  });
 }
 
 async function sendAI() {
@@ -3713,6 +3737,26 @@ showPwaPopup();
 init();
 
 /* ════ RESET ════ */
+/* ════ GENERIC DELETE CONFIRM ════ */
+let _delCb = null;
+function confirmDelete(title, body, cb) {
+  document.getElementById('del-title').textContent = title;
+  document.getElementById('del-body').textContent = body;
+  _delCb = cb;
+  document.getElementById('del-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function _delConfirm() {
+  document.getElementById('del-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if(_delCb) { _delCb(); _delCb = null; }
+}
+function _delCancel() {
+  document.getElementById('del-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  _delCb = null;
+}
+
 function openResetModal() {
   toggleDrawer(false);
   document.getElementById('reset-s1').style.display = '';
