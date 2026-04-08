@@ -629,17 +629,17 @@ nav::-webkit-scrollbar { display:none; }
 .txdl:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
 .txed:hover { color:var(--pr-l); background:rgba(77,120,212,.1); }
 .tx-edit-form {
-  grid-column:1/-1; margin-top:10px; padding-top:10px;
+  width:100%; margin-top:10px; padding-top:10px;
   border-top:1px solid var(--b1);
-  display:flex; flex-wrap:wrap; gap:8px;
+  display:flex; flex-direction:column; gap:8px;
 }
 .tx-edit-form input, .tx-edit-form select {
-  flex:1; min-width:100px; padding:7px 10px; border-radius:var(--r2);
+  width:100%; padding:10px 12px; border-radius:var(--r2);
   background:var(--s2); border:1px solid var(--b1); color:var(--text);
-  font-family:var(--fb); font-size:.8rem;
+  font-family:var(--fb); font-size:.85rem; box-sizing:border-box;
 }
-.tx-edit-actions { display:flex; gap:8px; width:100%; }
-.tx-edit-actions .btn { flex:1; padding:8px; font-size:.75rem; }
+.tx-edit-actions { display:flex; gap:8px; }
+.tx-edit-actions .btn { flex:1; padding:10px; font-size:.8rem; }
 @media(max-width:360px){ .txii { display:none; } .cpill { display:none; } }
 /* Sur mobile, le FAB chevauchait le bouton supprimer sur les transactions et objectifs */
 @media(max-width:620px){
