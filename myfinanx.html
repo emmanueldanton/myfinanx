@@ -206,7 +206,7 @@ body::before {
 
 /* ════ HEADER ════ */
 header {
-  position:sticky; top:0; z-index:100;
+  position:fixed; top:0; left:0; right:0; z-index:100;
   background:var(--header-bg); backdrop-filter:blur(24px);
   border-bottom:1px solid var(--b1);
   padding:0 20px; height:56px;
@@ -227,8 +227,7 @@ header {
 .brand-ico img { width:30px; height:30px; object-fit:cover; border-radius:9px; display:block; transition:filter .3s; }
 :root[data-theme="blue"]   .brand-ico img { filter: brightness(.7) saturate(1.2); }
 :root[data-theme="violet"] .brand-ico img { filter: brightness(.65) saturate(1.1) hue-rotate(20deg); }
-.brand-name { color:var(--text); }
-@media(max-width:440px){ .brand-name { display:none; } }
+.brand-name { color:var(--text); font-size:.88rem; }
 
 /* Month nav */
 .month-nav { display:flex; align-items:center; gap:5px; flex-shrink:0; }
@@ -314,10 +313,13 @@ header {
 .hdr-data-btn:hover { border-color:var(--pr); color:var(--pr-l); }
 @media(max-width:620px){ .hdr-data { display:none; } }
 
-/* Currency — icône globe cachée sur mobile */
-@media(max-width:380px){
+/* Currency — label adaptatif sur mobile */
+.cur-lbl-sym { display:none; }
+@media(max-width:520px){
+  .cur-lbl-full { display:none; }
+  .cur-lbl-sym  { display:inline; }
   .cur-btn svg:first-child { display:none; }
-  .cur-btn { padding:5px 8px; }
+  .cur-btn { padding:5px 8px; gap:3px; }
 }
 
 /* ════ NAV TABS ════ */
@@ -325,6 +327,7 @@ nav {
   display:flex; gap:2px; padding:7px 16px;
   background:var(--s0); border-bottom:1px solid var(--b1);
   overflow-x:auto; scrollbar-width:none;
+  position:sticky; top:56px; z-index:99;
 }
 nav::-webkit-scrollbar { display:none; }
 .tab {
@@ -1454,7 +1457,7 @@ nav::-webkit-scrollbar { display:none; }
   <div class="cur-pick" id="curPick">
     <button class="cur-btn" onclick="toggleCurDrop()" id="curBtnLabel">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      <span id="cur-active-lbl">EUR €</span>
+      <span id="cur-active-lbl" class="cur-lbl-full">EUR €</span><span id="cur-active-sym" class="cur-lbl-sym">€</span>
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <div class="cur-dropdown" id="curDrop">
@@ -1515,6 +1518,7 @@ nav::-webkit-scrollbar { display:none; }
 
   <div class="chip" id="chip">✓ Sauvegardé</div>
 </header>
+<div style="height:56px;flex-shrink:0"></div>
 
 <!-- ════ DRAWER (mobile) ════ -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
@@ -2365,6 +2369,7 @@ function setCurrency(code) {
   localStorage.setItem('monargent-cur', code);
   // Update button label
   document.getElementById('cur-active-lbl').textContent = `${cur.code} ${cur.symbol}`;
+  document.getElementById('cur-active-sym').textContent = cur.symbol;
   // Update dropdown active state
   document.querySelectorAll('.cur-opt').forEach(el => {
     el.classList.toggle('active', el.dataset.cur === code);
