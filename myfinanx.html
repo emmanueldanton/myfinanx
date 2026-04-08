@@ -644,7 +644,7 @@ nav::-webkit-scrollbar { display:none; }
   background:var(--s2); border:1px solid var(--b1); color:var(--text);
   font-family:var(--fb); font-size:.85rem; box-sizing:border-box;
 }
-.tx-edit-actions { display:flex; gap:8px; }
+.tx-edit-actions { display:flex; gap:8px; margin-top:4px; }
 .tx-edit-actions .btn { flex:1; padding:10px; font-size:.8rem; }
 @media(max-width:360px){ .txii { display:none; } .cpill { display:none; } }
 /* Sur mobile, le FAB chevauchait le bouton supprimer sur les transactions et objectifs */
@@ -697,11 +697,11 @@ nav::-webkit-scrollbar { display:none; }
   margin-bottom:3px;
 }
 .g-edit-field { display:flex; flex-direction:column; }
-.g-edit-row { display:contents; }
+.g-edit-row { display:flex; flex-direction:column; gap:8px; }
 .g-edit-field input, .g-edit-field select { width:100%; padding:10px 12px; border-radius:var(--r2);
   background:var(--s2); border:1px solid var(--b1); color:var(--text);
   font-family:var(--fb); font-size:.85rem; box-sizing:border-box; }
-.g-edit-actions { display:flex; gap:8px; }
+.g-edit-actions { display:flex; gap:8px; margin-top:4px; }
 .g-edit-actions .btn { flex:1; padding:10px; font-size:.8rem; }
 .g-del svg { stroke:currentColor; }
 .g-del:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
@@ -3404,6 +3404,30 @@ function buildGoalCard(g, prefix) {
     ?`<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
     :`<span class="gbadge gb-p">${pct}% · En cours</span>`;
   const clockIco=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+
+  // Vue globale : carte lecture seule, sans boutons ni formulaire
+  if(prefix === 'ov-') {
+    return `<div class="gc">
+    <div class="gt">
+      <div class="gt-left">
+        <div class="g-ico" style="background:${g.color}22">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        </div>
+        <div style="min-width:0">
+          <div class="gn">${esc(g.name)}</div>
+          ${g.deadline?`<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>`:''}
+        </div>
+      </div>
+      <div>${badge}</div>
+    </div>
+    <div class="pt" style="height:6px;margin-top:10px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
+    <div class="gam">
+      <div class="gcur" style="color:${g.color}">${fmt(g.saved)}</div>
+      <div class="gtgt">/ ${fmt(g.target)}</div>
+    </div>
+  </div>`;
+  }
+
   const inputId=`${prefix}ga-${g.id}`;
   return `<div class="gc">
     <div class="gt">
