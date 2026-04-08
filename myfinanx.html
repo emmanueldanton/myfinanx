@@ -2932,7 +2932,12 @@ function renderRevRows() {
   }).join('');
 }
 
-function delRev(id) { D.revenus=D.revenus.filter(r=>r.id!==id); renderRevRows(); recalc(); save(); }
+function delRev(id) {
+  const r = D.revenus.find(r=>r.id===id);
+  if(!r) return;
+  if(!confirm(`Supprimer la source "${r.name}" ?`)) return;
+  D.revenus=D.revenus.filter(r=>r.id!==id); renderRevRows(); recalc(); save();
+}
 
 function addRev() {
   const n = document.getElementById('nr-n').value.trim() || 'Revenu';
@@ -2967,7 +2972,12 @@ function renderBudRows() {
   }).join('');
 }
 
-function delBud(id) { D.budget=D.budget.filter(b=>b.id!==id); renderBudRows(); recalc(); save(); }
+function delBud(id) {
+  const b = D.budget.find(b=>b.id===id);
+  if(!b) return;
+  if(!confirm(`Supprimer le poste "${b.name}" ?`)) return;
+  D.budget=D.budget.filter(b=>b.id!==id); renderBudRows(); recalc(); save();
+}
 
 function addBud() {
   const n = document.getElementById('nb-n').value.trim() || 'Nouveau poste';
@@ -3361,7 +3371,12 @@ function addToGoal(id, prefix='') {
   renderGoals(); save(); scheduleAiGreeting();
 }
 
-function delGoal(id) { D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); scheduleAiGreeting(); }
+function delGoal(id) {
+  const g = D.goals.find(g=>g.id===id);
+  if(!g) return;
+  if(!confirm(`Supprimer l'objectif "${g.name}" ?`)) return;
+  D.goals=D.goals.filter(g=>g.id!==id); renderGoals(); save(); scheduleAiGreeting();
+}
 
 function toggleEditGoal(id, prefix) {
   const form = document.getElementById('gef-'+prefix+id);
