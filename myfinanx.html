@@ -631,8 +631,14 @@ nav::-webkit-scrollbar { display:none; }
 .tx-edit-form {
   width:100%; margin-top:10px; padding-top:10px;
   border-top:1px solid var(--b1);
-  display:flex; flex-direction:column; gap:8px;
+  display:flex; flex-direction:column; gap:10px;
 }
+.tx-edit-lbl {
+  font-size:.62rem; font-weight:700; color:var(--muted);
+  font-family:var(--fh); letter-spacing:.04em; text-transform:uppercase;
+  margin-bottom:3px;
+}
+.tx-edit-field { display:flex; flex-direction:column; }
 .tx-edit-form input, .tx-edit-form select {
   width:100%; padding:10px 12px; border-radius:var(--r2);
   background:var(--s2); border:1px solid var(--b1); color:var(--text);
@@ -683,14 +689,21 @@ nav::-webkit-scrollbar { display:none; }
 .g-ed:hover { color:var(--pr-l); background:rgba(77,120,212,.1); }
 .g-edit-form {
   margin-top:12px; padding-top:12px; border-top:1px solid var(--b1);
-  display:flex; flex-direction:column; gap:8px;
+  display:flex; flex-direction:column; gap:10px;
 }
-.g-edit-row { display:flex; gap:8px; }
-.g-edit-row input { flex:1; min-width:0; padding:8px 10px; border-radius:var(--r2);
+.g-edit-lbl {
+  font-size:.62rem; font-weight:700; color:var(--muted);
+  font-family:var(--fh); letter-spacing:.04em; text-transform:uppercase;
+  margin-bottom:3px;
+}
+.g-edit-field { display:flex; flex-direction:column; }
+.g-edit-row { display:flex; gap:8px; flex-wrap:wrap; }
+.g-edit-row .g-edit-field { flex:1; min-width:120px; }
+.g-edit-row input { width:100%; padding:10px 12px; border-radius:var(--r2);
   background:var(--s2); border:1px solid var(--b1); color:var(--text);
-  font-family:var(--fb); font-size:.8rem; }
+  font-family:var(--fb); font-size:.85rem; box-sizing:border-box; }
 .g-edit-actions { display:flex; gap:8px; }
-.g-edit-actions .btn { flex:1; padding:9px; font-size:.75rem; }
+.g-edit-actions .btn { flex:1; padding:10px; font-size:.8rem; }
 .g-del svg { stroke:currentColor; }
 .g-del:hover { color:var(--red-l); background:rgba(196,58,58,.1); }
 .gam { display:flex; justify-content:space-between; align-items:baseline; margin-top:5px; }
@@ -3265,10 +3278,22 @@ function renderExpenses() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
       <div class="tx-edit-form" id="txef-${e.id}" style="display:none;">
-        <input type="text" class="tx-edit-desc" value="${esc(e.desc)}" placeholder="Description">
-        <select class="tx-edit-cat">${catsOpts}</select>
-        <input type="text" inputmode="decimal" class="tx-edit-amt" value="${toDisplay(e.amount).toFixed(getCur().code==='XOF'||getCur().code==='MAD'?0:2)}" placeholder="Montant">
-        <input type="date" class="tx-edit-date" value="${e.date}">
+        <div class="tx-edit-field">
+          <div class="tx-edit-lbl">Description</div>
+          <input type="text" class="tx-edit-desc" value="${esc(e.desc)}" placeholder="Description">
+        </div>
+        <div class="tx-edit-field">
+          <div class="tx-edit-lbl">Catégorie</div>
+          <select class="tx-edit-cat">${catsOpts}</select>
+        </div>
+        <div class="tx-edit-field">
+          <div class="tx-edit-lbl">Montant</div>
+          <input type="text" inputmode="decimal" class="tx-edit-amt" value="${toDisplay(e.amount).toFixed(getCur().code==='XOF'||getCur().code==='MAD'?0:2)}" placeholder="Montant">
+        </div>
+        <div class="tx-edit-field">
+          <div class="tx-edit-lbl">Date</div>
+          <input type="date" class="tx-edit-date" value="${e.date}">
+        </div>
         <div class="tx-edit-actions">
           <button class="btn bp bsm" onclick="saveEditTx('${e.id}')">Enregistrer</button>
           <button class="btn bsm" onclick="closeEditTx('${e.id}')">Annuler</button>
@@ -3402,12 +3427,24 @@ function buildGoalCard(g, prefix) {
     </div>
     <div class="g-edit-form" id="gef-${prefix}${g.id}" style="display:none;">
       <div class="g-edit-row">
-        <input type="text" class="g-edit-name" value="${esc(g.name)}" placeholder="Nom de l'objectif">
-        <input type="date" class="g-edit-dl" value="${g.deadline||''}">
+        <div class="g-edit-field">
+          <div class="g-edit-lbl">Nom de l'objectif</div>
+          <input type="text" class="g-edit-name" value="${esc(g.name)}" placeholder="Nom">
+        </div>
+        <div class="g-edit-field">
+          <div class="g-edit-lbl">Échéance</div>
+          <input type="date" class="g-edit-dl" value="${g.deadline||''}">
+        </div>
       </div>
       <div class="g-edit-row">
-        <input type="text" inputmode="decimal" class="g-edit-target" value="${toDisplay(g.target).toFixed(0)}" placeholder="Montant cible">
-        <input type="text" inputmode="decimal" class="g-edit-saved" value="${toDisplay(g.saved).toFixed(0)}" placeholder="Déjà épargné">
+        <div class="g-edit-field">
+          <div class="g-edit-lbl">Montant cible</div>
+          <input type="text" inputmode="decimal" class="g-edit-target" value="${toDisplay(g.target).toFixed(0)}" placeholder="Cible">
+        </div>
+        <div class="g-edit-field">
+          <div class="g-edit-lbl">Déjà épargné</div>
+          <input type="text" inputmode="decimal" class="g-edit-saved" value="${toDisplay(g.saved).toFixed(0)}" placeholder="Épargné">
+        </div>
       </div>
       <div class="g-edit-actions">
         <button class="btn bp bsm" onclick="saveEditGoal('${g.id}','${prefix}')">Enregistrer</button>
