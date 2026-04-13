@@ -1812,6 +1812,12 @@ nav::-webkit-scrollbar { display:none; }
       <div class="tf-val" id="rev-tot" style="color:var(--green)">0</div>
       <div style="width:22px;flex-shrink:0;"></div>
     </div>
+    <div class="tbl-foot" id="bud-ponctuel-row" style="display:none;border-top:none;">
+      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+      <div class="tf-lbl" style="color:var(--green)">Total avec ponctuels</div>
+      <div class="tf-val" id="bud-ponctuel-tot" style="color:var(--green)">0</div>
+      <div style="width:22px;flex-shrink:0;"></div>
+    </div>
   </div>
 
   <div class="sl">Planification budgétaire</div>
@@ -2320,6 +2326,34 @@ const CURRENCIES = {
   XOF: { code:'XOF', symbol:'FCFA', name:'Franc CFA',  rate:655.96, flag:'🌍' },
   MAD: { code:'MAD', symbol:'DH', name:'Dirham',        rate:10.82,  flag:'🇲🇦' },
 };
+
+const RATES_CACHE_KEY = 'myfinanx-rates-cache';
+const RATES_TTL_MS    = 24 * 60 * 60 * 1000; // 24 h
+
+async function fetchLiveRates() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(RATES_CACHE_KEY) || 'null');
+    if(cached && (Date.now() - cached.ts) < RATES_TTL_MS) {
+      applyRates(cached.rates);
+      return;
+    }
+    const res  = await fetch('https://api.frankfurter.app/latest?base=EUR&symbols=USD,GBP,CAD,MAD');
+    if(!res.ok) return;
+    const data = await res.json();
+    if(!data.rates) return;
+    localStorage.setItem(RATES_CACHE_KEY, JSON.stringify({ ts: Date.now(), rates: data.rates }));
+    applyRates(data.rates);
+    renderAll();
+  } catch(_) {
+    // réseau absent — on garde les taux hardcodés, aucune erreur visible
+  }
+}
+
+function applyRates(rates) {
+  ['USD','GBP','CAD','MAD'].forEach(code => {
+    if(rates[code]) CURRENCIES[code].rate = rates[code];
+  });
+}
 
 let activeCur = 'EUR'; // base currency for display
 
@@ -2850,6 +2884,9 @@ function init() {
   const savedCur = localStorage.getItem('monargent-cur') || 'XOF';
   setCurrency(savedCur);
 
+  // 5. Taux de change live (async, ne bloque pas l'init)
+  fetchLiveRates();
+
   // 4. Charge l'historique de la conversation IA
   loadAiHistory();
 
@@ -2922,6 +2959,7 @@ function closePlusPanel() {
 }
 
 function renderAll() {
+  if(!D) return;
   document.getElementById('ml').textContent = MONTHS[M]+' '+Y;
   renderRevRows();
   renderBudRows();
@@ -3013,27 +3051,34 @@ function addBud() {
    RECALC — all KPIs
 ═══════════════════════════════ */
 function recalc() {
-  const totalR = D.revenus.reduce((s,r)=>s+r.amount,0);
+  const totalR        = D.revenus.reduce((s,r)=>s+r.amount,0);
+  const totalPonctuel = D.expenses.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const totalIncome   = totalR + totalPonctuel;
   const totalB = D.budget.reduce((s,b)=>s+b.amount,0);
-  const restB  = totalR - totalB;
+  const restB  = totalIncome - totalB;
   const totalE = D.expenses.filter(e=>e.type!=='income').reduce((s,e)=>s+e.amount,0);
-  const restE  = totalR - totalE;
-  const pct    = totalR>0?Math.min(100,Math.round((totalE/totalR)*100)):0;
+  const restE  = totalIncome - totalE;
+  const pct    = totalIncome>0?Math.min(100,Math.round((totalE/totalIncome)*100)):0;
 
   /* ── Rev total / bud footer ── */
   setText('rev-tot', fmt(totalR));
+  const ponctuelRow = document.getElementById('bud-ponctuel-row');
+  if(ponctuelRow) {
+    ponctuelRow.style.display = totalPonctuel > 0 ? '' : 'none';
+    setText('bud-ponctuel-tot', fmt(totalIncome));
+  }
   setText('bud-tot', fmt(totalB));
-  const pctTot = totalR>0?Math.round((totalB/totalR)*100):0;
+  const pctTot = totalIncome>0?Math.round((totalB/totalIncome)*100):0;
   setText('bud-tot-pct', pctTot+'%');
   const br=document.getElementById('bud-reste');
   if(br){ br.textContent=(restB>=0?'+':'')+fmt(Math.abs(restB)); br.style.color=restB>=0?'var(--green)':'var(--red-l)'; }
   document.querySelectorAll('.bp3').forEach((el,i)=>{
-    if(D.budget[i]) el.textContent=totalR>0?Math.round((D.budget[i].amount/totalR)*100)+'%':'–';
+    if(D.budget[i]) el.textContent=totalIncome>0?Math.round((D.budget[i].amount/totalIncome)*100)+'%':'–';
   });
 
   /* ── HERO CARDS ── */
-  setText('ov-rev',  fmt(totalR));
-  setText('ov-rev2', fmt(totalR));
+  setText('ov-rev',  fmt(totalIncome));
+  setText('ov-rev2', fmt(totalIncome));
   setText('ov-dep',  fmt(totalE));
   const restEl=document.getElementById('ov-rest');
   if(restEl){ restEl.textContent=(restE<0?'−':'')+fmt(Math.abs(restE)); restEl.style.color=restE<0?'var(--red-l)':''; }
@@ -3050,10 +3095,10 @@ function recalc() {
   if(naSub){ naSub.textContent = restB>=0?'à réallouer':'Déficit budget'; }
 
   /* ── DONUT CHART ── */
-  renderDonut(totalE, totalR, totalB);
+  renderDonut(totalE, totalIncome, totalB);
 
   /* ── BUDGET LINES ── */
-  renderBudgetLines(totalR);
+  renderBudgetLines(totalIncome);
 
   /* ── OVERVIEW REVENUE CARDS ── */
   const cardsEl = document.getElementById('ov-cards');
@@ -3080,19 +3125,19 @@ function recalc() {
   setText('ov-all', fmt(totalB));
   // also update ov-rev text in budget section (separate from hero)
   const ovRevBudget = document.querySelectorAll('#ov-rev');
-  ovRevBudget.forEach(el => el.textContent = fmt(totalR));
+  ovRevBudget.forEach(el => el.textContent = fmt(totalIncome));
 
   /* ── TRACKER KPIs ── */
-  setText('tr-b', fmt(totalR));
+  setText('tr-b', fmt(totalIncome));
   updateTracker();
 
   /* ── ALERTS ── */
   const warnIco = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
   const infoIco  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
   let al='';
-  if(restB<0)        al+=`<div class="alert ab">${warnIco} Tu as alloué <strong>${fmt(Math.abs(restB))}</strong> de plus que tes revenus.</div>`;
-  else if(restB>100) al+=`<div class="alert ag">${infoIco} <strong>${fmt(restB)}</strong> non alloués — affecte-les à tes priorités.</div>`;
-  if(pct>90&&totalR>0) al+=`<div class="alert ab">${warnIco} Plus de 90% de tes revenus dépensés ce mois !</div>`;
+  if(restB<0)           al+=`<div class="alert ab">${warnIco} Tu as alloué <strong>${fmt(Math.abs(restB))}</strong> de plus que tes revenus.</div>`;
+  else if(restB>100)    al+=`<div class="alert ag">${infoIco} <strong>${fmt(restB)}</strong> non alloués — affecte-les à tes priorités.</div>`;
+  if(pct>90&&totalIncome>0) al+=`<div class="alert ab">${warnIco} Plus de 90% de tes revenus dépensés ce mois !</div>`;
   ['bud-al','ov-al'].forEach(id=>setText2(id,al));
 
   /* ── GREETING SUB ── */
@@ -3230,7 +3275,7 @@ function addTx() {
   const desc   = document.getElementById('tx-d').value.trim();
   const cat    = document.getElementById('tx-c').value;
   const dispAmt= parseAmt(document.getElementById('tx-a').value);
-  const date   = document.getElementById('tx-dt').value || new Date().toISOString().slice(0,10);
+  const date   = document.getElementById('tx-dt').value || todayISO();
   if(!desc||!dispAmt||dispAmt<=0){
     const a=document.getElementById('tx-a');
     a.style.borderColor='var(--red)'; a.style.boxShadow='0 0 0 3px rgba(196,58,58,.2)';
@@ -3357,8 +3402,10 @@ function renderCatBk(exps) {
 
 function updateTracker() {
   const totalR=D.revenus.reduce((s,r)=>s+r.amount,0);
+  const totalPonctuel=D.expenses.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const totalIncome=totalR+totalPonctuel;
   const totalE=D.expenses.filter(e=>e.type!=='income').reduce((s,e)=>s+e.amount,0);
-  const reste=totalR-totalE;
+  const reste=totalIncome-totalE;
   setText('tr-t', fmt(totalE));
   const el=document.getElementById('tr-r');
   if(el){el.textContent=fmt(Math.abs(reste)); el.style.color=reste>=0?'var(--pr-l)':'var(--red-l)';}
