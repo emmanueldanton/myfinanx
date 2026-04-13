@@ -1426,6 +1426,63 @@ nav::-webkit-scrollbar { display:none; }
   font-size:.64rem; color:var(--muted); margin-top:5px;
 }
 .cur-note svg { stroke:var(--muted); flex-shrink:0; }
+
+/* ════ TUTORIAL ════ */
+.tuto-overlay {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,.55); backdrop-filter:blur(5px);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px; opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.tuto-overlay.open { opacity:1; pointer-events:all; }
+.tuto-card {
+  background:var(--s1); border:1px solid var(--b1); border-radius:18px;
+  width:100%; max-width:420px; padding:28px 28px 24px; position:relative;
+  box-shadow:0 24px 64px rgba(0,0,0,.4);
+  transform:translateY(16px); transition:transform .25s;
+}
+.tuto-overlay.open .tuto-card { transform:translateY(0); }
+.tuto-prog {
+  position:absolute; top:0; left:0; height:3px; background:var(--pr);
+  border-radius:18px 18px 0 0; transition:width .35s cubic-bezier(.4,0,.2,1);
+}
+.tuto-slide { display:none; }
+.tuto-slide.active { display:block; }
+.tuto-ico {
+  width:46px; height:46px; border-radius:13px;
+  background:rgba(77,120,212,.14);
+  display:flex; align-items:center; justify-content:center; margin-bottom:16px;
+}
+.tuto-ico svg { stroke:var(--pr-l); }
+.tuto-title { font-family:var(--fh); font-size:1.08rem; font-weight:800; color:var(--text); margin-bottom:8px; line-height:1.2; }
+.tuto-body { font-size:.82rem; color:var(--muted); line-height:1.65; margin-bottom:20px; }
+.tuto-body strong { color:var(--text); font-weight:700; }
+.tuto-dots { display:flex; gap:6px; align-items:center; justify-content:center; margin-bottom:20px; }
+.tuto-dot { width:7px; height:7px; border-radius:50%; background:var(--b2); cursor:pointer; transition:.2s; }
+.tuto-dot.active { background:var(--pr); width:20px; border-radius:4px; }
+.tuto-actions { display:flex; gap:8px; }
+.tuto-skip {
+  flex:1; background:none; border:1px solid var(--b1); color:var(--muted);
+  border-radius:var(--r2); padding:10px 14px;
+  font-family:var(--fh); font-size:.78rem; font-weight:700;
+  cursor:pointer; transition:.15s;
+}
+.tuto-skip:hover { background:var(--s2); }
+.tuto-next {
+  flex:2; background:var(--pr); border:none; color:#fff; border-radius:var(--r2);
+  padding:10px 16px; font-family:var(--fh); font-size:.82rem; font-weight:800;
+  cursor:pointer; transition:background .2s;
+}
+.tuto-next:hover { opacity:.88; }
+.tuto-next.final { background:var(--green); }
+.hdr-help-btn {
+  background:none; border:1px solid var(--b1); color:var(--muted);
+  border-radius:50%; width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-family:var(--fh); font-size:.85rem; font-weight:800;
+  transition:.15s; flex-shrink:0;
+}
+.hdr-help-btn:hover { background:var(--s2); color:var(--text); }
 </style>
 </head>
 <body>
@@ -1516,6 +1573,7 @@ nav::-webkit-scrollbar { display:none; }
     </button>
   </div>
 
+  <button class="hdr-help-btn" onclick="openTuto()" title="Aide / Tutoriel">?</button>
   <div class="chip" id="chip">✓ Sauvegardé</div>
 </header>
 <div style="height:56px;flex-shrink:0"></div>
@@ -1814,7 +1872,10 @@ nav::-webkit-scrollbar { display:none; }
     </div>
     <div class="tbl-foot" id="bud-ponctuel-row" style="display:none;border-top:none;">
       <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-      <div class="tf-lbl" style="color:var(--green)">Total avec ponctuels</div>
+      <div class="tf-lbl" style="color:var(--green)">
+        Total avec ponctuels
+        <div id="bud-ponctuel-sub" style="font-size:.63rem;color:var(--muted);font-weight:500;margin-top:2px;"></div>
+      </div>
       <div class="tf-val" id="bud-ponctuel-tot" style="color:var(--green)">0</div>
       <div style="width:22px;flex-shrink:0;"></div>
     </div>
@@ -2895,6 +2956,9 @@ function init() {
 
   // 6. Rappels in-app (une fois par jour)
   checkReminder();
+
+  // 7. Tutoriel premier lancement
+  maybeShowTuto();
 }
 
 function changeMonth(d) {
@@ -3066,6 +3130,7 @@ function recalc() {
   if(ponctuelRow) {
     ponctuelRow.style.display = totalPonctuel > 0 ? '' : 'none';
     setText('bud-ponctuel-tot', fmt(totalIncome));
+    setText('bud-ponctuel-sub', `dont ${fmt(totalPonctuel)} ponctuels ce mois`);
   }
   setText('bud-tot', fmt(totalB));
   const pctTot = totalIncome>0?Math.round((totalB/totalIncome)*100):0;
@@ -4152,7 +4217,114 @@ if('serviceWorker' in navigator) {
     });
   });
 }
+
+/* ═══════════════════════════════
+   TUTORIAL
+═══════════════════════════════ */
+const TUTO_KEY   = 'myfinanx-tuto-done';
+const TUTO_TOTAL = 6;
+let _tutoIdx = 0;
+
+function openTuto(idx) {
+  _tutoIdx = (typeof idx === 'number') ? idx : 0;
+  _tutoRender();
+  document.getElementById('tuto-overlay').classList.add('open');
+  document.addEventListener('keydown', _tutoKey);
+}
+
+function closeTuto() {
+  document.getElementById('tuto-overlay').classList.remove('open');
+  document.removeEventListener('keydown', _tutoKey);
+  localStorage.setItem(TUTO_KEY, '1');
+}
+
+function tutoBackdrop(e) {
+  if(e.target === document.getElementById('tuto-overlay')) closeTuto();
+}
+
+function tutoNext() {
+  if(_tutoIdx < TUTO_TOTAL - 1) { _tutoIdx++; _tutoRender(); }
+  else closeTuto();
+}
+
+function tutoGo(idx) { _tutoIdx = idx; _tutoRender(); }
+
+function _tutoKey(e) {
+  if(e.key==='ArrowRight'||e.key==='Enter') tutoNext();
+  else if(e.key==='ArrowLeft' && _tutoIdx > 0) { _tutoIdx--; _tutoRender(); }
+  else if(e.key==='Escape') closeTuto();
+}
+
+function _tutoRender() {
+  document.querySelectorAll('.tuto-slide').forEach((s,i) =>
+    s.classList.toggle('active', i === _tutoIdx));
+  document.getElementById('tuto-prog').style.width =
+    ((_tutoIdx + 1) / TUTO_TOTAL * 100) + '%';
+  document.getElementById('tuto-dots').innerHTML =
+    Array.from({length: TUTO_TOTAL}, (_,i) =>
+      `<div class="tuto-dot${i===_tutoIdx?' active':''}" onclick="tutoGo(${i})"></div>`
+    ).join('');
+  const isLast = _tutoIdx === TUTO_TOTAL - 1;
+  const nb = document.getElementById('tuto-next-btn');
+  const sb = document.getElementById('tuto-skip-btn');
+  nb.textContent = isLast ? "C'est parti !" : 'Suivant';
+  nb.classList.toggle('final', isLast);
+  sb.style.display = isLast ? 'none' : '';
+}
+
+function maybeShowTuto() {
+  if(!localStorage.getItem(TUTO_KEY)) setTimeout(openTuto, 600);
+}
 </script>
+
+<!-- ════ TUTORIAL ════ -->
+<div class="tuto-overlay" id="tuto-overlay" onclick="tutoBackdrop(event)">
+  <div class="tuto-card">
+    <div class="tuto-prog" id="tuto-prog"></div>
+
+    <div class="tuto-slide active" id="tuto-s0">
+      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+      <div class="tuto-title">Bienvenue sur MyFinanx</div>
+      <div class="tuto-body">Ton assistant de finances personnelles, simple et 100&nbsp;% privé.<br><br>L'app comporte <strong>5 onglets</strong> : <strong>Vue globale</strong>, <strong>Budget</strong>, <strong>Dépenses</strong>, <strong>Objectifs</strong> et <strong>Conseiller IA</strong>.<br><br>Toutes tes données restent sur <strong>ton appareil</strong> — rien n'est envoyé en ligne.</div>
+    </div>
+
+    <div class="tuto-slide" id="tuto-s1">
+      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="tuto-title">Onglet Budget</div>
+      <div class="tuto-body">Commence par saisir tes <strong>revenus fixes</strong> (salaire, loyer perçu…).<br><br>Ensuite crée des <strong>postes budgétaires</strong> (Loyer, Alimentation, Transport…).<br><br>MyFinanx calcule en temps réel le <strong>reste non alloué</strong> et les <strong>% par poste</strong>.</div>
+    </div>
+
+    <div class="tuto-slide" id="tuto-s2">
+      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
+      <div class="tuto-title">Onglet Dépenses</div>
+      <div class="tuto-body">Saisis chaque <strong>dépense</strong> avec description, catégorie, montant et date.<br><br>Tu peux aussi enregistrer un <strong>revenu ponctuel</strong> (prime, vente…) — il s'ajoute automatiquement à ton total du mois.<br><br>Filtre par catégorie pour analyser où va ton argent.</div>
+    </div>
+
+    <div class="tuto-slide" id="tuto-s3">
+      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+      <div class="tuto-title">Onglet Objectifs</div>
+      <div class="tuto-body">Crée des objectifs d'épargne : vacances, fonds d'urgence, achat…<br><br>Chaque objectif affiche une <strong>barre de progression</strong> et une <strong>date cible</strong>.<br><br>Ajoute des montants au fur et à mesure pour suivre ta progression.</div>
+    </div>
+
+    <div class="tuto-slide" id="tuto-s4">
+      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="tuto-title">Conseiller IA</div>
+      <div class="tuto-body">Le conseiller analyse ta situation et génère des <strong>conseils personnalisés</strong>.<br><br>Pose-lui des questions directement : <em>"Dois-je réduire mes dépenses ?"</em>, <em>"Comment atteindre mon objectif ?"</em><br><br>Les conseils se mettent à jour automatiquement quand tes données changent.</div>
+    </div>
+
+    <div class="tuto-slide" id="tuto-s5">
+      <div class="tuto-ico" style="background:rgba(52,211,153,.12)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="var(--green)"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="tuto-title">Prêt à commencer !</div>
+      <div class="tuto-body"><strong>✓ Sauvegarde auto</strong> — tes données sont sauvegardées à chaque modification.<br><strong>✓ Navigation par mois</strong> — utilise les flèches dans le header pour changer de mois.<br><strong>✓ Devise</strong> — change la devise à tout moment via le sélecteur en haut.<br><strong>✓ Aide</strong> — le bouton <strong>?</strong> dans le header relance ce tutoriel à tout moment.</div>
+    </div>
+
+    <div class="tuto-dots" id="tuto-dots"></div>
+    <div class="tuto-actions">
+      <button class="tuto-skip" id="tuto-skip-btn" onclick="closeTuto()">Passer</button>
+      <button class="tuto-next" id="tuto-next-btn" onclick="tutoNext()">Suivant</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
