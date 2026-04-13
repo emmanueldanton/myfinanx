@@ -2975,11 +2975,10 @@ function renderBudRows() {
     const pct = totalR>0?Math.round((b.amount/totalR)*100):0;
     const displayAmt = (toDisplay(b.amount)).toFixed(cur.code==='XOF'||cur.code==='MAD'?0:2);
     const ico = catIco(b.name, 13);
-    return `<div class="bud-row">
+    return `<div class="bud-row" data-bud-id="${b.id}">
       <div class="b-ico-wrap" title="Catégorie">${ico}</div>
       <div class="bn"><input type="text" value="${esc(b.name)}" placeholder="Nom du poste"
-        oninput="D.budget.find(x=>x.id==='${b.id}').name=this.value;save()"
-        onblur="renderBudRows()"></div>
+        oninput="D.budget.find(x=>x.id==='${b.id}').name=this.value;updateBudIcon('${b.id}',this.value);save()"></div>
       <div class="ba"><input type="text" inputmode="decimal" value="${displayAmt}"
         oninput="D.budget.find(x=>x.id==='${b.id}').amount=fromDisplay(parseAmt(this.value));recalc();save()"></div>
       <div class="bp3">${pct}%</div>
@@ -2988,6 +2987,11 @@ function renderBudRows() {
       </button></div>
     </div>`;
   }).join('');
+}
+
+function updateBudIcon(id, name) {
+  const row = document.querySelector(`.bud-row[data-bud-id="${id}"]`);
+  if(row) row.querySelector('.b-ico-wrap').innerHTML = catIco(name, 13);
 }
 
 function delBud(id) {
@@ -3093,8 +3097,6 @@ function recalc() {
 
   /* ── GREETING SUB ── */
   scheduleAiGreeting();
-
-  save();
 }
 
 /* ── DONUT SVG ── */
