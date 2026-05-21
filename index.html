@@ -1633,7 +1633,7 @@ nav::-webkit-scrollbar { display:none; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         Réinitialiser
       </button>
-      <button class="drawer-data-btn" onclick="toggleDrawer(false);localStorage.removeItem('monargent-onboarded');openTutorial();" title="Revoir le tutoriel de démarrage">
+      <button class="drawer-data-btn" onclick="toggleDrawer(false);openTuto();" title="Revoir le tutoriel de démarrage">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Tutoriel
       </button>
@@ -2122,8 +2122,8 @@ nav::-webkit-scrollbar { display:none; }
   </div>
 </div>
 
-<!-- ════ ONBOARDING POPUP ════ -->
-<div class="pwa-overlay" id="ob-overlay">
+<!-- ob-overlay removed — replaced by src/ui/tutorial.js -->
+<div class="pwa-overlay" id="ob-overlay" style="display:none!important">
   <div class="pwa-card">
     <div class="ob-progress" id="ob-progress-bar">
       <div class="ob-dot on" id="ob-d0"></div>
@@ -2335,7 +2335,7 @@ nav::-webkit-scrollbar { display:none; }
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
           Réinitialiser
         </button>
-        <button class="drawer-data-btn" onclick="closePlusPanel();localStorage.removeItem('monargent-onboarded');openTutorial();">
+        <button class="drawer-data-btn" onclick="closePlusPanel();openTuto();">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           Tutoriel
         </button>
@@ -3004,56 +3004,6 @@ function changeMonth(d) {
   if(newY > now.getFullYear() || (newY === now.getFullYear() && adjM > now.getMonth())) return;
   M = adjM; Y = newY;
   loadMonth();
-}
-
-function goTab(id, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  const page = document.getElementById('page-'+id);
-  if(page) page.classList.add('active');
-  if(btn) {
-    btn.classList.add('active');
-  } else {
-    document.querySelectorAll('.tab').forEach(t=>{
-      const oc = t.getAttribute('onclick');
-      if(oc && oc.includes("'"+id+"'")) t.classList.add('active');
-    });
-  }
-  // Sync drawer items
-  document.querySelectorAll('.drawer-item').forEach(el => {
-    el.classList.toggle('active', el.id === 'di-'+id);
-  });
-  syncBnavActive(id);
-  window.scrollTo(0, 0);
-}
-
-function goTabMobile(id) {
-  document.getElementById('plus-panel')?.classList.remove('open');
-  document.getElementById('plus-overlay')?.classList.remove('open');
-  document.body.style.overflow = '';
-  goTab(id, null);
-}
-
-function syncBnavActive(id) {
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  const navId = id === 'ai' ? 'plus' : id;
-  document.getElementById('bn-' + navId)?.classList.add('active');
-}
-
-function openPlusPanel() {
-  document.getElementById('plus-overlay')?.classList.add('open');
-  document.getElementById('plus-panel')?.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('bn-plus')?.classList.add('active');
-}
-
-function closePlusPanel() {
-  document.getElementById('plus-overlay')?.classList.remove('open');
-  document.getElementById('plus-panel')?.classList.remove('open');
-  document.body.style.overflow = '';
-  const activePage = document.querySelector('.page.active');
-  if(activePage) syncBnavActive(activePage.id.replace('page-', ''));
 }
 
 function renderAll() {
@@ -4020,10 +3970,7 @@ function pwaTab(os) {
   document.getElementById('pwa-tab-android').classList.toggle('on', os === 'android');
 }
 
-/* ════ ONBOARDING ════ */
-let obStep = 0;
-const OB_TOTAL = 7;
-
+/* ════ ONBOARDING — removed; see src/ui/tutorial.js ════ */
 function launchConfetti() {
   const canvas = document.createElement('canvas');
   canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:10001;';
@@ -4079,54 +4026,6 @@ function launchConfetti() {
 
   // Démarrer au prochain frame pour s'assurer que le DOM est peint
   rafId = requestAnimationFrame(draw);
-}
-
-// Ouvre le tuto (sans garde) — appelé par le bouton Tutoriel du drawer
-function openTutorial() {
-  obStep = 0;
-  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.ob-dot').forEach(d => d.classList.remove('on'));
-  document.getElementById('ob-s0')?.classList.add('on');
-  document.getElementById('ob-d0')?.classList.add('on');
-  const btn = document.getElementById('ob-next');
-  if(btn) btn.textContent = 'Commencer';
-  document.getElementById('ob-overlay')?.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-// Ferme le tuto
-function closeTutorial() {
-  document.getElementById('ob-overlay')?.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// Première visite — uniquement en mode standalone (app installée sur écran d'accueil)
-function showOnboarding() {
-  if(localStorage.getItem('monargent-onboarded')) return;
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  if(!isStandalone) return;
-  openTutorial();
-}
-
-function obNext() {
-  document.getElementById('ob-s' + obStep)?.classList.remove('on');
-  obStep++;
-  if(obStep >= OB_TOTAL) {
-    closeTutorial();
-    localStorage.setItem('monargent-onboarded', '1');
-    requestAnimationFrame(() => requestAnimationFrame(launchConfetti));
-    if(window.OneSignalDeferred) {
-      OneSignalDeferred.push(o => o.Slidedown.promptPush());
-    }
-    return;
-  }
-  document.getElementById('ob-s' + obStep)?.classList.add('on');
-  for(let i = 0; i <= obStep; i++)
-    document.getElementById('ob-d' + i)?.classList.add('on');
-  const btn = document.getElementById('ob-next');
-  if(!btn) return;
-  if(obStep === OB_TOTAL - 1) btn.textContent = "C'est parti, j'y vais !";
-  else btn.textContent = "Suivant";
 }
 
 // ════ RAPPELS IN-APP ════
@@ -4303,110 +4202,22 @@ if('serviceWorker' in navigator) {
   });
 }
 
-/* ═══════════════════════════════
-   TUTORIAL
-═══════════════════════════════ */
-const TUTO_KEY   = 'myfinanx-tuto-done';
-const TUTO_TOTAL = 6;
-let _tutoIdx = 0;
-
-function openTuto(idx) {
-  _tutoIdx = (typeof idx === 'number') ? idx : 0;
-  _tutoRender();
-  document.getElementById('tuto-overlay').classList.add('open');
-  document.addEventListener('keydown', _tutoKey);
-}
-
-function closeTuto() {
-  document.getElementById('tuto-overlay').classList.remove('open');
-  document.removeEventListener('keydown', _tutoKey);
-  localStorage.setItem(TUTO_KEY, '1');
-}
-
-function tutoBackdrop(e) {
-  if(e.target === document.getElementById('tuto-overlay')) closeTuto();
-}
-
-function tutoNext() {
-  if(_tutoIdx < TUTO_TOTAL - 1) { _tutoIdx++; _tutoRender(); }
-  else closeTuto();
-}
-
-function tutoGo(idx) { _tutoIdx = idx; _tutoRender(); }
-
-function _tutoKey(e) {
-  if(e.key==='ArrowRight'||e.key==='Enter') tutoNext();
-  else if(e.key==='ArrowLeft' && _tutoIdx > 0) { _tutoIdx--; _tutoRender(); }
-  else if(e.key==='Escape') closeTuto();
-}
-
-function _tutoRender() {
-  document.querySelectorAll('.tuto-slide').forEach((s,i) =>
-    s.classList.toggle('active', i === _tutoIdx));
-  document.getElementById('tuto-prog').style.width =
-    ((_tutoIdx + 1) / TUTO_TOTAL * 100) + '%';
-  document.getElementById('tuto-dots').innerHTML =
-    Array.from({length: TUTO_TOTAL}, (_,i) =>
-      `<div class="tuto-dot${i===_tutoIdx?' active':''}" onclick="tutoGo(${i})"></div>`
-    ).join('');
-  const isLast = _tutoIdx === TUTO_TOTAL - 1;
-  const nb = document.getElementById('tuto-next-btn');
-  const sb = document.getElementById('tuto-skip-btn');
-  nb.textContent = isLast ? "C'est parti !" : 'Suivant';
-  nb.classList.toggle('final', isLast);
-  sb.style.display = isLast ? 'none' : '';
-}
-
-function maybeShowTuto() {
-  if(!localStorage.getItem(TUTO_KEY)) setTimeout(openTuto, 600);
-}
+/* Tutorial functions → src/ui/tutorial.js (exposed on window via initTutorial()) */
 </script>
 
-<!-- ════ TUTORIAL ════ -->
+<!-- ════ TUTORIAL — rendered dynamically by src/ui/tutorial.js ════ -->
 <div class="tuto-overlay" id="tuto-overlay" onclick="tutoBackdrop(event)">
   <div class="tuto-card">
     <div class="tuto-prog" id="tuto-prog"></div>
-
-    <div class="tuto-slide active" id="tuto-s0">
-      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
-      <div class="tuto-title">Bienvenue sur MyFinanx</div>
-      <div class="tuto-body">Ton assistant de finances personnelles, simple et 100&nbsp;% privé.<br><br>L'app comporte <strong>5 onglets</strong> : <strong>Vue globale</strong>, <strong>Budget</strong>, <strong>Dépenses</strong>, <strong>Objectifs</strong> et <strong>Conseiller IA</strong>.<br><br>Toutes tes données restent sur <strong>ton appareil</strong> — rien n'est envoyé en ligne.</div>
+    <div class="tuto-slide">
+      <div class="tuto-ico" id="tuto-ico"></div>
+      <div class="tuto-title" id="tuto-title"></div>
+      <div class="tuto-body" id="tuto-body"></div>
     </div>
-
-    <div class="tuto-slide" id="tuto-s1">
-      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-      <div class="tuto-title">Onglet Budget</div>
-      <div class="tuto-body">Commence par saisir tes <strong>revenus fixes</strong> (salaire, loyer perçu…).<br><br>Ensuite crée des <strong>postes budgétaires</strong> (Loyer, Alimentation, Transport…).<br><br>MyFinanx calcule en temps réel le <strong>reste non alloué</strong> et les <strong>% par poste</strong>.</div>
-    </div>
-
-    <div class="tuto-slide" id="tuto-s2">
-      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
-      <div class="tuto-title">Onglet Dépenses</div>
-      <div class="tuto-body">Saisis chaque <strong>dépense</strong> avec description, catégorie, montant et date.<br><br>Tu peux aussi enregistrer un <strong>revenu ponctuel</strong> (prime, vente…) — il s'ajoute automatiquement à ton total du mois.<br><br>Filtre par catégorie pour analyser où va ton argent.</div>
-    </div>
-
-    <div class="tuto-slide" id="tuto-s3">
-      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-      <div class="tuto-title">Onglet Objectifs</div>
-      <div class="tuto-body">Crée des objectifs d'épargne : vacances, fonds d'urgence, achat…<br><br>Chaque objectif affiche une <strong>barre de progression</strong> et une <strong>date cible</strong>.<br><br>Ajoute des montants au fur et à mesure pour suivre ta progression.</div>
-    </div>
-
-    <div class="tuto-slide" id="tuto-s4">
-      <div class="tuto-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-      <div class="tuto-title">Conseiller IA</div>
-      <div class="tuto-body">Le conseiller analyse ta situation et génère des <strong>conseils personnalisés</strong>.<br><br>Pose-lui des questions directement : <em>"Dois-je réduire mes dépenses ?"</em>, <em>"Comment atteindre mon objectif ?"</em><br><br>Les conseils se mettent à jour automatiquement quand tes données changent.</div>
-    </div>
-
-    <div class="tuto-slide" id="tuto-s5">
-      <div class="tuto-ico" style="background:rgba(52,211,153,.12)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="var(--green)"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="tuto-title">Prêt à commencer !</div>
-      <div class="tuto-body"><strong>✓ Sauvegarde auto</strong> — tes données sont sauvegardées à chaque modification.<br><strong>✓ Navigation par mois</strong> — utilise les flèches dans le header pour changer de mois.<br><strong>✓ Devise</strong> — change la devise à tout moment via le sélecteur en haut.<br><strong>✓ Aide</strong> — le bouton <strong>?</strong> dans le header relance ce tutoriel à tout moment.</div>
-    </div>
-
-    <div class="tuto-dots" id="tuto-dots"></div>
-    <div class="tuto-actions">
-      <button class="tuto-skip" id="tuto-skip-btn" onclick="closeTuto()">Passer</button>
-      <button class="tuto-next" id="tuto-next-btn" onclick="tutoNext()">Suivant</button>
+    <div class="tuto-nav">
+      <button class="tuto-skip" id="tuto-skip" onclick="closeTuto()">Passer</button>
+      <div class="tuto-dots" id="tuto-dots"></div>
+      <button class="tuto-next" id="tuto-next" onclick="tutoNext()">Suivant →</button>
     </div>
   </div>
 </div>

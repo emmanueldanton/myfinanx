@@ -1,0 +1,165 @@
+/* ════ TUTORIAL OVERLAY ════ */
+
+.tuto-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+
+.tuto-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.tuto-card {
+  position: relative;
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: 18px;
+  padding: 28px 24px 22px;
+  width: min(88vw, 360px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .55);
+  animation: tuto-in .28s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes tuto-in {
+  from { transform: scale(.88) translateY(12px); opacity: 0; }
+  to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+
+.tuto-prog {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.tuto-prog-step {
+  flex: 1;
+  height: 3px;
+  border-radius: 99px;
+  background: var(--b2);
+  transition: background .3s ease;
+}
+
+.tuto-prog-step.done {
+  background: var(--pr);
+}
+
+.tuto-slide {
+  text-align: center;
+}
+
+.tuto-ico {
+  font-size: 2.4rem;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+
+.tuto-title {
+  font-family: var(--fh);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.tuto-body {
+  font-size: .82rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+/* Navigation row */
+.tuto-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Touch targets ≥ 44px */
+.tuto-skip {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: .78rem;
+  cursor: pointer;
+  padding: 10px 8px;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 8px;
+  transition: color .15s;
+}
+
+.tuto-skip:hover { color: var(--text); }
+
+.tuto-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Touch target ≥ 44px via generous padding around the tiny dot */
+.tuto-dot {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 18px 10px;
+  box-sizing: content-box;
+  line-height: 0;
+}
+
+.tuto-dot::after {
+  content: '';
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--b2);
+  transition: background .2s, transform .2s;
+}
+
+.tuto-dot.active::after {
+  background: var(--pr);
+  transform: scale(1.25);
+}
+
+.tuto-next {
+  background: var(--pr);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 18px;
+  min-height: 44px;
+  min-width: 80px;
+  transition: background .15s, transform .1s;
+}
+
+.tuto-next:hover  { background: var(--pr-d); }
+.tuto-next:active { transform: scale(.96); }
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .tuto-card {
+    padding: 20px 16px 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    width: min(92vw, 360px);
+  }
+
+  .tuto-title { font-size: .97rem; }
+  .tuto-body  { font-size: .8rem; }
+}

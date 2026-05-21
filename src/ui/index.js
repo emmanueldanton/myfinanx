@@ -1,9 +1,10 @@
 import { store } from '../store.js';
-import { renderDonut, renderBudgetProgressBars } from './charts.js';
+import { renderDonut, renderBudgetProgressBars, initDonutResizeObserver } from './charts.js';
 import { fmt } from '../currency.js';
 import { calcTotalIncomes, calcTotalAllocated, calcUnallocated } from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes, getRecent } from '../transactions.js';
 import { calcProgress } from '../goals.js';
+import { MONTHS, catIco, esc, fmtDate, CAT_COLORS } from '../utils.js';
 
 function setText(id, v) {
   const el = document.getElementById(id);
@@ -14,19 +15,49 @@ export function renderAll(state) {
   const { budget, transactions, goals, month, year } = state;
   if (!budget) return;
 
-  const totalIncomesEUR   = calcTotalIncomes(budget);
-  const totalAllocatedEUR = calcTotalAllocated(budget);
-  const unallocatedEUR    = calcUnallocated(budget);
-  const totalExpensesEUR  = calcTotalExpenses(transactions);
+  const totalIncomesEUR    = calcTotalIncomes(budget);
+  const totalAllocatedEUR  = calcTotalAllocated(budget);
+  const unallocatedEUR     = calcUnallocated(budget);
+  const totalExpensesEUR   = calcTotalExpenses(transactions);
   const punctualIncomesEUR = calcTotalPunctualIncomes(transactions);
-  const totalRevenueEUR   = totalIncomesEUR + punctualIncomesEUR;
-  const availableEUR      = totalRevenueEUR - totalExpensesEUR;
+  const totalRevenueEUR    = totalIncomesEUR + punctualIncomesEUR;
+  const availableEUR       = totalRevenueEUR - totalExpensesEUR;
 
-  // KPI cards
-  setText('kpi-revenue',    fmt(totalRevenueEUR));
-  setText('kpi-expenses',   fmt(totalExpensesEUR));
-  setText('kpi-available',  fmt(availableEUR));
-  setText('kpi-unallocated', fmt(unallocatedEUR));
+  // Parse "YYYY-MM" into year + 0-indexed month
+  let Y = year ?? new Date().getFullYear(), M = new Date().getMonth();
+  if (month) {
+    const parts = month.split('-');
+    Y = parseInt(parts[0], 10);
+    M = parseInt(parts[1], 10) - 1;
+  }
+
+  // Month label
+  const mlEl = document.getElementById('ml');
+  if (mlEl) mlEl.textContent = MONTHS[M] + ' ' + Y;
+
+  // Hero KPI cards
+  setText('ov-rev', fmt(totalRevenueEUR));
+  setText('ov-rev2', fmt(totalRevenueEUR));
+  setText('ov-dep', fmt(totalExpensesEUR));
+
+  const restEl = document.getElementById('ov-rest');
+  if (restEl) {
+    restEl.textContent = (availableEUR < 0 ? '−' : '') + fmt(Math.abs(availableEUR));
+    restEl.style.color = availableEUR < 0 ? 'var(--red-l)' : '';
+  }
+  const naEl = document.getElementById('ov-na');
+  if (naEl) naEl.textContent = (unallocatedEUR >= 0 ? '+' : '') + fmt(Math.abs(unallocatedEUR));
+
+  // KPI sub-labels
+  const incomeCount = budget.incomes?.length ?? 0;
+  const txCount = transactions.filter(t => t.type === 'expense').length;
+  setText('ov-rev-sub', `${incomeCount} source${incomeCount > 1 ? 's' : ''}`);
+  setText('ov-dep-sub', `${txCount} transaction${txCount > 1 ? 's' : ''}`);
+
+  const restSub = document.getElementById('ov-rest-sub');
+  if (restSub) restSub.textContent = availableEUR >= 0 ? 'En sécurité' : 'Dépassement !';
+  const naSub = document.getElementById('ov-na-sub');
+  if (naSub) naSub.textContent = unallocatedEUR >= 0 ? 'à réallouer' : 'Déficit budget';
 
   // Donut chart
   renderDonut(totalExpensesEUR, totalRevenueEUR, totalAllocatedEUR);
@@ -34,29 +65,51 @@ export function renderAll(state) {
   // Budget progress bars
   renderBudgetProgressBars(budget.budgetItems || [], totalIncomesEUR);
 
-  // Recent transactions (5, sorted by date desc)
-  renderRecentTransactions(getRecent(transactions));
+  // Recent transactions
+  renderRecentTransactions(getRecent(transactions), transactions.length);
 
-  // Goals progress
+  // Goals summary
   renderGoalsSummary(goals || []);
+
+  // Overview progress bar
+  const pct = totalRevenueEUR > 0 ? Math.min(100, Math.round((totalExpensesEUR / totalRevenueEUR) * 100)) : 0;
+  const pb = document.getElementById('ov-pct-b');
+  if (pb) { pb.style.width = pct + '%'; pb.style.background = pct > 80 ? 'var(--red)' : pct > 60 ? 'var(--gold)' : 'var(--pr)'; }
+  const pl = document.getElementById('ov-pct-l');
+  if (pl) { pl.textContent = pct + '%'; pl.style.color = pct > 80 ? 'var(--red-l)' : pct > 60 ? 'var(--gold)' : 'var(--pr-l)'; }
+  setText('ov-all', fmt(totalAllocatedEUR));
 }
 
-function renderRecentTransactions(txs) {
+function renderRecentTransactions(txs, totalCount) {
   const el = document.getElementById('ov-recent-txs');
   if (!el) return;
   if (!txs.length) {
-    el.innerHTML = '<div class="empty">Aucune transaction ce mois-ci</div>';
+    el.innerHTML = `<div class="empty" style="padding:18px;"><div class="empty-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction ce mois-ci</div>`;
     return;
   }
+  const EXPENSE_COUNT = txs.filter(t => t.type === 'expense').length;
   el.innerHTML = txs.map(t => {
     const isE = t.type === 'expense';
-    return `<div class="tx-row">
-      <span class="tx-desc">${t.description || t.desc || ''}</span>
-      <span class="tx-amt" style="color:${isE ? 'var(--red-l)' : 'var(--green)'}">
-        ${isE ? '-' : '+'}${fmt(t.amountEUR || t.amount || 0)}
-      </span>
+    const col = isE ? 'var(--red-l)' : 'var(--green)';
+    const ibg = isE ? 'rgba(196,58,58,.14)' : 'rgba(52,211,153,.12)';
+    const sign = isE ? '−' : '+';
+    const ico = catIco(t.category, 13);
+    return `<div class="ov-recent-row">
+      <div class="ov-recent-ico" style="background:${ibg};color:${col}">${ico}</div>
+      <div class="ov-recent-info">
+        <div class="ov-recent-desc">${esc(t.description || '')}</div>
+        <div class="ov-recent-cat">${t.category || ''}</div>
+      </div>
+      <span class="ov-recent-date">${fmtDate(t.date)}</span>
+      <div class="ov-recent-amt" style="color:${col}">${sign} ${fmt(t.amountEUR ?? 0)}</div>
     </div>`;
   }).join('');
+  if (totalCount > 5) {
+    el.innerHTML += `<button class="ov-see-all" onclick="goTab('tracker')">
+      Voir toutes les transactions
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>`;
+  }
 }
 
 function renderGoalsSummary(goals) {
@@ -66,14 +119,31 @@ function renderGoalsSummary(goals) {
     el.innerHTML = '<div class="empty" style="padding:12px">Aucun objectif défini.</div>';
     return;
   }
+  const clockIco = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   el.innerHTML = goals.map(g => {
-    const pct = calcProgress(g);
-    return `<div class="gc-mini">
-      <div class="gn">${g.name}</div>
-      <div class="pt" style="height:6px;margin-top:6px;">
-        <div class="pf" style="width:${pct}%;background:${g.color || 'var(--pr)'}"></div>
+    const pct  = calcProgress(g);
+    const done = g.savedEUR >= g.targetEUR;
+    const badge = done
+      ? `<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
+      : `<span class="gbadge gb-p">${pct}% · En cours</span>`;
+    return `<div class="gc">
+      <div class="gt">
+        <div class="gt-left">
+          <div class="g-ico" style="background:${g.color || 'var(--pr)'}22">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color || 'var(--pr)'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          <div style="min-width:0">
+            <div class="gn">${esc(g.name)}</div>
+            ${g.deadline ? `<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>` : ''}
+          </div>
+        </div>
+        <div>${badge}</div>
       </div>
-      <div style="font-size:.7rem;color:var(--muted);margin-top:3px;">${pct}%</div>
+      <div class="pt" style="height:6px;margin-top:10px;"><div class="pf" style="width:${pct}%;background:${g.color || 'var(--pr)'}"></div></div>
+      <div class="gam">
+        <div class="gcur" style="color:${g.color || 'var(--pr)'}">${fmt(g.savedEUR ?? 0)}</div>
+        <div class="gtgt">/ ${fmt(g.targetEUR ?? 0)}</div>
+      </div>
     </div>`;
   }).join('');
 }
@@ -81,12 +151,11 @@ function renderGoalsSummary(goals) {
 // Subscribe to store changes
 export function subscribeAll(callback) {
   ['mfx_budget', 'mfx_transactions', 'mfx_goals'].forEach(key => {
-    store.subscribe(key, () => {
-      callback({
-        budget: store.get('mfx_budget'),
-        transactions: store.get('mfx_transactions') || [],
-        goals: store.get('mfx_goals') || [],
-      });
-    });
+    store.subscribe(key, () => callback());
   });
+}
+
+// Initialize donut resize observer (call once at startup)
+export function initDashboard() {
+  initDonutResizeObserver();
 }
