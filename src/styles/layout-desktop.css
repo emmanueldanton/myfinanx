@@ -1,0 +1,34 @@
+/* ════ LAYOUT DESKTOP (≥ 1200px) ════ */
+
+@media (min-width: 1200px) {
+  /* Sidebar — full width with labels */
+  .app-sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 220px; display: flex; flex-direction: column;
+    background: var(--s1); border-right: 1px solid var(--b1);
+    z-index: 200; padding: 20px 12px; gap: 4px;
+  }
+
+  .app-sidebar .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: var(--r2);
+    font-size: .85rem; color: var(--muted); cursor: pointer;
+    min-height: 44px; transition: .12s;
+  }
+  .app-sidebar .nav-item:hover { background: var(--b1); color: var(--text); }
+  .app-sidebar .nav-item.active { background: var(--pr); color: #fff; }
+
+  .app-main { margin-left: 220px; }
+  .app-nav { display: none; }
+
+  /* Multi-column dashboard — all widgets visible without scroll */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 20px;
+  }
+
+  /* 4 KPI cards in one row */
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+}

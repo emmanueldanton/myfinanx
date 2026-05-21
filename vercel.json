@@ -1,14 +1,17 @@
 {
-  "headers": [
-    {
-      "source": "/sw.js",
-      "headers": [{ "key": "Service-Worker-Allowed", "value": "/" }]
-    }
-  ],
   "rewrites": [
-    { "source": "/", "destination": "/myfinanx.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "redirects": [
     { "source": "/favicon.ico", "destination": "/icon.png", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    }
   ]
 }

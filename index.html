@@ -1793,7 +1793,7 @@ nav::-webkit-scrollbar { display:none; }
         Répartition du mois
       </div>
       <div class="donut-center-wrap">
-        <svg id="donut-svg" width="150" height="150" viewBox="0 0 130 130"></svg>
+        <svg id="donut-svg" viewBox="0 0 130 130" style="width:100%;max-width:180px;height:auto;display:block;"></svg>
         <div class="donut-label">
           <div class="donut-pct" id="donut-pct">0%</div>
           <div class="donut-sub">utilisé</div>
@@ -2425,23 +2425,32 @@ function toDisplay(eurAmount) {
   return eurAmount * getCur().rate;
 }
 
-// Convert from display currency to EUR (for storage)
+// Convert from display currency to EUR (for storage) — précision fixe sans erreur IEEE 754 (FR-029)
 function fromDisplay(amount) {
-  return amount / getCur().rate;
+  const cur = getCur();
+  const d = CURRENCY_DECIMALS[cur.code] ?? 2;
+  const raw = amount / cur.rate;
+  return Math.round(raw * Math.pow(10, d)) / Math.pow(10, d);
 }
 // Parse un montant saisi (accepte virgule ou point comme séparateur décimal)
 function parseAmt(str) {
   return parseFloat(String(str).replace(',', '.')) || 0;
 }
 
+// Pr\u00e9cision fixe par devise \u2014 lookup table (FR-028, FR-029)
+const CURRENCY_DECIMALS = { EUR:2, USD:2, GBP:2, CAD:2, MAD:2, XOF:0 };
+
+// Retourne la valeur EUR convertie en devise active, format\u00e9e pour un input (toFixed avec pr\u00e9cision fixe)
+function fmtInput(eurAmount) {
+  const d = CURRENCY_DECIMALS[getCur().code] ?? 2;
+  return toDisplay(eurAmount).toFixed(d);
+}
+
 function fmt(eurAmount) {
   const cur = getCur();
   const val = toDisplay(eurAmount);
-  const locale = activeCur === 'XOF' ? 'fr-FR' : 'fr-FR';
-  const decimals = cur.rate >= 100 ? 0 : (cur.rate < 2 ? 2 : 1);
-  // For large rates (FCFA) show 0 decimals, for others show 2
-  const d = cur.code === 'XOF' || cur.code === 'MAD' ? 0 : 2;
-  const formatted = val.toLocaleString('fr-FR', {minimumFractionDigits:0, maximumFractionDigits:d});
+  const d = CURRENCY_DECIMALS[cur.code] ?? 2;
+  const formatted = val.toLocaleString('fr-FR', {minimumFractionDigits:d, maximumFractionDigits:d});
   return formatted + '\u202f' + cur.symbol;
 }
 
@@ -2461,7 +2470,7 @@ document.addEventListener('keydown', e => {
 function setCurrency(code) {
   activeCur = code;
   const cur = CURRENCIES[code];
-  localStorage.setItem('monargent-cur', code);
+  try { localStorage.setItem('monargent-cur', code); } catch(e) { if(e.name==='QuotaExceededError') showStorageError(); }
   // Update button label
   document.getElementById('cur-active-lbl').textContent = `${cur.code} ${cur.symbol}`;
   document.getElementById('cur-active-sym').textContent = cur.symbol;
@@ -2551,7 +2560,7 @@ function setTheme(name) {
   document.querySelectorAll('.tdot, .dtdot').forEach(el => {
     el.classList.toggle('on', el.dataset.theme === name);
   });
-  localStorage.setItem('monargent-theme', name);
+  try { localStorage.setItem('monargent-theme', name); } catch(e) { if(e.name==='QuotaExceededError') showStorageError(); }
 }
 
 function toggleDrawer(open) {
@@ -2662,14 +2671,30 @@ const USER_KEY    = 'monargent-username';
 const GENDER_KEY  = 'monargent-usergender';
 let aiHistory   = [];
 
+function showStorageError() {
+  const existing = document.getElementById('storage-error-toast');
+  if(existing) return;
+  const toast = document.createElement('div');
+  toast.id = 'storage-error-toast';
+  toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3)';
+  toast.textContent = '⚠️ Stockage local plein — libérez de l\'espace ou exportez vos données.';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 6000);
+}
+
 let _saveTimer = null;
 let _chipTimer = null;
 function save() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     const monthData = { revenus: D.revenus, budget: D.budget, expenses: D.expenses };
-    localStorage.setItem(key(), JSON.stringify(monthData));
-    localStorage.setItem(GOALS_KEY, JSON.stringify(D.goals));
+    try {
+      localStorage.setItem(key(), JSON.stringify(monthData));
+      localStorage.setItem(GOALS_KEY, JSON.stringify(D.goals));
+    } catch(e) {
+      if(e.name === 'QuotaExceededError') showStorageError();
+      return;
+    }
     const chip = document.getElementById('chip');
     if(chip) {
       chip.textContent = '✓ Sauvegardé';
@@ -2693,7 +2718,8 @@ function loadGoals() {
 
 function loadMonth() {
   const raw = localStorage.getItem(key());
-  const goals = loadGoals();
+  // Preserve goals — loaded once at init(), never reloaded on month navigation (FR-007)
+  const goals = D.goals;
   if(raw) {
     try {
       const p = JSON.parse(raw);
@@ -2709,11 +2735,11 @@ function loadMonth() {
       D.goals = goals;
     }
   } else {
-    // Nouveau mois : reprend revenus et budget du mois précédent si disponible
+    // Nouveau mois : reprend revenus et budget du mois précédent avec de nouveaux IDs (T017)
     const prev = findPreviousMonthData();
     D = {
-      revenus:  prev ? prev.revenus : defaultData().revenus,
-      budget:   prev ? prev.budget  : defaultData().budget,
+      revenus:  prev ? prev.revenus.map(r => ({ ...r, id: uid() })) : defaultData().revenus,
+      budget:   prev ? prev.budget.map(b  => ({ ...b, id: uid() })) : defaultData().budget,
       expenses: [],
       goals,
     };
@@ -2814,7 +2840,7 @@ Situation de ${MONTHS[M]} ${Y} :
     const res = await fetch('/api/ai', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({question, context: ctx, history: []})
+      body: JSON.stringify({messages: [{ role: 'user', content: question }], context: ctx})
     });
     const data = await res.json();
     const msg = (data.reply || '').trim().replace(/^["'«»]|["'«»]$/g, '').trim();
@@ -2838,16 +2864,19 @@ function typeWriter(el, text, speed = 18) {
   }, speed);
 }
 
-// Planifie un appel IA avec debounce (évite les appels en rafale pendant la saisie)
+// Planifie un appel IA avec debounce — une seule fois par session (FR-006)
 function scheduleAiGreeting() {
+  if(sessionStorage.getItem('greetingDone')) return;
   clearTimeout(_greetAiTimer);
   _greetAiTimer = setTimeout(async () => {
+    if(sessionStorage.getItem('greetingDone')) return; // double-check après le délai
     const aiMsg = await fetchAiGreetingSub();
     if(aiMsg) {
+      sessionStorage.setItem('greetingDone', '1');
       const sub = document.querySelector('#greet-wrap .greet-sub');
       if(sub) typeWriter(sub, aiMsg);
     }
-  }, 1500);
+  }, 3000); // 3s debounce (spec FR-006)
 }
 
 function renderGreeting() {
@@ -2937,8 +2966,10 @@ function init() {
   const savedTheme = localStorage.getItem('monargent-theme') || 'light';
   setTheme(savedTheme);
 
-  // 3. Charge les vraies données AVANT setCurrency pour éviter que
-  //    setCurrency → renderAll → recalc → save() n'écrase le localStorage avec D vide
+  // 3. Charge les objectifs UNE SEULE FOIS — indépendant du cycle mensuel (FR-007)
+  D.goals = loadGoals();
+
+  // 4. Charge les données du mois — loadMonth() préserve D.goals, ne les recharge jamais
   loadMonth();
 
   // 4. Devise — renderAll s'exécute maintenant avec les vraies données dans D
@@ -2959,6 +2990,9 @@ function init() {
 
   // 7. Tutoriel premier lancement
   maybeShowTuto();
+
+  // 8. ResizeObserver pour le donut SVG (aucune dimension hardcodée — FR-002)
+  initDonutResizeObserver();
 }
 
 function changeMonth(d) {
@@ -3038,7 +3072,7 @@ function renderAll() {
 function renderRevRows() {
   const cur = getCur();
   document.getElementById('rev-rows').innerHTML = D.revenus.map((r,i) => {
-    const displayAmt = (toDisplay(r.amount)).toFixed(cur.code==='XOF'||cur.code==='MAD'?0:2);
+    const displayAmt = fmtInput(r.amount);
     return `<div class="rev-row">
       <div class="rn"><input type="text" value="${esc(r.name)}" placeholder="Source"
         oninput="D.revenus.find(x=>x.id==='${r.id}').name=this.value;save()"></div>
@@ -3075,7 +3109,7 @@ function renderBudRows() {
   const cur    = getCur();
   document.getElementById('bud-rows').innerHTML = D.budget.map(b => {
     const pct = totalR>0?Math.round((b.amount/totalR)*100):0;
-    const displayAmt = (toDisplay(b.amount)).toFixed(cur.code==='XOF'||cur.code==='MAD'?0:2);
+    const displayAmt = fmtInput(b.amount);
     const ico = catIco(b.name, 13);
     return `<div class="bud-row" data-bud-id="${b.id}">
       <div class="b-ico-wrap" title="Catégorie">${ico}</div>
@@ -3209,8 +3243,21 @@ function recalc() {
   scheduleAiGreeting();
 }
 
-/* ── DONUT SVG ── */
+/* ── DONUT SVG — ResizeObserver (aucune dimension hardcodée en px, FR-002) ── */
+let _lastDonutArgs = [0, 0, 0];
+let _donutObserver = null;
+
+function initDonutResizeObserver() {
+  const wrap = document.querySelector('.ov-donut-wrap');
+  if(!wrap || !window.ResizeObserver) return;
+  _donutObserver = new ResizeObserver(() => {
+    renderDonut(..._lastDonutArgs);
+  });
+  _donutObserver.observe(wrap);
+}
+
 function renderDonut(spent, revenue, budget) {
+  _lastDonutArgs = [spent, revenue, budget];
   const svg = document.getElementById('donut-svg');
   if(!svg) return;
   const cx=65, cy=65, R=52, r=38, stroke=14;
@@ -3428,7 +3475,7 @@ function renderExpenses() {
         </div>
         <div class="tx-edit-field">
           <div class="tx-edit-lbl">Montant</div>
-          <input type="text" inputmode="decimal" class="tx-edit-amt" value="${toDisplay(e.amount).toFixed(getCur().code==='XOF'||getCur().code==='MAD'?0:2)}" placeholder="Montant">
+          <input type="text" inputmode="decimal" class="tx-edit-amt" value="${fmtInput(e.amount)}" placeholder="Montant">
         </div>
         <div class="tx-edit-field">
           <div class="tx-edit-lbl">Date</div>
@@ -3496,8 +3543,17 @@ function addGoal() {
 function addToGoal(id, prefix='') {
   const inp=document.getElementById(prefix+'ga-'+id);
   if(!inp) return;
+  const errId = prefix+'ga-err-'+id;
   const a=fromDisplay(parseAmt(inp.value));
-  if(a<=0) return;
+  if(a<=0) {
+    // Erreur inline — pas de alert() (T024)
+    let err=document.getElementById(errId);
+    if(!err) { err=document.createElement('div'); err.id=errId; err.style.cssText='font-size:.7rem;color:var(--red-l);margin-top:3px;'; inp.parentNode.appendChild(err); }
+    err.textContent='Montant invalide (doit être > 0)';
+    setTimeout(()=>{ const e=document.getElementById(errId); if(e) e.remove(); }, 3000);
+    return;
+  }
+  const existErr=document.getElementById(errId); if(existErr) existErr.remove();
   const g=D.goals.find(g=>g.id===id);
   if(g){g.saved=Math.min(g.target,g.saved+a);inp.value='';}
   renderGoals(); save(); scheduleAiGreeting();
@@ -3610,11 +3666,11 @@ function buildGoalCard(g, prefix) {
       <div class="g-edit-row">
         <div class="g-edit-field">
           <div class="g-edit-lbl">Montant cible</div>
-          <input type="text" inputmode="decimal" class="g-edit-target" value="${toDisplay(g.target).toFixed(0)}" placeholder="Cible">
+          <input type="text" inputmode="decimal" class="g-edit-target" value="${fmtInput(g.target)}" placeholder="Cible">
         </div>
         <div class="g-edit-field">
           <div class="g-edit-lbl">Déjà épargné</div>
-          <input type="text" inputmode="decimal" class="g-edit-saved" value="${toDisplay(g.saved).toFixed(0)}" placeholder="Épargné">
+          <input type="text" inputmode="decimal" class="g-edit-saved" value="${fmtInput(g.saved)}" placeholder="Épargné">
         </div>
       </div>
       <div class="g-edit-actions">
@@ -3662,7 +3718,11 @@ function renderAiMsg(role, text) {
 }
 
 function saveAiHistory() {
-  localStorage.setItem(AI_KEY, JSON.stringify(aiHistory));
+  try {
+    localStorage.setItem(AI_KEY, JSON.stringify(aiHistory));
+  } catch(e) {
+    if(e.name === 'QuotaExceededError') showStorageError();
+  }
 }
 
 function loadAiHistory() {
@@ -3779,20 +3839,30 @@ Utilise le prénom et le genre de l'utilisateur pour personnaliser chaque répon
 Si l'utilisateur a des objectifs d'épargne, intègre-les dans tes recommandations.
 Zéro humour, zéro blague, zéro analogie amusante — reste professionnel et humain.`;
 
-  // Historique conversationnel (max 10 derniers échanges pour limiter la taille)
-  const history = aiHistory.slice(-10).map(m=>({ role: m.role==='user'?'user':'assistant', content: m.text }));
+  // Historique complet (sans troncature — exigence spec FR-024)
+  const messages = [
+    ...aiHistory.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text })),
+    { role: 'user', content: q }
+  ];
 
   try {
     const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question:q,context:sys,history})});
-    const data=await res.json();
-    const reply=data.reply||'Pas de réponse.';
+      body:JSON.stringify({messages, context:sys})});
     document.getElementById(tid)?.remove();
-    aiHistory.push({role:'ai', text: reply});
-    saveAiHistory();
-    renderAiMsg('ai', reply);
+    if(!res.ok) {
+      const errData = await res.json().catch(()=>({}));
+      const errMsg = errData.message || `Erreur ${res.status} — réessayez dans quelques instants.`;
+      renderAiMsg('ai', '⚠️ ' + errMsg);
+    } else {
+      const data=await res.json();
+      const reply=data.reply||'Pas de réponse.';
+      aiHistory.push({role:'ai', text: reply});
+      saveAiHistory();
+      renderAiMsg('ai', reply);
+    }
   } catch(e) {
-    const el=document.getElementById(tid); if(el) el.textContent='⚠️ Erreur de connexion.';
+    document.getElementById(tid)?.remove();
+    renderAiMsg('ai', '⚠️ Connexion impossible — vérifiez votre réseau et réessayez.');
   }
   btn.disabled=false; inp.disabled=false; inp.focus(); msgs.scrollTop=msgs.scrollHeight;
 }
@@ -3831,7 +3901,7 @@ function exportData() {
   const backup = { _version:1, _date:new Date().toISOString() };
   for(let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if(k && (k.startsWith('monargent') || k.startsWith('myfinanx'))) backup[k] = localStorage.getItem(k);
+    if(k && (k.startsWith('monargent') || k.startsWith('myfinanx') || k.startsWith('mfx'))) backup[k] = localStorage.getItem(k);
   }
   const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
@@ -3849,14 +3919,22 @@ function importData(file) {
   reader.onload = e => {
     try {
       const backup = JSON.parse(e.target.result);
-      if(typeof backup !== 'object' || Array.isArray(backup)) throw new Error();
-      let count = 0;
-      Object.entries(backup).forEach(([k,v]) => {
-        if(k.startsWith('monargent')) { localStorage.setItem(k, v); count++; }
-      });
-      if(count === 0) throw new Error();
+      if(typeof backup !== 'object' || Array.isArray(backup)) throw new Error('not-object');
+      // Valider : au moins une clé connue avant d'écrire quoi que ce soit (import atomique)
+      const entries = Object.entries(backup).filter(([k]) =>
+        k.startsWith('monargent') || k.startsWith('myfinanx') || k.startsWith('mfx')
+      );
+      if(entries.length === 0) throw new Error('no-valid-keys');
+      // Toutes les validations OK → écriture en une seule passe
+      try {
+        entries.forEach(([k,v]) => localStorage.setItem(k, v));
+      } catch(storageErr) {
+        alert('Espace de stockage insuffisant pour importer les données.');
+        return;
+      }
       location.reload();
     } catch(err) {
+      if(err.message !== 'no-valid-keys') console.warn('[import]', err);
       alert('Fichier invalide.\nUtilise un fichier exporté depuis MyFinanx.');
     }
   };
@@ -3896,7 +3974,7 @@ function confirmReset() {
   const keys = [];
   for(let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if(k && (k.startsWith('monargent') || k.startsWith('myfinanx'))) keys.push(k);
+    if(k && (k.startsWith('monargent') || k.startsWith('myfinanx') || k.startsWith('mfx'))) keys.push(k);
   }
   keys.forEach(k => localStorage.removeItem(k));
   sessionStorage.clear();
@@ -3908,6 +3986,11 @@ function showPwaPopup() {
   // Ne pas montrer si déjà installée en mode standalone
   if(window.matchMedia('(display-mode: standalone)').matches) return;
   if(navigator.standalone === true) return; // iOS standalone
+  // Uniquement sur appareils tactiles (mobile/tablette) — jamais sur desktop Chrome (FR-038)
+  if(!window.matchMedia('(pointer: coarse)').matches) return;
+  // Ne pas réafficher si dismissé il y a moins de 7 jours (T035)
+  const dismissed = parseInt(localStorage.getItem('mfx-pwa-popup-dismissed') || '0', 10);
+  if(dismissed && (Date.now() - dismissed) < 7 * 24 * 60 * 60 * 1000) return;
 
   // Détection OS synchrone avant affichage
   const isAndroid = /android/i.test(navigator.userAgent);
@@ -3922,6 +4005,8 @@ function showPwaPopup() {
 function closePwaPopup() {
   document.getElementById('pwa-overlay')?.classList.remove('open');
   document.body.style.overflow = '';
+  // Stocker la date de dismiss pour éviter le réaffichage 7 jours (T035)
+  try { localStorage.setItem('mfx-pwa-popup-dismissed', String(Date.now())); } catch(e) {}
 }
 
 function pwaOverlayClick(e) {
@@ -4326,5 +4411,6 @@ function maybeShowTuto() {
   </div>
 </div>
 
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>

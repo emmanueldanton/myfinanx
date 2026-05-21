@@ -1,0 +1,42 @@
+/* ════ COMPONENTS — agnostic de breakpoint ════ */
+
+/* Inputs — font-size:16px obligatoire pour éviter le zoom iOS (Principe V, FR-035) */
+.fw input, .fw select, .fw textarea,
+.rn input, .ra input, .bn input, .ba input,
+.tx-edit-form input, .tx-edit-form select,
+.g-edit-form input, .g-edit-form select {
+  font-size: 16px;
+}
+
+/* Cards */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--r3);
+  padding: 16px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px; border-radius: var(--r2);
+  border: 1px solid var(--b1); background: var(--s2); color: var(--text);
+  font-family: var(--fh); font-size: .85rem; font-weight: 600;
+  cursor: pointer; transition: .12s; touch-action: manipulation;
+  min-height: 44px; /* touch target ≥ 44px (Principe V) */
+}
+.btn:hover { background: var(--b1); }
+.btn.bp { background: var(--pr); border-color: var(--pr); color: #fff; }
+.btn.bp:hover { opacity: .9; }
+
+/* Progress bar */
+.pt { background: var(--b1); border-radius: 99px; overflow: hidden; }
+.pf { height: 100%; border-radius: 99px; transition: width .4s ease; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  padding: 10px 18px; border-radius: 8px; font-size: 14px;
+  z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  pointer-events: none;
+}

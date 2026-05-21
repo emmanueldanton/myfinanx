@@ -1,0 +1,30 @@
+/* ════ LAYOUT MOBILE (< 768px) ════ */
+
+@media (max-width: 767px) {
+  /* Bottom navigation bar */
+  .app-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; height: 60px;
+    background: var(--s1); border-top: 1px solid var(--b1);
+    z-index: 200;
+  }
+
+  .app-nav .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+    font-size: .6rem; color: var(--muted);
+    min-height: 44px; cursor: pointer;
+  }
+
+  .app-nav .nav-item.active { color: var(--pr); }
+
+  /* Single-column layout */
+  .app-main { padding-bottom: 68px; }
+  .dashboard-grid { display: flex; flex-direction: column; gap: 12px; }
+
+  /* KPI cards stacked */
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Sidebar hidden */
+  .app-sidebar { display: none; }
+}

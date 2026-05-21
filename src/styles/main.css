@@ -1,0 +1,27 @@
+/* ════ GLOBAL — breakpoints & resets ════ */
+:root {
+  --bp-mobile: 768px;    /* mobile → tablette */
+  --bp-tablet: 1200px;   /* tablette → desktop */
+
+  --fh: 'Inter', system-ui, sans-serif;
+  --fb: 'Inter', system-ui, sans-serif;
+  --r1: 8px;
+  --r2: 10px;
+  --r3: 14px;
+  --r4: 18px;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--fb);
+  background: var(--s0);
+  color: var(--text);
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS zoom on input focus — all inputs must be ≥ 16px (Principe V) */
+input, select, textarea {
+  font-size: 16px !important;
+}
