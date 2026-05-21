@@ -59,6 +59,7 @@ export function tutoNext() {
     _idx++;
     _tutoRender();
   } else {
+    if (typeof window.launchConfetti === 'function') window.launchConfetti();
     closeTuto();
   }
 }
@@ -81,13 +82,9 @@ function _tutoRender() {
   const slide = SLIDES[_idx];
   if (!slide) return;
 
-  // Progress steps
+  // CSS progress bar — set width as percentage
   const progEl = document.getElementById('tuto-prog');
-  if (progEl) {
-    progEl.innerHTML = Array.from({ length: TUTO_TOTAL }, (_, i) =>
-      `<div class="tuto-prog-step${i <= _idx ? ' done' : ''}"></div>`
-    ).join('');
-  }
+  if (progEl) progEl.style.width = ((_idx + 1) / TUTO_TOTAL * 100) + '%';
 
   // Slide content
   const icoEl   = document.getElementById('tuto-ico');
@@ -111,7 +108,10 @@ function _tutoRender() {
   const isLast = _idx === TUTO_TOTAL - 1;
 
   if (skipEl) skipEl.style.visibility = isLast ? 'hidden' : 'visible';
-  if (nextEl) nextEl.textContent = isLast ? "C'est parti !" : 'Suivant →';
+  if (nextEl) {
+    nextEl.textContent = isLast ? "C'est parti !" : 'Suivant →';
+    nextEl.classList.toggle('final', isLast);
+  }
 }
 
 function _tutoKey(e) {

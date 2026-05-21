@@ -1427,54 +1427,7 @@ nav::-webkit-scrollbar { display:none; }
 }
 .cur-note svg { stroke:var(--muted); flex-shrink:0; }
 
-/* ════ TUTORIAL ════ */
-.tuto-overlay {
-  position:fixed; inset:0; z-index:1000;
-  background:rgba(0,0,0,.55); backdrop-filter:blur(5px);
-  display:flex; align-items:center; justify-content:center;
-  padding:20px; opacity:0; pointer-events:none; transition:opacity .25s;
-}
-.tuto-overlay.open { opacity:1; pointer-events:all; }
-.tuto-card {
-  background:var(--s1); border:1px solid var(--b1); border-radius:18px;
-  width:100%; max-width:420px; padding:28px 28px 24px; position:relative;
-  box-shadow:0 24px 64px rgba(0,0,0,.4);
-  transform:translateY(16px); transition:transform .25s;
-}
-.tuto-overlay.open .tuto-card { transform:translateY(0); }
-.tuto-prog {
-  position:absolute; top:0; left:0; height:3px; background:var(--pr);
-  border-radius:18px 18px 0 0; transition:width .35s cubic-bezier(.4,0,.2,1);
-}
-.tuto-slide { display:none; }
-.tuto-slide.active { display:block; }
-.tuto-ico {
-  width:46px; height:46px; border-radius:13px;
-  background:rgba(77,120,212,.14);
-  display:flex; align-items:center; justify-content:center; margin-bottom:16px;
-}
-.tuto-ico svg { stroke:var(--pr-l); }
-.tuto-title { font-family:var(--fh); font-size:1.08rem; font-weight:800; color:var(--text); margin-bottom:8px; line-height:1.2; }
-.tuto-body { font-size:.82rem; color:var(--muted); line-height:1.65; margin-bottom:20px; }
-.tuto-body strong { color:var(--text); font-weight:700; }
-.tuto-dots { display:flex; gap:6px; align-items:center; justify-content:center; margin-bottom:20px; }
-.tuto-dot { width:7px; height:7px; border-radius:50%; background:var(--b2); cursor:pointer; transition:.2s; }
-.tuto-dot.active { background:var(--pr); width:20px; border-radius:4px; }
-.tuto-actions { display:flex; gap:8px; }
-.tuto-skip {
-  flex:1; background:none; border:1px solid var(--b1); color:var(--muted);
-  border-radius:var(--r2); padding:10px 14px;
-  font-family:var(--fh); font-size:.78rem; font-weight:700;
-  cursor:pointer; transition:.15s;
-}
-.tuto-skip:hover { background:var(--s2); }
-.tuto-next {
-  flex:2; background:var(--pr); border:none; color:#fff; border-radius:var(--r2);
-  padding:10px 16px; font-family:var(--fh); font-size:.82rem; font-weight:800;
-  cursor:pointer; transition:background .2s;
-}
-.tuto-next:hover { opacity:.88; }
-.tuto-next.final { background:var(--green); }
+/* ════ TUTORIAL → src/styles/tutorial.css ════ */
 .hdr-help-btn {
   background:none; border:1px solid var(--b1); color:var(--muted);
   border-radius:50%; width:30px; height:30px;
