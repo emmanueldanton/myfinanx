@@ -1,27 +1,74 @@
-/* ════ GLOBAL — breakpoints & resets ════ */
+/* ════ GLOBAL — design tokens, resets, breakpoints ════ */
 :root {
-  --bp-mobile: 768px;    /* mobile → tablette */
-  --bp-tablet: 1200px;   /* tablette → desktop */
+  /* Breakpoint thresholds */
+  --bp-mobile: 768px;
+  --bp-tablet: 1200px;
 
-  --fh: 'Inter', system-ui, sans-serif;
-  --fb: 'Inter', system-ui, sans-serif;
-  --r1: 8px;
-  --r2: 10px;
+  /* Typography */
+  --fh: 'Gabarito', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+
+  /* Border radius */
+  --r:  12px;
+  --r2:  8px;
   --r3: 14px;
-  --r4: 18px;
+
+  /* Default design tokens — blue theme (overridden by setTheme() at runtime) */
+  --bg:      #000000;
+  --s0:      #080c14;
+  --s1:      #0f1520;
+  --s2:      #161e2e;
+  --b1:      #202840;
+  --b2:      #2c3a58;
+
+  --pr:      #4D78D4;
+  --pr-l:    #7BA3F0;
+  --pr-d:    #3560b8;
+
+  --red:     #C43A3A;
+  --red-l:   #e87a7a;
+
+  --green:   #34d399;
+  --gold:    #f59e0b;
+  --violet:  #a78bfa;
+
+  --text:    #edeff5;
+  --muted:   #6878a0;
+  --faint:   #1a2238;
+
+  --header-bg:   rgba(0,0,0,.88);
+  --shadow-lg:   rgba(0,0,0,.6);
+  --grad1:       rgba(77,120,212,.08);
+  --grad2:       rgba(196,58,58,.04);
+
+  --ai-bg1:      #06080f;
+  --ai-bg2:      #0a0810;
+  --ai-bdr:      #1a2238;
+  --ai-msg-bg:   rgba(6,8,20,.6);
+  --ai-msg-col:  #3050a0;
+  --dot-active:  rgba(255,255,255,.7);
+
+  --logo-bg:     #0f1520;
+  --chat-bg:     #06080f;
+  --bubble-bot:  #0f1520;
 }
 
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   font-family: var(--fb);
-  background: var(--s0);
+  background: var(--bg);
   color: var(--text);
-  min-height: 100dvh;
+  font-size: 14px;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 
-/* Prevent iOS zoom on input focus — all inputs must be ≥ 16px (Principe V) */
-input, select, textarea {
-  font-size: 16px !important;
-}
+/* Prevent iOS zoom on input focus — all inputs must be ≥ 16px (FR-035) */
+input, select, textarea { font-size: 16px !important; }
+
+/* On desktop (pointer:fine) textarea can be smaller */
+@media (hover: hover) { textarea { font-size: 14px !important; } }

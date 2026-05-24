@@ -8,13 +8,22 @@ import './styles/layout-desktop.css';
 
 // ═══ Module imports ═══
 import { store } from './store.js';
-import { loadTheme } from './theme.js';
+import { loadTheme, setTheme } from './theme.js';
 import { fetchLiveRates, setActiveCurrency } from './currency.js';
 import { renderAll, subscribeAll, initDashboard } from './ui/index.js';
 import { bridgeLoad, bridgeLoadGoals, bridgeSave, bridgeLoadPrefs } from './data-bridge.js';
 import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
 import { initTutorial, maybeShowTuto } from './ui/tutorial.js';
+import { initBudgetUI, renderRevRows, renderBudRows, renderBudgetFooter } from './ui/budget-ui.js';
+import { initTransactionsUI, renderExpenses, updateTracker } from './ui/transactions-ui.js';
+import { initGoalsUI, renderGoals } from './ui/goals-ui.js';
+import { initAiChatUI, loadAiHistory } from './ui/ai-chat-ui.js';
+import { initGreetingUI, renderGreeting, scheduleAiGreeting } from './ui/greeting.js';
+import { initRemindersUI, checkReminder } from './ui/reminders.js';
+import { initSettingsUI, setCurrency } from './ui/settings-ui.js';
+import { initDataManagementUI } from './ui/data-management-ui.js';
+import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -35,13 +44,22 @@ function changeMonth(delta) {
 
 function _notifyAll() {
   const month = `${_Y}-${String(_M + 1).padStart(2, '0')}`;
-  renderAll({
+  const state = {
     budget:       store.get('mfx_budget'),
     transactions: store.get('mfx_transactions') || [],
     goals:        store.get('mfx_goals') || [],
     month,
     year: _Y,
-  });
+  };
+  renderAll(state);
+  renderRevRows(state);
+  renderBudRows(state);
+  renderBudgetFooter(state);
+  renderExpenses(state);
+  updateTracker(state);
+  renderGoals(state);
+  scheduleAiGreeting();
+  checkReminder();
 }
 
 // ═══ Breakpoint manager — sets data-layout on <html> ═══
@@ -96,7 +114,35 @@ function init() {
   // Wire tutorial module (exposes openTuto etc. on window)
   initTutorial();
 
-  // Expose changeMonth on window for monolith onclick handlers
+  // Wire budget UI module (exposes addRev, delRev etc. on window)
+  initBudgetUI(() => [_Y, _M]);
+
+  // Wire transactions UI module (exposes addTx, delTx etc. on window)
+  initTransactionsUI(() => [_Y, _M]);
+
+  // Wire goals UI module (exposes addGoal, delGoal etc. on window)
+  initGoalsUI();
+
+  // Wire AI chat UI module (exposes sendAI, clearAiHistory, typeWriter on window)
+  initAiChatUI(() => [_Y, _M]);
+
+  // Wire greeting + reminders UI modules
+  initGreetingUI(() => [_Y, _M]);
+  initRemindersUI();
+
+  // Wire settings, data management, and PWA UI modules
+  initSettingsUI(() => _notifyAll());
+  initDataManagementUI();
+  initPwaUI();
+
+  // Refresh currency DOM labels with saved currency (setActiveCurrency already set module state above)
+  setCurrency(prefs.currency);
+
+  // Load AI conversation history once on init
+  loadAiHistory();
+
+  // Expose theme and navigation functions for inline onclick handlers
+  window.setTheme    = setTheme;
   window.changeMonth = changeMonth;
 
   // Init donut ResizeObserver
@@ -108,8 +154,14 @@ function init() {
   // Initial render
   _notifyAll();
 
+  // Render greeting once — not on every store update to avoid breaking name edit
+  renderGreeting();
+
   // Show tutorial on first launch (600ms delay)
   maybeShowTuto();
+
+  // Show PWA install prompt on eligible devices (mobile only, 800ms delay internal)
+  showPwaPopup();
 }
 
 // Modules are deferred — monolith's inline init() runs first, then this wires the modular layer

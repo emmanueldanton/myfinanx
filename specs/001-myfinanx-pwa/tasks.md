@@ -45,7 +45,11 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 - [X] T006 [P] [US1] Mettre à jour `src/ui/index.js` `renderAll(state)` : adapter les accès aux champs de `state` pour utiliser les noms modulaires (`amountEUR`, `allocatedEUR`, `description`, `category`, `targetEUR`, `savedEUR`). Ajouter `month` et `year` dans le state passé par `subscribeAll`. Fichier : `src/ui/index.js`
 - [X] T007 [P] [US1] Mettre à jour `src/ui/charts.js` : vérifier que `renderBudgetProgressBars` lit bien `b.allocatedEUR` (et non `b.amount`), et que `renderDonut` reçoit des valeurs en EUR calculées depuis le state modulaire. Fichier : `src/ui/charts.js`
 - [X] T008 [US1] Créer `src/ui/dashboard.js` : `renderKPIs(state)` (met à jour les 4 cartes KPI via setText), `renderMonthLabel(Y, M)` (met à jour le label du mois dans le header), `initDashboard()` (appelle `initDonutResizeObserver` depuis `src/ui/charts.js`). Exposer sur window. Fichier : `src/ui/dashboard.js`
-- [ ] T009 [US1] Supprimer de l'inline `<script>` de `index.html` : `recalc`, `renderRecentTxs`, `renderBudgetLines`, `renderDonut`, `initDonutResizeObserver`, `renderAll`, `_lastDonutArgs`, `_donutObserver`. Vérifier que le dashboard s'affiche correctement. Fichier : `index.html`
+- [X] T009 [US1] Nettoyer `index.html` des doublons dashboard — 3 sous-étapes :
+  - **A — Inliner `loadMonth()`** : remplacer l'appel `renderAll()` (monolithe) dans `loadMonth()` par les appels directs `document.getElementById('ml').textContent=…; renderRevRows(); renderBudRows(); renderExpenses(); renderGoals(); recalc();` puis supprimer la fonction `renderAll()` monolithe (~lignes 2709+2962–2970). Les onglets Budget/Dépenses/Objectifs continuent de fonctionner.
+  - **B — Modifier `recalc()`** : retirer les blocs que la couche modulaire gère déjà — hero cards (`ov-rev`, `ov-dep`, `ov-rest`, `ov-na` + sous-labels), appel `renderDonut()`, appel `renderBudgetLines()`, bloc `ov-cards` (revenue cards), appel `renderRecentTxs()`, blocs progress bar (`ov-pct-b`, `ov-pct-l`, `ov-all`). **Garder** : budget footer (`rev-tot`, `bud-tot`, `bud-reste`, `.bp3`), tracker KPIs (`tr-b`, `updateTracker()`), alertes (`bud-al`, `ov-al`), `scheduleAiGreeting()`.
+  - **C — Supprimer fonctions standalone** : `_lastDonutArgs`, `_donutObserver`, `initDonutResizeObserver()` (+ son appel dans `init()` ligne ~2948), `renderDonut()` (~48 lignes), `renderBudgetLines()` (~28 lignes), `renderRecentTxs()` (~32 lignes).
+  - **Vérification** : build OK, dashboard affiche KPIs/donut/budget lines/recent txs via modules — pas de double rendu. Fichier : `index.html`
 
 **Checkpoint** : Dashboard entièrement rendu par les modules src/ui/. Aucune régression sur les 4 KPIs, donut, barres et transactions récentes.
 
@@ -59,9 +63,9 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] Créer `src/ui/budget-ui.js` : `renderRevRows(state)`, `renderBudRows(state)`, `addRev()`, `delRev(id)`, `addBud()`, `delBud(id)`, `updateBudIcon(id, name)`. Chaque mutation appelle `store.set('mfx_budget', ...)` puis `bridgeSave(Y, M)`. Exposer sur window. Fichier : `src/ui/budget-ui.js`
-- [ ] T011 [US2] Mettre à jour `src/main.js` : importer `src/ui/budget-ui.js`, appeler `renderRevRows` et `renderBudRows` depuis `subscribeAll`. Fichier : `src/main.js`
-- [ ] T012 [US2] Supprimer de l'inline `<script>` de `index.html` : `renderRevRows`, `renderBudRows`, `delRev`, `addRev`, `addBud`, `delBud`, `updateBudIcon`. Vérifier CRUD budget fonctionnel. Fichier : `index.html`
+- [X] T010 [US2] Créer `src/ui/budget-ui.js` : `renderRevRows(state)`, `renderBudRows(state)`, `addRev()`, `delRev(id)`, `addBud()`, `delBud(id)`, `updateBudIcon(id, name)`. Chaque mutation appelle `store.set('mfx_budget', ...)` puis `bridgeSave(Y, M)`. Exposer sur window. Fichier : `src/ui/budget-ui.js`
+- [X] T011 [US2] Mettre à jour `src/main.js` : importer `src/ui/budget-ui.js`, appeler `renderRevRows` et `renderBudRows` depuis `subscribeAll`. Fichier : `src/main.js`
+- [X] T012 [US2] Supprimer de l'inline `<script>` de `index.html` : `renderRevRows`, `renderBudRows`, `delRev`, `addRev`, `addBud`, `delBud`, `updateBudIcon`. Vérifier CRUD budget fonctionnel. Fichier : `index.html`
 
 **Checkpoint** : Onglet Budget entièrement géré par les modules. Copie auto du mois précédent fonctionnelle.
 
@@ -75,9 +79,9 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 ### Implementation for User Story 3
 
-- [ ] T013 [US3] Créer `src/ui/transactions-ui.js` : `renderExpenses(state)`, `renderCatBk(expenses)`, `updateTracker(state)`, `addTx()`, `delTx(id)`, `openEditTx(id)`, `closeEditTx(id)`, `saveEditTx(id)`, `setTxType(t)`, `updateCatSel()`. Chaque mutation appelle `store.set('mfx_transactions', ...)` puis `bridgeSave(Y, M)`. Exposer sur window. Fichier : `src/ui/transactions-ui.js`
-- [ ] T014 [US3] Mettre à jour `src/main.js` : importer `src/ui/transactions-ui.js`, brancher sur `subscribeAll`. Fichier : `src/main.js`
-- [ ] T015 [US3] Supprimer de l'inline `<script>` de `index.html` : `renderExpenses`, `renderCatBk`, `updateTracker`, `addTx`, `delTx`, `openEditTx`, `closeEditTx`, `saveEditTx`, `setTxType`, `updateCatSel`. Vérifier CRUD transactions fonctionnel. Fichier : `index.html`
+- [X] T013 [US3] Créer `src/ui/transactions-ui.js` : `renderExpenses(state)`, `renderCatBk(expenses)`, `updateTracker(state)`, `addTx()`, `delTx(id)`, `openEditTx(id)`, `closeEditTx(id)`, `saveEditTx(id)`, `setTxType(t)`, `updateCatSel()`. Chaque mutation appelle `store.set('mfx_transactions', ...)` puis `bridgeSave(Y, M)`. Exposer sur window. Fichier : `src/ui/transactions-ui.js`
+- [X] T014 [US3] Mettre à jour `src/main.js` : importer `src/ui/transactions-ui.js`, brancher sur `subscribeAll`. Fichier : `src/main.js`
+- [X] T015 [US3] Supprimer de l'inline `<script>` de `index.html` : `renderExpenses`, `renderCatBk`, `updateTracker`, `addTx`, `delTx`, `openEditTx`, `closeEditTx`, `saveEditTx`, `setTxType`, `updateCatSel`. Vérifier CRUD transactions fonctionnel. Fichier : `index.html`
 
 **Checkpoint** : Onglet Dépenses entièrement modulaire. Filtres, édition et graphique catégories opérationnels.
 
@@ -91,9 +95,9 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 ### Implementation for User Story 4
 
-- [ ] T016 [US4] Créer `src/ui/goals-ui.js` : `renderGoals(state)`, `buildGoalCard(g, prefix)`, `addGoal()`, `delGoal(id)`, `addToGoal(id, prefix)` (valide montant > 0, erreur inline), `toggleEditGoal(id, prefix)`, `saveEditGoal(id, prefix)`, `selC(el)`. Chaque mutation appelle `store.set('mfx_goals', ...)` puis `bridgeSaveGoals()`. Exposer sur window. Fichier : `src/ui/goals-ui.js`
-- [ ] T017 [US4] Mettre à jour `src/main.js` : importer `src/ui/goals-ui.js`. Les objectifs sont chargés UNE SEULE FOIS via `bridgeLoadGoals()` dans `init()`, jamais lors de `changeMonth()`. Fichier : `src/main.js`
-- [ ] T018 [US4] Supprimer de l'inline `<script>` de `index.html` : `renderGoals`, `buildGoalCard`, `addGoal`, `delGoal`, `addToGoal`, `toggleEditGoal`, `saveEditGoal`, `selC`. Vérifier indépendance objectifs/mois. Fichier : `index.html`
+- [X] T016 [US4] Créer `src/ui/goals-ui.js` : `renderGoals(state)`, `buildGoalCard(g, prefix)`, `addGoal()`, `delGoal(id)`, `addToGoal(id, prefix)` (valide montant > 0, erreur inline), `toggleEditGoal(id, prefix)`, `saveEditGoal(id, prefix)`, `selC(el)`. Chaque mutation appelle `store.set('mfx_goals', ...)` puis `bridgeSaveGoals()`. Exposer sur window. Fichier : `src/ui/goals-ui.js`
+- [X] T017 [US4] Mettre à jour `src/main.js` : importer `src/ui/goals-ui.js`. Les objectifs sont chargés UNE SEULE FOIS via `bridgeLoadGoals()` dans `init()`, jamais lors de `changeMonth()`. Fichier : `src/main.js`
+- [X] T018 [US4] Supprimer de l'inline `<script>` de `index.html` : `renderGoals`, `buildGoalCard`, `addGoal`, `delGoal`, `addToGoal`, `toggleEditGoal`, `saveEditGoal`, `selC`. Vérifier indépendance objectifs/mois. Fichier : `index.html`
 
 **Checkpoint** : Objectifs persistants, versements réactifs, indépendants du cycle mensuel.
 
@@ -107,9 +111,9 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 ### Implementation for User Story 5
 
-- [ ] T019 [US5] Créer `src/ui/ai-chat-ui.js` : `renderAiMsg(role, text)`, `loadAiHistory()` (lit `monargent_ai_chat`, restaure l'UI), `saveAiHistory()` (écrit `monargent_ai_chat`), `clearAiHistory()`, `sendAI()` (construit `messages[]` complet incluant l'historique, sans limite, rôle `'ai'` → `'assistant'`), `typeWriter(el, text, speed)`. Exposer sur window. Fichier : `src/ui/ai-chat-ui.js`
-- [ ] T020 [US5] Mettre à jour `src/main.js` : importer `src/ui/ai-chat-ui.js`, appeler `loadAiHistory()` lors de l'init. Fichier : `src/main.js`
-- [ ] T021 [US5] Supprimer de l'inline `<script>` de `index.html` : `renderAiMsg`, `loadAiHistory`, `saveAiHistory`, `clearAiHistory`, `sendAI`, `typeWriter`, `AI_WELCOME`, `BOT_AV_SVG`. Vérifier que le chat IA fonctionne. Fichier : `index.html`
+- [X] T019 [US5] Créer `src/ui/ai-chat-ui.js` : `renderAiMsg(role, text)`, `loadAiHistory()` (lit `monargent_ai_chat`, restaure l'UI), `saveAiHistory()` (écrit `monargent_ai_chat`), `clearAiHistory()`, `sendAI()` (construit `messages[]` complet incluant l'historique, sans limite, rôle `'ai'` → `'assistant'`), `typeWriter(el, text, speed)`. Exposer sur window. Fichier : `src/ui/ai-chat-ui.js`
+- [X] T020 [US5] Mettre à jour `src/main.js` : importer `src/ui/ai-chat-ui.js`, appeler `loadAiHistory()` lors de l'init. Fichier : `src/main.js`
+- [X] T021 [US5] Supprimer de l'inline `<script>` de `index.html` : `renderAiMsg`, `loadAiHistory`, `saveAiHistory`, `clearAiHistory`, `sendAI`, `typeWriter`, `AI_WELCOME`, `BOT_AV_SVG`. Vérifier que le chat IA fonctionne. Fichier : `index.html`
 
 **Checkpoint** : Chat IA fonctionnel, historique complet transmis, persistance entre sessions.
 
@@ -121,10 +125,10 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 ### Implementation for User Story 6
 
-- [ ] T022 [P] [US6] Créer `src/ui/greeting.js` : `renderGreeting(state)` (affiche le prénom + accord genré), `scheduleAiGreeting(state)` (une seule fois par session via `sessionStorage.greetingDone`, debounce 3s, invalidation par hash des données financières), `greetDataHash(state)`, `fetchAiGreetingSub(state)` (appel POST `/api/ai` avec context financier structuré). Exposer sur window. Fichier : `src/ui/greeting.js`
-- [ ] T023 [P] [US6] Créer `src/ui/reminders.js` : `checkReminder(state)` (1 fois/jour max, `monargent-reminder-seen`), `showReminder(type, txt)`, `closeReminder()`. Exposer sur window. Fichier : `src/ui/reminders.js`
-- [ ] T024 [US6] Mettre à jour `src/main.js` : importer greeting.js et reminders.js, les appeler depuis subscribeAll après renderAll. Fichier : `src/main.js`
-- [ ] T025 [US6] Supprimer de l'inline `<script>` de `index.html` : `renderGreeting`, `scheduleAiGreeting`, `greetDataHash`, `fetchAiGreetingSub`, `greetFinancialSub`, `checkReminder`, `showReminder`, `closeReminder`, `GREETING_CACHE_KEY`, `_greetAiTimer`. Vérifier greeting et rappels opérationnels. Fichier : `index.html`
+- [X] T022 [P] [US6] Créer `src/ui/greeting.js` : `renderGreeting(state)` (affiche le prénom + accord genré), `scheduleAiGreeting(state)` (une seule fois par session via `sessionStorage.greetingDone`, debounce 3s, invalidation par hash des données financières), `greetDataHash(state)`, `fetchAiGreetingSub(state)` (appel POST `/api/ai` avec context financier structuré). Exposer sur window. Fichier : `src/ui/greeting.js`
+- [X] T023 [P] [US6] Créer `src/ui/reminders.js` : `checkReminder(state)` (1 fois/jour max, `monargent-reminder-seen`), `showReminder(type, txt)`, `closeReminder()`. Exposer sur window. Fichier : `src/ui/reminders.js`
+- [X] T024 [US6] Mettre à jour `src/main.js` : importer greeting.js et reminders.js, les appeler depuis subscribeAll après renderAll. Fichier : `src/main.js`
+- [X] T025 [US6] Supprimer de l'inline `<script>` de `index.html` : `renderGreeting`, `scheduleAiGreeting`, `greetDataHash`, `fetchAiGreetingSub`, `greetFinancialSub`, `checkReminder`, `showReminder`, `closeReminder`, `GREETING_CACHE_KEY`, `_greetAiTimer`. Vérifier greeting et rappels opérationnels. Fichier : `index.html`
 
 **Checkpoint** : Greeting généré une seule fois par session, rappels affichés une fois par jour.
 
@@ -136,11 +140,11 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 ### Implementation for User Story 7
 
-- [ ] T026 [P] [US7] Créer `src/ui/settings-ui.js` : `toggleCurDrop()`, `setCurrency(code)` (met à jour `activeCur`, appelle `bridgeSave`, `renderAll`), `showGenderPick()`, `editGreetName()`, `toggleDrawer(open)`, `applyRates(rates)` (met à jour les taux dans CURRENCIES). Exposer sur window. Fichier : `src/ui/settings-ui.js`
-- [ ] T027 [P] [US7] Créer `src/ui/data-management-ui.js` : `exportData()`, `importData(file)` (atomique, valide les préfixes `monargent`, `myfinanx`, `mfx`), `openResetModal()`, `closeResetModal()`, `resetStep2()`, `confirmReset()` (efface toutes les clés + sessionStorage + recharge). `showStorageError()` (toast non-bloquant pour `QuotaExceededError`). Exposer sur window. Fichier : `src/ui/data-management-ui.js`
-- [ ] T028 [P] [US7] Créer `src/ui/pwa-ui.js` : `showPwaPopup()` (uniquement si `pointer:coarse`, pas en standalone, cooldown 7 jours via `mfx-pwa-popup-dismissed`), `closePwaPopup()`, `pwaOverlayClick(e)`, `pwaTab(os)`. Exposer sur window. Fichier : `src/ui/pwa-ui.js`
-- [ ] T029 [US7] Mettre à jour `src/main.js` : importer settings-ui, data-management-ui, pwa-ui. Appeler `showPwaPopup()` dans init avec délai. Fichier : `src/main.js`
-- [ ] T030 [US7] Supprimer de l'inline `<script>` de `index.html` : `toggleCurDrop`, `setCurrency`, `applyRates`, `showGenderPick`, `editGreetName`, `toggleDrawer`, `exportData`, `importData`, `openResetModal`, `closeResetModal`, `resetStep2`, `confirmReset`, `showStorageError`, `showPwaPopup`, `closePwaPopup`, `pwaOverlayClick`, `pwaTab`, `save`, `loadGoals`, `loadMonth`, `findPreviousMonthData`, `defaultData`, `key`, ainsi que les constantes `GOALS_KEY`, `AI_KEY`, `USER_KEY`, `GENDER_KEY`, `CURRENCIES`, `THEMES`, `CURRENCY_DECIMALS`, `MONTHS` et les fonctions `fmt`, `fmtInput`, `fromDisplay`, `toDisplay`, `getCur`, `parseAmt`. Vérifier toutes les fonctionnalités. Fichier : `index.html`
+- [X] T026 [P] [US7] Créer `src/ui/settings-ui.js` : `toggleCurDrop()`, `setCurrency(code)` (met à jour `activeCur`, appelle `bridgeSave`, `renderAll`), `showGenderPick()`, `editGreetName()`, `toggleDrawer(open)`, `applyRates(rates)` (met à jour les taux dans CURRENCIES). Exposer sur window. Fichier : `src/ui/settings-ui.js`
+- [X] T027 [P] [US7] Créer `src/ui/data-management-ui.js` : `exportData()`, `importData(file)` (atomique, valide les préfixes `monargent`, `myfinanx`, `mfx`), `openResetModal()`, `closeResetModal()`, `resetStep2()`, `confirmReset()` (efface toutes les clés + sessionStorage + recharge). `showStorageError()` (toast non-bloquant pour `QuotaExceededError`). Exposer sur window. Fichier : `src/ui/data-management-ui.js`
+- [X] T028 [P] [US7] Créer `src/ui/pwa-ui.js` : `showPwaPopup()` (uniquement si `pointer:coarse`, pas en standalone, cooldown 7 jours via `mfx-pwa-popup-dismissed`), `closePwaPopup()`, `pwaOverlayClick(e)`, `pwaTab(os)`. Exposer sur window. Fichier : `src/ui/pwa-ui.js`
+- [X] T029 [US7] Mettre à jour `src/main.js` : importer settings-ui, data-management-ui, pwa-ui. Appeler `showPwaPopup()` dans init avec délai. Fichier : `src/main.js`
+- [X] T030 [US7] Supprimer de l'inline `<script>` de `index.html` : `toggleCurDrop`, `setCurrency`, `applyRates`, `showGenderPick`, `editGreetName`, `toggleDrawer`, `exportData`, `importData`, `openResetModal`, `closeResetModal`, `resetStep2`, `confirmReset`, `showStorageError`, `showPwaPopup`, `closePwaPopup`, `pwaOverlayClick`, `pwaTab`, `save`, `loadGoals`, `loadMonth`, `findPreviousMonthData`, `defaultData`, `key`, ainsi que les constantes `GOALS_KEY`, `AI_KEY`, `USER_KEY`, `GENDER_KEY`, `CURRENCIES`, `THEMES`, `CURRENCY_DECIMALS`, `MONTHS` et les fonctions `fmt`, `fmtInput`, `fromDisplay`, `toDisplay`, `getCur`, `parseAmt`. Vérifier toutes les fonctionnalités. Fichier : `index.html`
 
 **Checkpoint** : Export/import fonctionnel, reset efface correctement tout y compris `myfinanx-tuto-done`, devise et thème persistés.
 
@@ -168,11 +172,11 @@ description: "Task list — Migration onglet par onglet : monolithe → architec
 
 **Purpose** : Retirer le `<script>` inline résiduel et les styles inline de `index.html`. L'app tourne entièrement depuis `src/`.
 
-- [ ] T036 Retirer le bloc `<style>` inline de `index.html` (CSS now in `src/styles/*.css`). Vérifier que Vite injecte bien les CSS via `src/main.js`. Fichier : `index.html`
-- [ ] T037 Retirer tout code résiduel du bloc `<script>` inline de `index.html` : fonctions utilitaires (`uid`, `esc`, `setText`, `setText2`, `todayISO`, `fmtDate`), constantes (`CAT_ICONS`, `CAT_COLORS`, `CATS_E`, `CATS_I`, `COLS`, `catIco`), état global (`txType`, `gColor`), init(), tout le reste non encore retiré. Fichier : `index.html`
-- [ ] T038 [P] Supprimer `<script>` et style liés à l'ancien onboarding dans index.html (si pas déjà fait en T035). Supprimer `showOnboarding`, le code confetti (`launchConfetti`), `AD_SEEN_KEY`, `loadAd`, `showAd`, `closeAd` s'ils existent encore. Fichier : `index.html`
-- [ ] T039 Vérifier `npm run build` : le build doit réussir sans erreur, générer `dist/sw.js` versionné automatiquement, et les assets bundlés doivent inclure tous les modules src/. Fichier : `vite.config.js` + root
-- [ ] T040 [P] Mettre à jour `src/styles/main.css` : ajouter les variables CSS globales manquantes (`--r2`, `--r3`, `--fh` si pas encore présentes), vérifier que `font-size: 16px !important` couvre tous les inputs y compris dans `.fw`, `.rn`, `.ra`, `.bn`, `.ba`. Fichier : `src/styles/main.css`
+- [X] T036 Retirer le bloc `<style>` inline de `index.html` (CSS now in `src/styles/*.css`). Vérifier que Vite injecte bien les CSS via `src/main.js`. Fichier : `index.html`
+- [X] T037 Retirer tout code résiduel du bloc `<script>` inline de `index.html` : fonctions utilitaires (`uid`, `esc`, `setText`, `setText2`, `todayISO`, `fmtDate`), constantes (`CAT_ICONS`, `CAT_COLORS`, `CATS_E`, `CATS_I`, `COLS`, `catIco`), état global (`txType`, `gColor`), init(), tout le reste non encore retiré. Fichier : `index.html`
+- [X] T038 [P] Supprimer `<script>` et style liés à l'ancien onboarding dans index.html (si pas déjà fait en T035). Supprimer `showOnboarding`, le code confetti (`launchConfetti`), `AD_SEEN_KEY`, `loadAd`, `showAd`, `closeAd` s'ils existent encore. Fichier : `index.html`
+- [X] T039 Vérifier `npm run build` : le build doit réussir sans erreur, générer `dist/sw.js` versionné automatiquement, et les assets bundlés doivent inclure tous les modules src/. Fichier : `vite.config.js` + root
+- [X] T040 [P] Mettre à jour `src/styles/main.css` : ajouter les variables CSS globales manquantes (`--r2`, `--r3`, `--fh` si pas encore présentes), vérifier que `font-size: 16px !important` couvre tous les inputs y compris dans `.fw`, `.rn`, `.ra`, `.bn`, `.ba`. Fichier : `src/styles/main.css`
 
 **Checkpoint** : `index.html` ne contient plus que du HTML pur. `src/main.js` est le seul point d'entrée JavaScript. Le build Vite réussit.
 
