@@ -24,6 +24,7 @@ import { initRemindersUI, checkReminder } from './ui/reminders.js';
 import { initSettingsUI, setCurrency } from './ui/settings-ui.js';
 import { initDataManagementUI } from './ui/data-management-ui.js';
 import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
+import { scheduleDailyPush } from './ui/push-notify.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -162,6 +163,9 @@ function init() {
 
   // Show PWA install prompt on eligible devices (mobile only, 800ms delay internal)
   showPwaPopup();
+
+  // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)
+  scheduleDailyPush();
 }
 
 // Modules are deferred — monolith's inline init() runs first, then this wires the modular layer

@@ -54,6 +54,8 @@
       notifyButton: { enable: false },
       promptOptions: { slidedown: { prompts: [{ type:"push", autoPrompt:false }] } }
     });
+    const prenom = localStorage.getItem('monargent-username');
+    if (prenom) OneSignal.User.addTag('prenom', prenom);
   });
 </script>
 
