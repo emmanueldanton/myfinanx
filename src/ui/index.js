@@ -3,7 +3,6 @@ import { renderDonut, renderBudgetProgressBars, initDonutResizeObserver } from '
 import { fmt } from '../currency.js';
 import { calcTotalIncomes, calcTotalAllocated, calcUnallocated } from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes, getRecent } from '../transactions.js';
-import { calcProgress } from '../goals.js';
 import { MONTHS, catIco, esc, fmtDate, CAT_COLORS, COLS } from '../utils.js';
 
 function setText(id, v) {
@@ -67,9 +66,6 @@ export function renderAll(state) {
 
   // Recent transactions
   renderRecentTransactions(getRecent(transactions), transactions.length);
-
-  // Goals summary
-  renderGoalsSummary(goals || []);
 
   // Overview progress bar
   const pct = totalRevenueEUR > 0 ? Math.min(100, Math.round((totalExpensesEUR / totalRevenueEUR) * 100)) : 0;
@@ -137,42 +133,6 @@ function renderRecentTransactions(txs, totalCount) {
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>`;
   }
-}
-
-function renderGoalsSummary(goals) {
-  const el = document.getElementById('ov-goals');
-  if (!el) return;
-  if (!goals.length) {
-    el.innerHTML = '<div class="empty" style="padding:12px">Aucun objectif défini.</div>';
-    return;
-  }
-  const clockIco = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
-  el.innerHTML = goals.map(g => {
-    const pct  = calcProgress(g);
-    const done = g.savedEUR >= g.targetEUR;
-    const badge = done
-      ? `<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
-      : `<span class="gbadge gb-p">${pct}% · En cours</span>`;
-    return `<div class="gc">
-      <div class="gt">
-        <div class="gt-left">
-          <div class="g-ico" style="background:${g.color || 'var(--pr)'}22">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color || 'var(--pr)'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-          </div>
-          <div style="min-width:0">
-            <div class="gn">${esc(g.name)}</div>
-            ${g.deadline ? `<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>` : ''}
-          </div>
-        </div>
-        <div>${badge}</div>
-      </div>
-      <div class="pt" style="height:6px;margin-top:10px;"><div class="pf" style="width:${pct}%;background:${g.color || 'var(--pr)'}"></div></div>
-      <div class="gam">
-        <div class="gcur" style="color:${g.color || 'var(--pr)'}">${fmt(g.savedEUR ?? 0)}</div>
-        <div class="gtgt">/ ${fmt(g.targetEUR ?? 0)}</div>
-      </div>
-    </div>`;
-  }).join('');
 }
 
 // Subscribe to store changes

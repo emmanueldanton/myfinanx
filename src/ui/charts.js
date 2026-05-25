@@ -1,5 +1,5 @@
 import { fmt } from '../currency.js';
-import { CAT_COLORS } from '../utils.js';
+import { CAT_COLORS, esc } from '../utils.js';
 
 let _lastDonutArgs = [0, 0, 0];
 let _donutObserver = null;
@@ -78,7 +78,7 @@ export function renderBudgetProgressBars(budgetItems, totalIncomes) {
       <div class="ov-bline-hd">
         <div class="ov-bline-name">
           <div class="ov-bline-name-dot" style="background:${col}"></div>
-          ${b.name}
+          ${esc(b.name)}
         </div>
         <div class="ov-bline-val" style="color:${col}">${fmt(b.allocatedEUR)} <span style="color:var(--muted);font-weight:400;font-size:.62rem;">(${revPct}%)</span></div>
       </div>
