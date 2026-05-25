@@ -73,12 +73,12 @@ export function requestPushPermission() {
 
   _pushShownThisSession = true;
   const overlay = document.getElementById('push-overlay');
-  if (overlay) overlay.classList.add('open');
+  if (overlay) { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
 }
 
 export function closePushOverlay() {
-  // "Plus tard" — ferme sans flag permanent → redemandera à la prochaine ouverture
   document.getElementById('push-overlay')?.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 export function pushOverlayBackdrop(e) {
