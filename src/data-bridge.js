@@ -22,6 +22,13 @@ function defaultMonthData() {
   return { revenus: [], budget: [], expenses: [] };
 }
 
+function defaultBudgetItems() {
+  return [
+    'Alimentation', 'Transport', 'Téléphone', 'Logement',
+    'Épargne', 'Loisirs', 'Santé', 'Business', 'Imprévus',
+  ].map(name => ({ id: uid(), name, amount: 0 }));
+}
+
 function findPreviousMonthData(Y, M) {
   let pm = M - 1, py = Y;
   if (pm < 0) { pm = 11; py--; }
@@ -63,11 +70,14 @@ export function bridgeLoad(Y, M) {
     };
   }
 
-  // If budget is still empty after check, try previous month (covers months with cleared budgets)
+  // If budget is still empty, try previous month first, then fall back to default items
   if (!mono.budget.length) {
     const prev = findPreviousMonthData(Y, M);
     if (prev && Array.isArray(prev.budget) && prev.budget.length) {
       mono.budget = prev.budget.map(b => ({ ...b, id: uid() }));
+    } else {
+      // First-time user — seed with default budget categories (amount 0)
+      mono.budget = defaultBudgetItems();
     }
   }
 
