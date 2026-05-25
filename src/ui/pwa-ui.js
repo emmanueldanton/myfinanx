@@ -2,30 +2,26 @@
 
 const PWA_DISMISSED_KEY = 'mfx-pwa-popup-dismissed';
 const PWA_COOLDOWN_MS   = 7 * 24 * 60 * 60 * 1000; // 7 jours
-const PUSH_ASKED_KEY    = 'mfx-push-asked';
+
+// Guard session : on ne montre la demande push qu'une fois par ouverture d'app
+let _pushShownThisSession = false;
 
 // ── Init ──────────────────────────────────────────────────────────
 
 export function initPwaUI() {
-  window.closePwaPopup        = closePwaPopup;
-  window.pwaOverlayClick      = pwaOverlayClick;
-  window.pwaTab               = pwaTab;
-  window.closePushOverlay     = closePushOverlay;
-  window.pushOverlayBackdrop  = pushOverlayBackdrop;
+  window.closePwaPopup         = closePwaPopup;
+  window.pwaOverlayClick       = pwaOverlayClick;
+  window.pwaTab                = pwaTab;
+  window.closePushOverlay      = closePushOverlay;
+  window.pushOverlayBackdrop   = pushOverlayBackdrop;
   window.confirmPushPermission = confirmPushPermission;
+  window.requestPushPermission = requestPushPermission;
 }
 
 // ── Show install popup ────────────────────────────────────────────
 
 export function showPwaPopup() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                    || navigator.standalone === true;
-
-  // App déjà installée — pas de popup install, mais on peut demander les notifs
-  if (isStandalone) {
-    setTimeout(requestPushPermission, 2000);
-    return;
-  }
+  if (_isStandalone()) return; // App installée — pas de popup install
 
   // Uniquement sur appareils tactiles — jamais sur desktop Chrome (FR-038)
   if (!window.matchMedia('(pointer: coarse)').matches) return;
@@ -34,7 +30,6 @@ export function showPwaPopup() {
   const dismissed = parseInt(localStorage.getItem(PWA_DISMISSED_KEY) || '0', 10);
   if (dismissed && (Date.now() - dismissed) < PWA_COOLDOWN_MS) return;
 
-  // Pré-sélectionner l'onglet Android si pertinent
   const isAndroid = /android/i.test(navigator.userAgent);
   if (isAndroid) pwaTab('android');
 
@@ -44,14 +39,10 @@ export function showPwaPopup() {
   }, 800);
 }
 
-// ── Close install popup ───────────────────────────────────────────
-
 export function closePwaPopup() {
   document.getElementById('pwa-overlay')?.classList.remove('open');
   document.body.style.overflow = '';
   try { localStorage.setItem(PWA_DISMISSED_KEY, String(Date.now())); } catch (e) {}
-  // Après fermeture du popup install, proposer les notifs push
-  setTimeout(requestPushPermission, 3000);
 }
 
 export function pwaOverlayClick(e) {
@@ -68,20 +59,26 @@ export function pwaTab(os) {
 // ── Push permission overlay ───────────────────────────────────────
 
 export function requestPushPermission() {
-  // Ne demander qu'une seule fois
-  if (localStorage.getItem(PUSH_ASKED_KEY)) return;
+  // Une seule fois par session (rechargement de page)
+  if (_pushShownThisSession) return;
+
+  // Uniquement si l'app est installée en standalone sur mobile
+  if (!_isStandalone()) return;
+
+  // Uniquement si le tutoriel a été complété
+  if (!_tutoDone()) return;
+
   // Pas de prompt si déjà accordé ou refusé
   if (typeof Notification !== 'undefined' && Notification.permission !== 'default') return;
 
-  try { localStorage.setItem(PUSH_ASKED_KEY, '1'); } catch (e) {}
-
+  _pushShownThisSession = true;
   const overlay = document.getElementById('push-overlay');
   if (overlay) overlay.classList.add('open');
 }
 
 export function closePushOverlay() {
-  const overlay = document.getElementById('push-overlay');
-  if (overlay) overlay.classList.remove('open');
+  // "Plus tard" — ferme sans flag permanent → redemandera à la prochaine ouverture
+  document.getElementById('push-overlay')?.classList.remove('open');
 }
 
 export function pushOverlayBackdrop(e) {
@@ -90,9 +87,20 @@ export function pushOverlayBackdrop(e) {
 
 export function confirmPushPermission() {
   closePushOverlay();
-  // Déclenche directement le dialogue natif du navigateur via OneSignal
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(function(OneSignal) {
     OneSignal.Notifications.requestPermission();
   });
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+
+function _isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || navigator.standalone === true;
+}
+
+function _tutoDone() {
+  return !!(localStorage.getItem('myfinanx-tuto-done')
+         || localStorage.getItem('monargent-onboarded'));
 }

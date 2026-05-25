@@ -164,6 +164,10 @@ function init() {
   // Show PWA install prompt on eligible devices (mobile only, 800ms delay internal)
   showPwaPopup();
 
+  // Si le tuto est déjà fait et app en standalone → demande les notifs après 1.5s
+  const tutoDone = localStorage.getItem('myfinanx-tuto-done') || localStorage.getItem('monargent-onboarded');
+  if (tutoDone) setTimeout(() => window.requestPushPermission?.(), 1500);
+
   // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)
   scheduleDailyPush();
 }

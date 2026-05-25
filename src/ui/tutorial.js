@@ -94,6 +94,8 @@ export function tutoNext() {
   } else {
     if (typeof window.launchConfetti === 'function') window.launchConfetti();
     closeTuto();
+    // Demande push après la fin du tuto (délai pour laisser le confetti s'afficher)
+    setTimeout(() => window.requestPushPermission?.(), 1500);
   }
 }
 
