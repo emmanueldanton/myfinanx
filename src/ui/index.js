@@ -4,7 +4,7 @@ import { fmt } from '../currency.js';
 import { calcTotalIncomes, calcTotalAllocated, calcUnallocated } from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes, getRecent } from '../transactions.js';
 import { calcProgress } from '../goals.js';
-import { MONTHS, catIco, esc, fmtDate, CAT_COLORS } from '../utils.js';
+import { MONTHS, catIco, esc, fmtDate, CAT_COLORS, COLS } from '../utils.js';
 
 function setText(id, v) {
   const el = document.getElementById(id);
@@ -78,6 +78,33 @@ export function renderAll(state) {
   const pl = document.getElementById('ov-pct-l');
   if (pl) { pl.textContent = pct + '%'; pl.style.color = pct > 80 ? 'var(--red-l)' : pct > 60 ? 'var(--gold)' : 'var(--pr-l)'; }
   setText('ov-all', fmt(totalAllocatedEUR));
+
+  // Revenue source mini-cards (ov-cards)
+  const cardsEl = document.getElementById('ov-cards');
+  if (cardsEl) {
+    cardsEl.innerHTML = (budget.incomes || []).map((r, i) => `<div class="kpi">
+      <div class="kpi-bar" style="background:${COLS[i % COLS.length]}"></div>
+      <div class="kpi-hd">
+        <div class="kpi-hd-ico" style="background:${COLS[i % COLS.length]}22">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${COLS[i % COLS.length]}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="kpi-lbl">${esc(r.name)}</div>
+      </div>
+      <div class="kpi-val" style="color:${COLS[i % COLS.length]}">${fmt(r.amountEUR ?? 0)}</div>
+    </div>`).join('');
+  }
+
+  // Budget / expense alerts (bud-al + ov-al)
+  const warnIco = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const infoIco = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  let al = '';
+  if (unallocatedEUR < 0)        al += `<div class="alert ab">${warnIco} Tu as alloué <strong>${fmt(Math.abs(unallocatedEUR))}</strong> de plus que tes revenus.</div>`;
+  else if (unallocatedEUR > 100) al += `<div class="alert ag">${infoIco} <strong>${fmt(unallocatedEUR)}</strong> non alloués — affecte-les à tes priorités.</div>`;
+  if (pct > 90 && totalRevenueEUR > 0) al += `<div class="alert ab">${warnIco} Plus de 90% de tes revenus dépensés ce mois !</div>`;
+  ['bud-al', 'ov-al'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = al;
+  });
 }
 
 function renderRecentTransactions(txs, totalCount) {
