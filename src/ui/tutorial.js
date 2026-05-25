@@ -1,5 +1,6 @@
 // ═══ Tutorial — 6-slide first-launch walkthrough (bottom sheet) ═══
 import iconSrc from '../../icon.png';
+import { openOverlay, closeOverlay } from './overlay.js';
 
 const TUTO_KEY   = 'myfinanx-tuto-done';
 const TUTO_TOTAL = 6;
@@ -73,16 +74,13 @@ let _idx = 0;
 
 export function openTuto(startIdx = 0) {
   _idx = Math.max(0, Math.min(startIdx, TUTO_TOTAL - 1));
-  const overlay = document.getElementById('tuto-overlay');
-  if (!overlay) return;
-  overlay.classList.add('open');
+  openOverlay('tuto-overlay');
   _tutoRender();
   document.addEventListener('keydown', _tutoKey);
 }
 
 export function closeTuto() {
-  const overlay = document.getElementById('tuto-overlay');
-  if (overlay) overlay.classList.remove('open');
+  closeOverlay('tuto-overlay');
   document.removeEventListener('keydown', _tutoKey);
   try { localStorage.setItem(TUTO_KEY, '1'); } catch (e) {}
 }
