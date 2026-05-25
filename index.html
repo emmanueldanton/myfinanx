@@ -53,7 +53,17 @@
       appId: "72f38150-9fe6-4197-acf3-63278a8a86c9",
       notifyButton: { enable: false },
       promptOptions: {
-        slidedown: { prompts: [{ type:"push", autoPrompt:false }] }
+        slidedown: {
+          prompts: [{
+            type: "push",
+            autoPrompt: false,
+            text: {
+              actionMessage: "Reçois des rappels financiers intelligents directement sur ton appareil.",
+              acceptButton: "Activer",
+              cancelButton: "Plus tard"
+            }
+          }]
+        }
       }
     });
   });
