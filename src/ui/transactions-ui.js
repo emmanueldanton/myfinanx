@@ -3,6 +3,7 @@ import { store }      from '../store.js';
 import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
+import { showSuccessToast, showUndoToast } from './toast.js';
 
 let _txType      = 'expense';
 let _getYM       = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()]; };
@@ -240,14 +241,16 @@ export function addTx() {
   document.getElementById('tx-d').value = '';
   document.getElementById('tx-a').value = '';
   _mutate(txs);
+  showSuccessToast('Transaction ajoutée');
 }
 
 export function delTx(id) {
-  const txs = _txs();
-  const tx  = txs.find(t => t.id === id);
+  const txs      = _txs();
+  const tx       = txs.find(t => t.id === id);
   if (!tx) return;
-  if (!confirm(`Supprimer "${tx.description}" (${fmt(tx.amountEUR ?? 0)}) ?`)) return;
+  const snapshot = [...txs];
   _mutate(txs.filter(t => t.id !== id));
+  showUndoToast(`"${tx.description}" supprimée`, () => _mutate(snapshot));
 }
 
 export function openEditTx(id) {

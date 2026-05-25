@@ -1,8 +1,9 @@
 // ═══ Goals UI — objectifs d'épargne (onglet Objectifs + vue globale) ═══
-import { store }         from '../store.js';
-import { bridgeSaveGoals } from '../data-bridge.js';
+import { store }           from '../store.js';
+import { bridgeSaveGoals }  from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, todayISO } from '../utils.js';
-import { fmt, fmtInput, fromDisplay } from '../currency.js';
+import { fmt, fmtInput, fromDisplay }   from '../currency.js';
+import { showSuccessToast, showUndoToast } from './toast.js';
 
 let _gColor = '#4D78D4';
 
@@ -163,6 +164,7 @@ export function addGoal() {
   ['ng-n', 'ng-t', 'ng-c'].forEach(i => { document.getElementById(i).value = ''; });
   document.getElementById('ng-d').value = todayISO();
   _mutate(goals);
+  showSuccessToast(`Objectif "${n}" créé`);
 }
 
 export function addToGoal(id, prefix = '') {
@@ -188,14 +190,16 @@ export function addToGoal(id, prefix = '') {
   const g = goals.find(g => g.id === id);
   if (g) { g.savedEUR = Math.min(g.targetEUR, g.savedEUR + a); inp.value = ''; }
   _mutate(goals);
+  showSuccessToast(`${fmt(a)} ajouté à l'objectif`);
 }
 
 export function delGoal(id) {
-  const goals = _goals();
-  const g = goals.find(g => g.id === id);
+  const goals    = _goals();
+  const g        = goals.find(x => x.id === id);
   if (!g) return;
-  if (!confirm(`Supprimer l'objectif "${g.name}" ?`)) return;
-  _mutate(goals.filter(g => g.id !== id));
+  const snapshot = [...goals];
+  _mutate(goals.filter(x => x.id !== id));
+  showUndoToast(`"${g.name}" supprimé`, () => _mutate(snapshot));
 }
 
 export function toggleEditGoal(id, prefix) {

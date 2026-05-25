@@ -3,6 +3,7 @@ import { store }      from '../store.js';
 import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, catIco, COLS } from '../utils.js';
 import { fmt, fmtInput, fromDisplay }       from '../currency.js';
+import { showSuccessToast, showUndoToast }  from './toast.js';
 
 // Injected by initBudgetUI — returns [Y, M] of the active month
 let _getYM = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()]; };
@@ -164,15 +165,17 @@ export function addRev() {
   document.getElementById('nr-n').value = '';
   document.getElementById('nr-a').value = '';
   _mutate(b);
+  showSuccessToast('Revenu ajouté');
 }
 
 export function delRev(id) {
-  const b = _budget();
-  const r = b.incomes.find(x => x.id === id);
+  const b        = _budget();
+  const r        = b.incomes.find(x => x.id === id);
   if (!r) return;
-  if (!confirm(`Supprimer la source "${r.name}" ?`)) return;
+  const snapshot = JSON.parse(JSON.stringify(b));
   b.incomes = b.incomes.filter(x => x.id !== id);
   _mutate(b);
+  showUndoToast(`"${r.name}" supprimé`, () => _mutate(snapshot));
 }
 
 // ── Budget item mutations ─────────────────────────────────────────
@@ -202,13 +205,15 @@ export function addBud() {
   document.getElementById('nb-n').value = '';
   document.getElementById('nb-a').value = '';
   _mutate(b);
+  showSuccessToast('Poste budgétaire ajouté');
 }
 
 export function delBud(id) {
-  const b = _budget();
-  const item = b.budgetItems.find(x => x.id === id);
+  const b        = _budget();
+  const item     = b.budgetItems.find(x => x.id === id);
   if (!item) return;
-  if (!confirm(`Supprimer le poste "${item.name}" ?`)) return;
-  b.budgetItems = b.budgetItems.filter(x => x.id !== id);
+  const snapshot = JSON.parse(JSON.stringify(b));
+  b.budgetItems  = b.budgetItems.filter(x => x.id !== id);
   _mutate(b);
+  showUndoToast(`"${item.name}" supprimé`, () => _mutate(snapshot));
 }

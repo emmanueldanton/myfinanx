@@ -24,6 +24,7 @@ import { initSettingsUI, setCurrency } from './ui/settings-ui.js';
 import { initDataManagementUI } from './ui/data-management-ui.js';
 import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
 import { scheduleDailyPush } from './ui/push-notify.js';
+import { initToast } from './ui/toast.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -128,6 +129,9 @@ function init() {
 
   // Wire greeting UI module
   initGreetingUI(() => [_Y, _M]);
+
+  // Wire toast (exposes window.toastUndo for inline onclick)
+  initToast();
 
   // Wire settings, data management, and PWA UI modules
   initSettingsUI(() => _notifyAll());
