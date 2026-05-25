@@ -20,7 +20,6 @@ import { initTransactionsUI, renderExpenses, updateTracker } from './ui/transact
 import { initGoalsUI, renderGoals } from './ui/goals-ui.js';
 import { initAiChatUI, loadAiHistory } from './ui/ai-chat-ui.js';
 import { initGreetingUI, renderGreeting, scheduleAiGreeting } from './ui/greeting.js';
-import { initRemindersUI, checkReminder } from './ui/reminders.js';
 import { initSettingsUI, setCurrency } from './ui/settings-ui.js';
 import { initDataManagementUI } from './ui/data-management-ui.js';
 import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
@@ -60,7 +59,6 @@ function _notifyAll() {
   updateTracker(state);
   renderGoals(state);
   scheduleAiGreeting();
-  checkReminder();
 }
 
 // ═══ Breakpoint manager — sets data-layout on <html> ═══
@@ -127,9 +125,8 @@ function init() {
   // Wire AI chat UI module (exposes sendAI, clearAiHistory, typeWriter on window)
   initAiChatUI(() => [_Y, _M]);
 
-  // Wire greeting + reminders UI modules
+  // Wire greeting UI module
   initGreetingUI(() => [_Y, _M]);
-  initRemindersUI();
 
   // Wire settings, data management, and PWA UI modules
   initSettingsUI(() => _notifyAll());

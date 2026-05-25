@@ -943,24 +943,6 @@ nav::-webkit-scrollbar { display:none; }
 }
 .pwa-dismiss:hover { color:var(--text); border-color:var(--b2); }
 
-/* ════ REMINDER BAR ════ */
-.reminder-bar {
-  display:none; align-items:center; gap:10px;
-  padding:9px 20px; font-size:.78rem; color:var(--text);
-  background:var(--s1); border-bottom:1px solid var(--b1);
-  position:sticky; top:56px; z-index:90;
-}
-.reminder-bar.show { display:flex; animation:fadeDown .25s ease; }
-.reminder-bar svg { flex-shrink:0; }
-.reminder-close {
-  margin-left:auto; background:none; border:none;
-  color:var(--muted); cursor:pointer; font-size:1rem;
-  padding:2px 6px; line-height:1; transition:.12s;
-}
-.reminder-close:hover { color:var(--text); }
-.rb-warn { border-left:3px solid var(--gold); }
-.rb-good { border-left:3px solid var(--green); }
-.rb-info { border-left:3px solid var(--pr); }
 
 /* ════ AD POPUP ════ */
 .ad-overlay {
@@ -1672,12 +1654,6 @@ nav::-webkit-scrollbar { display:none; }
   </button>
 </nav>
 
-<!-- ════ REMINDER BAR ════ -->
-<div class="reminder-bar" id="reminder-bar">
-  <svg id="reminder-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-  <span id="reminder-txt"></span>
-  <button class="reminder-close" onclick="closeReminder()">✕</button>
-</div>
 
 <div class="wrap">
 
