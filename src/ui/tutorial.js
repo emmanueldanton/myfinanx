@@ -107,7 +107,8 @@ export function tutoBackdrop(e) {
 }
 
 export function maybeShowTuto() {
-  if (localStorage.getItem(TUTO_KEY)) return;
+  // Also check the legacy monolith key so returning users don't see the tutorial again
+  if (localStorage.getItem(TUTO_KEY) || localStorage.getItem('monargent-onboarded')) return;
   setTimeout(openTuto, 600);
 }
 

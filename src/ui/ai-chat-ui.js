@@ -103,7 +103,6 @@ export async function sendAI() {
   const msgs = document.getElementById('ai-msgs');
   btn.disabled = true; inp.disabled = true; inp.value = '';
 
-  _aiHistory.push({ role: 'user', text: esc(q) });
   renderAiMsg('user', esc(q));
 
   const tid    = 'ty' + Date.now();
@@ -120,11 +119,12 @@ export async function sendAI() {
 
   const sys = _buildSystemPrompt();
 
-  // Historique complet transmis sans troncature (FR-024)
+  // Build messages from previous history BEFORE pushing current message — avoids duplication
   const messages = [
     ..._aiHistory.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text })),
     { role: 'user', content: q },
   ];
+  _aiHistory.push({ role: 'user', text: esc(q) });
 
   try {
     const res = await fetch('/api/ai', {
