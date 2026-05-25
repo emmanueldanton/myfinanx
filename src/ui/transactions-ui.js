@@ -4,8 +4,11 @@ import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 
-let _txType = 'expense';
-let _getYM  = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()]; };
+let _txType      = 'expense';
+let _getYM       = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()]; };
+let _searchQuery = '';
+let _filterCat   = '';
+let _lastState   = null;
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -18,6 +21,8 @@ export function initTransactionsUI(getYM) {
   window.saveEditTx   = saveEditTx;
   window.setTxType    = setTxType;
   window.updateCatSel = updateCatSel;
+  window.searchTx     = searchTx;
+  window.filterTxCat  = filterTxCat;
 
   const txDt = document.getElementById('tx-dt');
   if (txDt && !txDt.value) txDt.value = todayISO();
@@ -43,16 +48,70 @@ function _setText(id, v) {
 
 // ── Render ────────────────────────────────────────────────────────
 
+export function searchTx(q) {
+  _searchQuery = q.trim().toLowerCase();
+  const inp = document.getElementById('tx-search');
+  const clr = document.getElementById('tx-search-clear');
+  if (inp) inp.value = q;
+  if (clr) clr.style.display = _searchQuery ? '' : 'none';
+  if (_lastState) renderExpenses(_lastState);
+}
+
+export function filterTxCat(cat) {
+  _filterCat = _filterCat === cat ? '' : cat; // toggle
+  if (_lastState) renderExpenses(_lastState);
+}
+
+function _applyFilters(txs) {
+  return txs.filter(t => {
+    const matchCat = !_filterCat || t.category === _filterCat;
+    const matchQ   = !_searchQuery
+      || (t.description || '').toLowerCase().includes(_searchQuery)
+      || (t.category    || '').toLowerCase().includes(_searchQuery);
+    return matchCat && matchQ;
+  });
+}
+
+function _renderCatPills(txs) {
+  const wrap = document.getElementById('tx-cat-pills');
+  if (!wrap) return;
+  const cats = [...new Set(txs.map(t => t.category).filter(Boolean))].sort();
+  if (!cats.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = [
+    `<button class="tx-cat-pill${!_filterCat ? ' active' : ''}" onclick="filterTxCat('')">Tous</button>`,
+    ...cats.map(c =>
+      `<button class="tx-cat-pill${_filterCat === c ? ' active' : ''}" onclick="filterTxCat('${esc(c)}')">${esc(c)}</button>`
+    ),
+  ].join('');
+}
+
+export function resetTxFilters() {
+  _searchQuery = '';
+  _filterCat   = '';
+  const inp = document.getElementById('tx-search');
+  const clr = document.getElementById('tx-search-clear');
+  if (inp) inp.value = '';
+  if (clr) clr.style.display = 'none';
+}
+
 export function renderExpenses(state) {
+  _lastState = state;
   const list = document.getElementById('txl');
   if (!list) return;
-  const txs = state?.transactions ?? [];
-  if (!txs.length) {
+  const allTxs     = state?.transactions ?? [];
+  const filtered   = _applyFilters(allTxs);
+  _renderCatPills(allTxs);
+
+  if (!allTxs.length) {
     list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction.<br>Ajoute ta première ci-dessus.</div>`;
     renderCatBk([]);
     return;
   }
-  list.innerHTML = txs.map(t => {
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>Aucun résultat pour ce filtre.</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(t => {
     const isE  = t.type !== 'income';
     const col  = isE ? 'var(--red-l)' : 'var(--green)';
     const ibg  = isE ? 'rgba(196,58,58,.14)' : 'rgba(52,211,153,.12)';
@@ -101,7 +160,7 @@ export function renderExpenses(state) {
       </div>
     </div>`;
   }).join('');
-  renderCatBk(txs.filter(t => t.type !== 'income'));
+  renderCatBk(allTxs.filter(t => t.type !== 'income'));
 }
 
 export function renderCatBk(expenses) {

@@ -602,6 +602,33 @@ nav::-webkit-scrollbar { display:none; }
 @media(max-width:600px){ .txg { grid-template-columns:1fr 1fr; } .txg .btn { grid-column:1/-1; } }
 @media(max-width:380px){ .txg { grid-template-columns:1fr; } }
 
+/* ════ TX SEARCH + FILTER ════ */
+.tx-controls { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.tx-search-wrap {
+  display:flex; align-items:center; gap:8px;
+  background:var(--s1); border:1px solid var(--b1); border-radius:var(--r2);
+  padding:0 12px; color:var(--muted);
+}
+.tx-search-wrap input {
+  flex:1; background:none; border:none; outline:none;
+  color:var(--text); font-size:.84rem; padding:10px 0;
+}
+.tx-search-wrap input::placeholder { color:var(--muted); }
+.tx-search-clear {
+  background:none; border:none; color:var(--muted);
+  cursor:pointer; font-size:.9rem; padding:2px 4px; line-height:1;
+  transition:.12s;
+}
+.tx-search-clear:hover { color:var(--text); }
+.tx-cat-pills { display:flex; flex-wrap:wrap; gap:6px; }
+.tx-cat-pill {
+  background:var(--s2); border:1px solid var(--b1); border-radius:20px;
+  padding:4px 12px; font-size:.72rem; font-weight:600; cursor:pointer;
+  color:var(--muted); transition:.15s; white-space:nowrap;
+}
+.tx-cat-pill:hover { border-color:var(--pr); color:var(--pr-l); }
+.tx-cat-pill.active { background:var(--pr); border-color:var(--pr); color:#fff; }
+
 /* ════ TRANSACTION LIST ════ */
 .txl { background:var(--s1); border:1px solid var(--b1); border-radius:var(--r); overflow:hidden; }
 .txi {
@@ -1919,6 +1946,14 @@ nav::-webkit-scrollbar { display:none; }
   </div>
 
   <div class="sl">Transactions du mois</div>
+  <div class="tx-controls">
+    <div class="tx-search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="tx-search" placeholder="Rechercher une transaction..." oninput="searchTx(this.value)" autocomplete="off">
+      <button id="tx-search-clear" class="tx-search-clear" onclick="searchTx('')" style="display:none" aria-label="Effacer">✕</button>
+    </div>
+    <div id="tx-cat-pills" class="tx-cat-pills"></div>
+  </div>
   <div class="txl" id="txl">
     <div class="empty">
       <div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>

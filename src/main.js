@@ -16,7 +16,7 @@ import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
 import { initTutorial, maybeShowTuto } from './ui/tutorial.js';
 import { initBudgetUI, renderRevRows, renderBudRows, renderBudgetFooter } from './ui/budget-ui.js';
-import { initTransactionsUI, renderExpenses, updateTracker } from './ui/transactions-ui.js';
+import { initTransactionsUI, renderExpenses, updateTracker, resetTxFilters } from './ui/transactions-ui.js';
 import { initGoalsUI, renderGoals } from './ui/goals-ui.js';
 import { initAiChatUI, loadAiHistory } from './ui/ai-chat-ui.js';
 import { initGreetingUI, renderGreeting, scheduleAiGreeting } from './ui/greeting.js';
@@ -38,6 +38,7 @@ function changeMonth(delta) {
   if (newY > now.getFullYear() || (newY === now.getFullYear() && adjM > now.getMonth())) return;
   _M = adjM; _Y = newY;
   bridgeLoad(_Y, _M);
+  resetTxFilters();
   // Goals are NOT reloaded on month change (FR-007 — independent lifecycle)
   _notifyAll();
 }
