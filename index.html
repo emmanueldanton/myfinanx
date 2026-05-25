@@ -52,19 +52,7 @@
     await OneSignal.init({
       appId: "72f38150-9fe6-4197-acf3-63278a8a86c9",
       notifyButton: { enable: false },
-      promptOptions: {
-        slidedown: {
-          prompts: [{
-            type: "push",
-            autoPrompt: false,
-            text: {
-              actionMessage: "Reçois des rappels financiers intelligents directement sur ton appareil.",
-              acceptButton: "Activer",
-              cancelButton: "Plus tard"
-            }
-          }]
-        }
-      }
+      promptOptions: { slidedown: { prompts: [{ type:"push", autoPrompt:false }] } }
     });
   });
 </script>
@@ -2588,6 +2576,30 @@ if('serviceWorker' in navigator) {
 
 /* Tutorial functions → src/ui/tutorial.js (exposed on window via initTutorial()) */
 </script>
+
+<!-- ════ PUSH PERMISSION — bottom sheet, même design que le tutoriel ════ -->
+<div class="tuto-overlay" id="push-overlay" onclick="pushOverlayBackdrop(event)">
+  <div class="tuto-card">
+    <button class="tuto-close" onclick="closePushOverlay()" aria-label="Fermer">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="tuto-slide">
+      <div class="tuto-ico">
+        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="34" height="34" aria-hidden="true">
+          <path d="M20 6a3 3 0 0 0-3 3v1A9 9 0 0 0 11 19v7l-2 3h22l-2-3v-7a9 9 0 0 0-6-9V9a3 3 0 0 0-3-3z" fill="currentColor" fill-opacity=".15"/>
+          <path d="M20 6a3 3 0 0 0-3 3v1A9 9 0 0 0 11 19v7l-2 3h22l-2-3v-7a9 9 0 0 0-6-9V9a3 3 0 0 0-3-3z"/>
+          <path d="M17 32a3 3 0 0 0 6 0"/>
+        </svg>
+      </div>
+      <div class="tuto-title">Rappels intelligents</div>
+      <div class="tuto-body">Reçois des alertes financières adaptées à ta situation — quand dépenser moins, quand tu approches ton budget, quand tu es dans le vert.</div>
+    </div>
+    <div class="tuto-nav">
+      <button class="tuto-skip" onclick="closePushOverlay()">Plus tard</button>
+      <button class="tuto-next" onclick="confirmPushPermission()">Activer les notifs</button>
+    </div>
+  </div>
+</div>
 
 <!-- ════ TUTORIAL — bottom sheet, rendered dynamically by src/ui/tutorial.js ════ -->
 <div class="tuto-overlay" id="tuto-overlay" onclick="tutoBackdrop(event)">

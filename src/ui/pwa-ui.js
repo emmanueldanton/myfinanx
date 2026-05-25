@@ -7,12 +7,15 @@ const PUSH_ASKED_KEY    = 'mfx-push-asked';
 // ── Init ──────────────────────────────────────────────────────────
 
 export function initPwaUI() {
-  window.closePwaPopup   = closePwaPopup;
-  window.pwaOverlayClick = pwaOverlayClick;
-  window.pwaTab          = pwaTab;
+  window.closePwaPopup        = closePwaPopup;
+  window.pwaOverlayClick      = pwaOverlayClick;
+  window.pwaTab               = pwaTab;
+  window.closePushOverlay     = closePushOverlay;
+  window.pushOverlayBackdrop  = pushOverlayBackdrop;
+  window.confirmPushPermission = confirmPushPermission;
 }
 
-// ── Show ──────────────────────────────────────────────────────────
+// ── Show install popup ────────────────────────────────────────────
 
 export function showPwaPopup() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
@@ -41,13 +44,13 @@ export function showPwaPopup() {
   }, 800);
 }
 
-// ── Close ─────────────────────────────────────────────────────────
+// ── Close install popup ───────────────────────────────────────────
 
 export function closePwaPopup() {
   document.getElementById('pwa-overlay')?.classList.remove('open');
   document.body.style.overflow = '';
   try { localStorage.setItem(PWA_DISMISSED_KEY, String(Date.now())); } catch (e) {}
-  // Après fermeture du popup install, demander les notifs push
+  // Après fermeture du popup install, proposer les notifs push
   setTimeout(requestPushPermission, 3000);
 }
 
@@ -62,7 +65,7 @@ export function pwaTab(os) {
   document.getElementById('pwa-tab-android')?.classList.toggle('on', os === 'android');
 }
 
-// ── Push notifications ────────────────────────────────────────────
+// ── Push permission overlay ───────────────────────────────────────
 
 export function requestPushPermission() {
   // Ne demander qu'une seule fois
@@ -72,8 +75,24 @@ export function requestPushPermission() {
 
   try { localStorage.setItem(PUSH_ASKED_KEY, '1'); } catch (e) {}
 
+  const overlay = document.getElementById('push-overlay');
+  if (overlay) overlay.classList.add('open');
+}
+
+export function closePushOverlay() {
+  const overlay = document.getElementById('push-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+export function pushOverlayBackdrop(e) {
+  if (e.target === document.getElementById('push-overlay')) closePushOverlay();
+}
+
+export function confirmPushPermission() {
+  closePushOverlay();
+  // Déclenche directement le dialogue natif du navigateur via OneSignal
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(function(OneSignal) {
-    OneSignal.Slidedown.promptPush();
+    OneSignal.Notifications.requestPermission();
   });
 }
