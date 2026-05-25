@@ -50,6 +50,7 @@ export async function fetchLiveRates() {
     const cached = JSON.parse(localStorage.getItem(RATES_CACHE_KEY) || 'null');
     if (cached && (Date.now() - cached.timestamp) < RATES_TTL_MS) {
       applyRates(cached.rates);
+      _refreshRateUI(cached.rates);
       return;
     }
     const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,GBP,CAD,MAD');
@@ -59,6 +60,7 @@ export async function fetchLiveRates() {
     const cache = { base: 'EUR', timestamp: Date.now(), rates: data.rates };
     try { localStorage.setItem(RATES_CACHE_KEY, JSON.stringify(cache)); } catch (_) {}
     applyRates(data.rates);
+    _refreshRateUI(data.rates);
   } catch (_) {
     // réseau absent — taux hardcodés conservés
   }
@@ -67,5 +69,15 @@ export async function fetchLiveRates() {
 function applyRates(rates) {
   ['USD', 'GBP', 'CAD', 'MAD'].forEach(code => {
     if (rates[code]) CURRENCIES[code].rate = rates[code];
+  });
+}
+
+function _refreshRateUI(rates) {
+  document.querySelectorAll('[id^="rate-"]').forEach(el => {
+    const c = el.id.replace('rate-', '');
+    if (c && CURRENCIES[c]) {
+      const rc = CURRENCIES[c];
+      el.textContent = `≈ ${rc.rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} ${rc.symbol}`;
+    }
   });
 }

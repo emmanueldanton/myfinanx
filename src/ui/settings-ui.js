@@ -1,5 +1,5 @@
 // ═══ Settings UI — devise, thème, drawer ═══
-import { setActiveCurrency, getActiveCurrency } from '../currency.js';
+import { setActiveCurrency, getActiveCurrency, CURRENCIES } from '../currency.js';
 
 const USER_KEY   = 'monargent-username';
 const GENDER_KEY = 'monargent-usergender';
@@ -53,8 +53,8 @@ export function setCurrency(code) {
   // Update rate notes
   document.querySelectorAll('[id^="rate-"]').forEach(el => {
     const c = el.id.replace('rate-', '');
-    if (c && window._mfxCurrencies?.[c]) {
-      const rc = window._mfxCurrencies[c];
+    if (c && CURRENCIES[c]) {
+      const rc = CURRENCIES[c];
       el.textContent = `≈ ${rc.rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} ${rc.symbol}`;
     }
   });
@@ -92,9 +92,16 @@ export function setCurrency(code) {
 }
 
 export function applyRates(rates) {
-  if (!window._mfxCurrencies) return;
   ['USD', 'GBP', 'CAD', 'MAD'].forEach(code => {
-    if (rates[code] && window._mfxCurrencies[code]) window._mfxCurrencies[code].rate = rates[code];
+    if (rates[code] && CURRENCIES[code]) CURRENCIES[code].rate = rates[code];
+  });
+  // Refresh rate notes in the currency picker
+  document.querySelectorAll('[id^="rate-"]').forEach(el => {
+    const c = el.id.replace('rate-', '');
+    if (c && CURRENCIES[c]) {
+      const rc = CURRENCIES[c];
+      el.textContent = `≈ ${rc.rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 })} ${rc.symbol}`;
+    }
   });
 }
 
