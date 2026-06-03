@@ -10,7 +10,7 @@ import './styles/layout-desktop.css';
 import { store } from './store.js';
 import { loadTheme, setTheme } from './theme.js';
 import { fetchLiveRates, setActiveCurrency } from './currency.js';
-import { renderAll, subscribeAll, initDashboard } from './ui/index.js';
+import { renderAll, initDashboard } from './ui/index.js';
 import { bridgeLoad, bridgeLoadGoals, bridgeSave, bridgeLoadPrefs } from './data-bridge.js';
 import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
@@ -44,23 +44,53 @@ function changeMonth(delta) {
   _notifyAll();
 }
 
-function _notifyAll() {
+function _buildState() {
   const month = `${_Y}-${String(_M + 1).padStart(2, '0')}`;
-  const state = {
+  return {
     budget:       store.get('mfx_budget'),
     transactions: store.get('mfx_transactions') || [],
     goals:        store.get('mfx_goals') || [],
     month,
     year: _Y,
   };
-  renderAll(state);
-  renderRevRows(state);
-  renderBudRows(state);
-  renderBudgetFooter(state);
-  renderExpenses(state);
-  updateTracker(state);
-  renderGoals(state);
+}
+
+// Render only the views that depend on the changed data slices.
+//   b = budget changed, t = transactions changed, g = goals changed
+function _renderViews(b, t, g) {
+  const state = _buildState();
+  if (b || t) renderAll(state);                               // dashboard ← budget + transactions
+  if (b)      { renderRevRows(state); renderBudRows(state); } // budget page rows ← budget
+  if (b || t) renderBudgetFooter(state);                      // footer ← budget + ponctuels (transactions)
+  if (t)      renderExpenses(state);                          // transaction list ← transactions
+  if (b || t) updateTracker(state);                           // tracker totals ← budget + transactions
+  if (g)      renderGoals(state);                             // goals page ← goals
   scheduleAiGreeting();
+}
+
+// Coalesce multiple store writes in the same tick into a single targeted render.
+const _dirty = new Set();
+let _renderScheduled = false;
+function _scheduleRender(key) {
+  _dirty.add(key);
+  if (_renderScheduled) return;
+  _renderScheduled = true;
+  queueMicrotask(() => {
+    if (!_renderScheduled) return;          // a full sync render already ran this tick
+    _renderScheduled = false;
+    const b = _dirty.has('mfx_budget');
+    const t = _dirty.has('mfx_transactions');
+    const g = _dirty.has('mfx_goals');
+    _dirty.clear();
+    _renderViews(b, t, g);
+  });
+}
+
+// Force a full synchronous render (month change, currency change, init).
+function _notifyAll() {
+  _renderScheduled = false;                 // cancel any pending coalesced render
+  _dirty.clear();
+  _renderViews(true, true, true);
 }
 
 // ═══ Breakpoint manager — sets data-layout on <html> ═══
@@ -151,8 +181,10 @@ function init() {
   // Init donut ResizeObserver
   initDashboard();
 
-  // Subscribe to store changes → re-render
-  subscribeAll(() => _notifyAll());
+  // Targeted re-render: each data slice notifies only the views that depend on it
+  store.subscribe('mfx_budget',       () => _scheduleRender('mfx_budget'));
+  store.subscribe('mfx_transactions', () => _scheduleRender('mfx_transactions'));
+  store.subscribe('mfx_goals',        () => _scheduleRender('mfx_goals'));
 
   // Initial render
   _notifyAll();

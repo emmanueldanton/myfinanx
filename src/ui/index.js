@@ -1,4 +1,3 @@
-import { store } from '../store.js';
 import { renderDonut, renderBudgetProgressBars, initDonutResizeObserver } from './charts.js';
 import { fmt } from '../currency.js';
 import { calcTotalIncomes, calcTotalAllocated, calcUnallocated } from '../budget.js';
@@ -133,13 +132,6 @@ function renderRecentTransactions(txs, totalCount) {
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>`;
   }
-}
-
-// Subscribe to store changes
-export function subscribeAll(callback) {
-  ['mfx_budget', 'mfx_transactions', 'mfx_goals'].forEach(key => {
-    store.subscribe(key, () => callback());
-  });
 }
 
 // Initialize donut resize observer (call once at startup)
