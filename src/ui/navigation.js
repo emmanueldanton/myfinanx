@@ -27,6 +27,17 @@ export function syncBnavActive(id) {
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
   const navId = id === 'ai' ? 'plus' : id;
   document.getElementById('bn-' + navId)?.classList.add('active');
+  moveBnavPill();
+}
+
+// Déplace/morphe l'indicateur "pilule" sous l'onglet actif (transform + width animés en CSS)
+export function moveBnavPill() {
+  const inner  = document.querySelector('.bnav-inner');
+  const pill   = document.getElementById('bnav-pill');
+  const active = inner?.querySelector('.bnav-btn.active');
+  if (!inner || !pill || !active || active.offsetWidth === 0) return;
+  pill.style.width = active.offsetWidth + 'px';
+  pill.style.transform = 'translateX(' + active.offsetLeft + 'px)';
 }
 
 export function openPlusPanel() {
@@ -35,6 +46,7 @@ export function openPlusPanel() {
   document.body.style.overflow = 'hidden';
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('bn-plus')?.classList.add('active');
+  moveBnavPill();
 }
 
 export function closePlusPanel() {
@@ -52,4 +64,14 @@ export function initNavigation() {
   window.syncBnavActive = syncBnavActive;
   window.openPlusPanel  = openPlusPanel;
   window.closePlusPanel = closePlusPanel;
+
+  // Place la pilule au chargement SANS animation, puis réactive la transition
+  const pill = document.getElementById('bnav-pill');
+  requestAnimationFrame(() => {
+    if (pill) pill.style.transition = 'none';
+    moveBnavPill();
+    requestAnimationFrame(() => { if (pill) pill.style.transition = ''; });
+  });
+  // Recalcule en cas de rotation / redimensionnement (desktop ↔ mobile)
+  window.addEventListener('resize', moveBnavPill);
 }

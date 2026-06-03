@@ -1,104 +1,122 @@
 /* ════ THEMES — CSS custom properties per theme (FOUC prevention) ════
    These selectors apply on first paint (data-theme set by inline <head> script).
    setTheme() in theme.js then overrides via inline style, using the same values.
-   Keep both files in sync at all times.
+   Keep theme.js, index.html (script anti-FOUC + :root) and this file in sync.
 ════════════════════════════════════════════════════════════════════════ */
 
-:root[data-theme="blue"] {
-  --bg:         #000000;
-  --s0:         #080c14;
-  --s1:         #0f1520;
-  --s2:         #161e2e;
-  --b1:         #202840;
-  --b2:         #2c3a58;
-  --pr:         #4D78D4;
-  --pr-l:       #7BA3F0;
-  --pr-d:       #3560b8;
-  --text:       #edeff5;
-  --muted:      #6878a0;
-  --faint:      #1a2238;
-  --red:        #C43A3A;
-  --red-l:      #e87a7a;
-  --green:      #34d399;
-  --gold:       #f59e0b;
-  --violet:     #a78bfa;
-  --header-bg:  rgba(0,0,0,.88);
-  --shadow-lg:  rgba(0,0,0,.6);
-  --grad1:      rgba(77,120,212,.08);
-  --grad2:      rgba(196,58,58,.04);
-  --ai-bg1:     #06080f;
-  --ai-bg2:     #0a0810;
-  --ai-bdr:     #1a2238;
-  --ai-msg-bg:  rgba(6,8,20,.6);
-  --ai-msg-col: #3050a0;
-  --dot-active: rgba(255,255,255,.7);
-  --chat-bg:    #06080f;
-  --bubble-bot: #0f1520;
-  --logo-bg:    #0f1520;
-}
-
-:root[data-theme="violet"] {
-  --bg:         #050408;
-  --s0:         #0c0a12;
-  --s1:         #131020;
-  --s2:         #1a1628;
-  --b1:         #26203c;
-  --b2:         #342c50;
-  --pr:         #7A6BC4;
-  --pr-l:       #a897e8;
-  --pr-d:       #5a4fb0;
-  --text:       #eceaff;
-  --muted:      #7870a8;
-  --faint:      #1e1830;
-  --red:        #C43A3A;
-  --red-l:      #e87a7a;
-  --green:      #34d399;
-  --gold:       #f59e0b;
-  --violet:     #a78bfa;
-  --header-bg:  rgba(5,4,8,.90);
-  --shadow-lg:  rgba(0,0,0,.6);
-  --grad1:      rgba(122,107,196,.08);
-  --grad2:      rgba(196,58,58,.04);
-  --ai-bg1:     #07050e;
-  --ai-bg2:     #0c0914;
-  --ai-bdr:     #201a38;
-  --ai-msg-bg:  rgba(8,6,18,.6);
-  --ai-msg-col: #5040a0;
-  --dot-active: rgba(255,255,255,.7);
-  --chat-bg:    #08060e;
-  --bubble-bot: #131020;
-  --logo-bg:    #131020;
-}
-
+/* ─── Clair & aéré (défaut) ─── */
 :root[data-theme="light"] {
-  --bg:         #ffffff;
-  --s0:         #fafafa;
-  --s1:         #ffffff;
-  --s2:         #f5f5f5;
-  --b1:         #e8e8e8;
-  --b2:         #d4d4d4;
-  --pr:         #4D78D4;
-  --pr-l:       #2a5bc4;
-  --pr-d:       #1a4ab0;
-  --text:       #111111;
-  --muted:      #737373;
-  --faint:      #f0f0f0;
-  --red:        #b83030;
-  --red-l:      #b83030;
-  --green:      #1a9c6e;
-  --gold:       #c97a00;
-  --violet:     #7c3aed;
-  --header-bg:  rgba(255,255,255,.90);
-  --shadow-lg:  rgba(0,0,0,.08);
-  --grad1:      rgba(0,0,0,.03);
-  --grad2:      rgba(0,0,0,.01);
-  --ai-bg1:     #fafafa;
-  --ai-bg2:     #f5f5f5;
-  --ai-bdr:     #e8e8e8;
-  --ai-msg-bg:  rgba(245,245,245,.8);
-  --ai-msg-col: #5070c0;
-  --dot-active: rgba(0,0,0,.5);
-  --chat-bg:    #fafafa;
-  --bubble-bot: #ffffff;
-  --logo-bg:    #f5f5f5;
+  --bg:          #EEF3FB;
+  --s0:          #F6F9FE;
+  --s1:          #FFFFFF;
+  --s2:          #F2F6FC;
+  --b1:          #E7EDF7;
+  --b2:          #DBE3F1;
+  --pr:          #2F6BFF;
+  --pr-l:        #1E54E0;
+  --pr-d:        #1A47C0;
+  --text:        #0F1B33;
+  --muted:       #6B7896;
+  --faint:       #9AA6BD;
+  --red:         #E5484D;
+  --red-l:       #DA3A40;
+  --green:       #12A971;
+  --gold:        #D98A00;
+  --violet:      #6D55F2;
+  --header-bg:   rgba(246,249,254,.82);
+  --shadow-lg:   rgba(28,45,80,.14);
+  --shadow-card: 0 1px 3px rgba(20,40,80,.04), 0 8px 24px rgba(20,40,80,.06);
+  --shadow-soft: 0 6px 22px rgba(20,40,80,.08);
+  --shadow-pop:  0 18px 44px rgba(20,40,80,.18);
+  --grad1:       rgba(47,107,255,.07);
+  --grad2:       rgba(18,169,113,.05);
+  --ai-bg1:      #F6F9FE;
+  --ai-bg2:      #EEF3FB;
+  --ai-bdr:      #E7EDF7;
+  --ai-msg-bg:   rgba(242,246,252,.8);
+  --ai-msg-col:  #2F6BFF;
+  --dot-active:  rgba(20,40,80,.55);
+  --chat-bg:     #F6F9FE;
+  --bubble-bot:  #FFFFFF;
+  --logo-bg:     #EAF1FF;
+  --page-bg:     linear-gradient(155deg, #E9F1FF 0%, #E6F5FB 48%, #EFEBFC 100%);
+  --glass-hi:    rgba(255,255,255,.60);
+}
+
+/* ─── Sombre bleu nuit (option) ─── */
+:root[data-theme="blue"] {
+  --bg:          #0A0E17;
+  --s0:          #0E1320;
+  --s1:          #141B2B;
+  --s2:          #1B2436;
+  --b1:          #232E45;
+  --b2:          #303D5A;
+  --pr:          #5B8DEF;
+  --pr-l:        #89B0F7;
+  --pr-d:        #3F6FD0;
+  --text:        #EAEFF8;
+  --muted:       #8190AE;
+  --faint:       #2A3550;
+  --red:         #F0656A;
+  --red-l:       #F58A8E;
+  --green:       #34D399;
+  --gold:        #FBBF24;
+  --violet:      #A78BFA;
+  --header-bg:   rgba(10,14,23,.82);
+  --shadow-lg:   rgba(0,0,0,.55);
+  --shadow-card: 0 1px 3px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-soft: 0 6px 22px rgba(0,0,0,.42);
+  --shadow-pop:  0 18px 44px rgba(0,0,0,.6);
+  --grad1:       rgba(91,141,239,.10);
+  --grad2:       rgba(167,139,250,.06);
+  --ai-bg1:      #0E1320;
+  --ai-bg2:      #120E22;
+  --ai-bdr:      #232E45;
+  --ai-msg-bg:   rgba(20,27,43,.6);
+  --ai-msg-col:  #3050a0;
+  --dot-active:  rgba(255,255,255,.85);
+  --chat-bg:     #0E1320;
+  --bubble-bot:  #1B2436;
+  --logo-bg:     #1B2436;
+  --page-bg:     linear-gradient(155deg, #0A0E17 0%, #0C1426 55%, #0E0B1C 100%);
+  --glass-hi:    rgba(255,255,255,.07);
+}
+
+/* ─── Sombre violet (option) ─── */
+:root[data-theme="violet"] {
+  --bg:          #0B0814;
+  --s0:          #110C1E;
+  --s1:          #181227;
+  --s2:          #211934;
+  --b1:          #2C2348;
+  --b2:          #3A2F5C;
+  --pr:          #9D7BF0;
+  --pr-l:        #BBA0F8;
+  --pr-d:        #7D5FD6;
+  --text:        #ECE8FB;
+  --muted:       #897FB0;
+  --faint:       #2A2148;
+  --red:         #F0656A;
+  --red-l:       #F58A8E;
+  --green:       #34D399;
+  --gold:        #FBBF24;
+  --violet:      #B9A6FF;
+  --header-bg:   rgba(11,8,20,.84);
+  --shadow-lg:   rgba(0,0,0,.55);
+  --shadow-card: 0 1px 3px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-soft: 0 6px 22px rgba(0,0,0,.42);
+  --shadow-pop:  0 18px 44px rgba(0,0,0,.6);
+  --grad1:       rgba(157,123,240,.10);
+  --grad2:       rgba(91,141,239,.05);
+  --ai-bg1:      #110C1E;
+  --ai-bg2:      #150E24;
+  --ai-bdr:      #2C2348;
+  --ai-msg-bg:   rgba(33,25,52,.6);
+  --ai-msg-col:  #5040a0;
+  --dot-active:  rgba(255,255,255,.85);
+  --chat-bg:     #110C1E;
+  --bubble-bot:  #181227;
+  --logo-bg:     #181227;
+  --page-bg:     linear-gradient(155deg, #0B0814 0%, #0F0A20 55%, #0A0C1C 100%);
+  --glass-hi:    rgba(255,255,255,.07);
 }

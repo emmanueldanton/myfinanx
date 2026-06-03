@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <!-- Apply saved theme before first paint — prevents flash of wrong colors -->
-<script>(function(){var t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'blue';document.documentElement.setAttribute('data-theme',t);})();</script>
+<script>(function(){var t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <!-- ═══ FAVICON ═══ -->
@@ -23,7 +23,7 @@
 <meta name="keywords" content="budget, finances personnelles, gestion argent, épargne, dépenses, revenus, dashboard financier">
 <meta name="author" content="Emmanuel Danton">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#4D78D4">
+<meta name="theme-color" content="#2F6BFF">
 
 <!-- ═══ OPEN GRAPH (Facebook, WhatsApp, LinkedIn) ═══ -->
 <meta property="og:type" content="website">
@@ -62,13 +62,13 @@
 <script>
 // Applique le thème AVANT le premier paint pour éviter le flash
 (function(){
-  const t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'blue';
+  const t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';
   const THEMES_MINI={
-    blue:{'--bg':'#000000','--s0':'#080c14','--s1':'#0f1520','--s2':'#161e2e','--b1':'#202840','--b2':'#2c3a58','--text':'#edeff5','--muted':'#6878a0','--faint':'#1a2238','--header-bg':'rgba(0,0,0,.88)','--logo-bg':'#0f1520','--chat-bg':'#06080f','--bubble-bot':'#0f1520','--ai-bg1':'#06080f','--ai-bg2':'#0a0810','--ai-bdr':'#1a2238'},
-    violet:{'--bg':'#050408','--s0':'#0c0a12','--s1':'#131020','--s2':'#1a1628','--b1':'#26203c','--b2':'#342c50','--text':'#eceaff','--muted':'#7870a8','--faint':'#1e1830','--header-bg':'rgba(5,4,8,.90)','--logo-bg':'#131020','--chat-bg':'#08060e','--bubble-bot':'#131020','--ai-bg1':'#07050e','--ai-bg2':'#0c0914','--ai-bdr':'#201a38'},
-    light:{'--bg':'#ffffff','--s0':'#fafafa','--s1':'#ffffff','--s2':'#f5f5f5','--b1':'#e8e8e8','--b2':'#d4d4d4','--text':'#111111','--muted':'#737373','--faint':'#f0f0f0','--header-bg':'rgba(255,255,255,.90)','--logo-bg':'#f5f5f5','--chat-bg':'#fafafa','--bubble-bot':'#ffffff','--ai-bg1':'#fafafa','--ai-bg2':'#f5f5f5','--ai-bdr':'#e8e8e8'},
+    light:{'--bg':'#EEF3FB','--s0':'#F6F9FE','--s1':'#FFFFFF','--s2':'#F2F6FC','--b1':'#E7EDF7','--b2':'#DBE3F1','--text':'#0F1B33','--muted':'#6B7896','--faint':'#9AA6BD','--header-bg':'rgba(246,249,254,.82)','--logo-bg':'#EAF1FF','--chat-bg':'#F6F9FE','--bubble-bot':'#FFFFFF','--ai-bg1':'#F6F9FE','--ai-bg2':'#EEF3FB','--ai-bdr':'#E7EDF7'},
+    blue:{'--bg':'#0A0E17','--s0':'#0E1320','--s1':'#141B2B','--s2':'#1B2436','--b1':'#232E45','--b2':'#303D5A','--text':'#EAEFF8','--muted':'#8190AE','--faint':'#2A3550','--header-bg':'rgba(10,14,23,.82)','--logo-bg':'#1B2436','--chat-bg':'#0E1320','--bubble-bot':'#1B2436','--ai-bg1':'#0E1320','--ai-bg2':'#120E22','--ai-bdr':'#232E45'},
+    violet:{'--bg':'#0B0814','--s0':'#110C1E','--s1':'#181227','--s2':'#211934','--b1':'#2C2348','--b2':'#3A2F5C','--text':'#ECE8FB','--muted':'#897FB0','--faint':'#2A2148','--header-bg':'rgba(11,8,20,.84)','--logo-bg':'#181227','--chat-bg':'#110C1E','--bubble-bot':'#181227','--ai-bg1':'#110C1E','--ai-bg2':'#150E24','--ai-bdr':'#2C2348'},
   };
-  const vars=THEMES_MINI[t]||THEMES_MINI.blue;
+  const vars=THEMES_MINI[t]||THEMES_MINI.light;
   const r=document.documentElement.style;
   Object.entries(vars).forEach(([k,v])=>r.setProperty(k,v));
 })();
@@ -77,48 +77,55 @@
 <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
-   DESIGN TOKENS — MIDNIGHT BLUE
+   DESIGN TOKENS — LIGHT & AIRY (défaut)
+   theme.js réécrit ces tokens au runtime.
 ═══════════════════════════════════════════ */
 :root {
-  --bg:      #000000;
-  --s0:      #080c14;
-  --s1:      #0f1520;
-  --s2:      #161e2e;
-  --b1:      #202840;
-  --b2:      #2c3a58;
+  --bg:      #EEF3FB;
+  --s0:      #F6F9FE;
+  --s1:      #FFFFFF;
+  --s2:      #F2F6FC;
+  --b1:      #E7EDF7;
+  --b2:      #DBE3F1;
 
-  --pr:      #4D78D4;
-  --pr-l:    #7BA3F0;
-  --pr-d:    #3560b8;
+  --pr:      #2F6BFF;
+  --pr-l:    #1E54E0;
+  --pr-d:    #1A47C0;
 
-  --red:     #C43A3A;
-  --red-l:   #e87a7a;
+  --red:     #E5484D;
+  --red-l:   #DA3A40;
 
-  --green:   #34d399;
-  --gold:    #f59e0b;
-  --violet:  #a78bfa;
+  --green:   #12A971;
+  --gold:    #D98A00;
+  --violet:  #6D55F2;
 
-  --text:    #edeff5;
-  --muted:   #6878a0;
-  --faint:   #1a2238;
+  --text:    #0F1B33;
+  --muted:   #6B7896;
+  --faint:   #9AA6BD;
 
   /* Theme-aware variables */
-  --header-bg:   rgba(0,0,0,.88);
-  --shadow-lg:   rgba(0,0,0,.6);
-  --grad1:       rgba(77,120,212,.08);
-  --grad2:       rgba(196,58,58,.04);
-  --ai-bg1:      #06080f;
-  --ai-bg2:      #0a0810;
-  --ai-bdr:      #1a2238;
-  --ai-msg-bg:   rgba(6,8,20,.6);
-  --ai-msg-col:  #3050a0;
-  --dot-active:  rgba(255,255,255,.7);
+  --header-bg:   rgba(246,249,254,.82);
+  --shadow-lg:   rgba(28,45,80,.14);
+  --shadow-card: 0 1px 3px rgba(20,40,80,.04), 0 8px 24px rgba(20,40,80,.06);
+  --shadow-soft: 0 6px 22px rgba(20,40,80,.08);
+  --shadow-pop:  0 18px 44px rgba(20,40,80,.18);
+  --grad1:       rgba(47,107,255,.07);
+  --grad2:       rgba(18,169,113,.05);
+  --ai-bg1:      #F6F9FE;
+  --ai-bg2:      #EEF3FB;
+  --ai-bdr:      #E7EDF7;
+  --ai-msg-bg:   rgba(242,246,252,.8);
+  --ai-msg-col:  #2F6BFF;
+  --dot-active:  rgba(20,40,80,.55);
 
   --fh: 'Gabarito', sans-serif;
   --fb: 'DM Sans', sans-serif;
-  --r:  12px;
-  --r2:  8px;
-  --logo-bg: #0f1520;
+  --r:  18px;
+  --r2: 12px;
+  --r3: 22px;
+  --logo-bg: #EAF1FF;
+  --page-bg: linear-gradient(155deg, #E9F1FF 0%, #E6F5FB 48%, #EFEBFC 100%);
+  --glass-hi: rgba(255,255,255,.60);
 }
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -1550,9 +1557,9 @@ nav::-webkit-scrollbar { display:none; }
 
   <!-- Theme dots -->
   <div class="theme-dots">
-    <div class="tdot"    data-theme="blue"   style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')"   title="Midnight Blue"></div>
-    <div class="tdot"    data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
-    <div class="tdot on" data-theme="light"  style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
+    <div class="tdot on" data-theme="light"  style="background:linear-gradient(135deg,#FFFFFF,#D6E4FF)" onclick="setTheme('light')"  title="Clair & aéré"></div>
+    <div class="tdot"    data-theme="blue"   style="background:linear-gradient(135deg,#5B8DEF,#0A0E17)" onclick="setTheme('blue')"   title="Bleu nuit"></div>
+    <div class="tdot"    data-theme="violet" style="background:linear-gradient(135deg,#9D7BF0,#0B0814)" onclick="setTheme('violet')" title="Violet sombre"></div>
   </div>
 
   <div class="hdr-data">
@@ -1612,9 +1619,9 @@ nav::-webkit-scrollbar { display:none; }
   <div class="drawer-ft">
     <div class="drawer-ft-lbl">Thème</div>
     <div class="drawer-themes">
-      <div class="dtdot" data-theme="blue"   style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')"   title="Midnight Blue"></div>
-      <div class="dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
-      <div class="dtdot on" data-theme="light" style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
+      <div class="dtdot on" data-theme="light" style="background:linear-gradient(135deg,#FFFFFF,#D6E4FF)" onclick="setTheme('light')"  title="Clair & aéré"></div>
+      <div class="dtdot" data-theme="blue"   style="background:linear-gradient(135deg,#5B8DEF,#0A0E17)" onclick="setTheme('blue')"   title="Bleu nuit"></div>
+      <div class="dtdot" data-theme="violet" style="background:linear-gradient(135deg,#9D7BF0,#0B0814)" onclick="setTheme('violet')" title="Violet sombre"></div>
     </div>
     <div class="drawer-ft-lbl" style="margin-top:14px;">Données</div>
     <div class="drawer-data">
@@ -2272,6 +2279,7 @@ nav::-webkit-scrollbar { display:none; }
 <!-- ════ BOTTOM NAV ════ -->
 <div class="bottom-nav">
   <div class="bnav-inner">
+    <div class="bnav-pill" id="bnav-pill"></div>
     <button class="bnav-btn active" id="bn-overview" onclick="goTabMobile('overview')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       <span class="bnav-lbl">Vue globale</span>
