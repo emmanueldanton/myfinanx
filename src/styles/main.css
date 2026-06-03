@@ -72,8 +72,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Prevent iOS zoom on input focus — all inputs must be ≥ 16px (FR-035) */
-input, select, textarea { font-size: 16px !important; }
-
-/* On desktop (pointer:fine) textarea can be smaller */
-@media (hover: hover) { textarea { font-size: 14px !important; } }
+/* Texte uniforme à 14px sur toute l'app, inputs compris */
+input, select, textarea { font-size: 14px !important; }
+/* Exception mobile tactile : 16px pour bloquer le zoom-au-focus d'iOS Safari (FR-035) */
+@media (hover: none) and (pointer: coarse) {
+  input, select, textarea { font-size: 16px !important; }
+}
