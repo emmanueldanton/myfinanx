@@ -12,7 +12,7 @@
   .app-nav .nav-item {
     flex: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 2px;
-    font-size: .6rem; color: var(--muted);
+    font-size: .75rem; color: var(--muted);
     min-height: 44px; cursor: pointer;
   }
 
