@@ -65,11 +65,21 @@ function _setText(id, v) {
   if (el) el.textContent = v;
 }
 
+// True while the user is actively typing in an input inside `el`. We must NOT
+// rebuild the rows then — innerHTML would steal focus and reformat the value
+// mid-entry (e.g. "12" → "12.00"). Totals/percentages still refresh via
+// renderBudgetFooter, which only touches textContent.
+function _isEditingInside(el) {
+  const ae = document.activeElement;
+  return !!ae && ae.tagName === 'INPUT' && el.contains(ae);
+}
+
 // ── Render ────────────────────────────────────────────────────────
 
 export function renderRevRows(state) {
   const el = document.getElementById('rev-rows');
   if (!el) return;
+  if (_isEditingInside(el)) return;
   const incomes = state?.budget?.incomes ?? [];
   el.innerHTML = incomes.map((r, i) =>
     `<div class="rev-row">
@@ -88,6 +98,7 @@ export function renderRevRows(state) {
 export function renderBudRows(state) {
   const el = document.getElementById('bud-rows');
   if (!el) return;
+  if (_isEditingInside(el)) return;
   const budget = state?.budget ?? { incomes: [], budgetItems: [] };
   const items  = budget.budgetItems ?? [];
   const totalR = (budget.incomes ?? []).reduce((s, r) => s + r.amountEUR, 0);
