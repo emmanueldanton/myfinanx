@@ -573,6 +573,36 @@ nav::-webkit-scrollbar { display:none; }
 .bp3 { width:40px; font-size:.75rem; color:var(--muted); text-align:right; font-weight:600; font-family:var(--fh); flex-shrink:0; }
 @media(max-width:500px){ .bp3 { display:none; } .ba { width:88px; } }
 
+/* ── Lignes Budget : mode lecture / édition (bouton de modification, pas de commit live) ── */
+.row-acts { display:flex; align-items:center; gap:1px; flex-shrink:0; }
+.row-acts button {
+  background:none; border:none; color:var(--muted); cursor:pointer;
+  padding:4px; border-radius:5px; transition:.12s; display:flex;
+}
+.row-acts button svg { stroke:currentColor; }
+.r-edit:hover { color:var(--pr-l); background:rgba(77,120,212,.12); }
+.r-del:hover, .r-cancel:hover { color:var(--red-l); background:rgba(196,58,58,.12); }
+.r-save { color:var(--green); }
+.r-save:hover { background:rgba(52,211,153,.14); }
+.row-view-txt {
+  display:block; font-size:.83rem; font-weight:500; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.row-view-txt.amt { font-family:var(--fh); font-weight:700; text-align:right; font-size:.85rem; }
+/* Mode lecture (défaut) : champs + valider/annuler masqués */
+.rev-row .rn input, .rev-row .ra input,
+.bud-row .bn input, .bud-row .ba input,
+.row-acts .r-save, .row-acts .r-cancel { display:none; }
+/* Mode édition (.editing) : on masque le texte + crayon/poubelle, on montre champs + valider/annuler */
+.rev-row.editing .rn .row-view-txt, .rev-row.editing .ra .row-view-txt,
+.bud-row.editing .bn .row-view-txt, .bud-row.editing .ba .row-view-txt,
+.rev-row.editing .r-edit, .rev-row.editing .r-del,
+.bud-row.editing .r-edit, .bud-row.editing .r-del { display:none; }
+.rev-row.editing .rn input, .rev-row.editing .ra input,
+.bud-row.editing .bn input, .bud-row.editing .ba input { display:block; }
+.rev-row.editing .r-save, .rev-row.editing .r-cancel,
+.bud-row.editing .r-save, .bud-row.editing .r-cancel { display:flex; }
+
 /* Add row form */
 .arf {
   display:flex; gap:6px; padding:9px 14px;
