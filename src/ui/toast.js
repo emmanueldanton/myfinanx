@@ -1,5 +1,7 @@
 // ═══ Toast — feedback visuel léger + undo suppression (5s) ═══
 
+import { esc } from '../utils.js';
+
 const DURATION_SUCCESS = 3000;
 const DURATION_UNDO    = 5000;
 
@@ -37,7 +39,7 @@ function _show(message, type, duration) {
 
   wrap.innerHTML = `<div class="toast toast-${type}">
     <span class="toast-ico">${type === 'success' ? icoCheck : icoTrash}</span>
-    <span class="toast-msg">${message}</span>
+    <span class="toast-msg">${esc(message)}</span>
     ${type === 'undo' ? `<button class="toast-undo-btn" onclick="toastUndo()">Annuler</button>` : ''}
     ${type === 'undo' ? `<div class="toast-bar" style="animation-duration:${duration}ms"></div>` : ''}
   </div>`;

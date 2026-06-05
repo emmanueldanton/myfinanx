@@ -1,12 +1,48 @@
+// ── Garde-fous : origine autorisée + débit (best-effort, par instance) ──
+const _hits = new Map();
+
+function allowedOrigin(req) {
+  const extra = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+  const src = req.headers.origin || req.headers.referer || '';
+  let host = '';
+  try { host = src ? new URL(src).host : ''; } catch (e) { host = ''; }
+  if (!host) return false;
+  if (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)) return true;   // dev
+  if (host.endsWith('.vercel.app')) return true;                     // prod + previews Vercel
+  return extra.some(o => { try { return new URL(o).host === host; } catch (e) { return false; } });
+}
+
+function rateLimited(req, max, windowMs) {
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const now = Date.now();
+  const arr = (_hits.get(ip) || []).filter(t => now - t < windowMs);
+  arr.push(now);
+  _hits.set(ip, arr);
+  return arr.length > max;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
+  }
+
+  // Bloque les appels hors de l'app (limite l'abus de la clé Groq depuis d'autres sites)
+  if (!allowedOrigin(req)) {
+    return res.status(403).json({ error: 'FORBIDDEN', message: 'Origine non autorisée.' });
+  }
+  if (rateLimited(req, 20, 60000)) {
+    return res.status(429).json({ error: 'RATE_LIMITED', message: 'Trop de requêtes — réessaie dans une minute.' });
   }
 
   const { messages, context, temperature, maxTokens, json } = req.body || {};
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'INVALID_BODY', message: 'messages[] est requis et ne peut pas être vide.' });
+  }
+
+  // Plafond de taille — évite les payloads abusifs / coûteux
+  if (messages.length > 40 || JSON.stringify(messages).length > 24000) {
+    return res.status(413).json({ error: 'PAYLOAD_TOO_LARGE', message: 'Conversation trop longue, réinitialise-la.' });
   }
 
   if (!process.env.GROQ_API_KEY) {
