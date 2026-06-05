@@ -45,6 +45,7 @@ export async function scheduleDailyPush() {
 
 function _getSubscriptionId() {
   return new Promise(resolve => {
+    window.loadOneSignal?.();   // charge le SDK à la demande (permission déjà accordée ici)
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(function(OneSignal) {
       resolve(OneSignal.User.PushSubscription.id ?? null);

@@ -1,6 +1,5 @@
 // ═══ AI Chat UI — historique de conversation + envoi (onglet Conseiller IA) ═══
 import { store }              from '../store.js';
-import { esc }                from '../utils.js';
 import { fmt, getActiveCurrency } from '../currency.js';
 
 const AI_KEY      = 'monargent_ai_chat';
@@ -39,6 +38,29 @@ export function typeWriter(el, text, speed = 18) {
 
 // ── Render ────────────────────────────────────────────────────────
 
+// Rendu markdown léger et SÛR : on échappe d'abord tout le HTML (anti-XSS),
+// puis on applique gras/italique/code en ligne et les listes à puces.
+function renderMarkdown(raw) {
+  const escHtml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const inline = s => escHtml(s)
+    .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  const out = [];
+  let list = null;
+  (raw ?? '').split('\n').forEach(line => {
+    const m = line.match(/^\s*[-*•]\s+(.+)/);
+    if (m) {
+      (list ??= []).push(`<li>${inline(m[1])}</li>`);
+    } else {
+      if (list) { out.push(`<ul>${list.join('')}</ul>`); list = null; }
+      out.push(inline(line));
+    }
+  });
+  if (list) out.push(`<ul>${list.join('')}</ul>`);
+  return out.join('<br>').replace(/<br>(<ul>)/g, '$1').replace(/(<\/ul>)<br>/g, '$1');
+}
+
 export function renderAiMsg(role, text) {
   const msgs = document.getElementById('ai-msgs');
   if (!msgs) return;
@@ -52,7 +74,7 @@ export function renderAiMsg(role, text) {
   }
   const bubble = document.createElement('div');
   bubble.className = 'ai-bubble ' + (role === 'user' ? 'usr' : 'bot');
-  bubble.innerHTML = text.replace(/\n/g, '<br>');
+  bubble.innerHTML = renderMarkdown(text);   // texte BRUT → échappé + formaté ici
   row.appendChild(bubble);
   msgs.appendChild(row);
   msgs.scrollTop = msgs.scrollHeight;
@@ -103,7 +125,7 @@ export async function sendAI() {
   const msgs = document.getElementById('ai-msgs');
   btn.disabled = true; inp.disabled = true; inp.value = '';
 
-  renderAiMsg('user', esc(q));
+  renderAiMsg('user', q);
 
   const tid    = 'ty' + Date.now();
   const typRow = document.createElement('div');
@@ -124,13 +146,13 @@ export async function sendAI() {
     ..._aiHistory.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text })),
     { role: 'user', content: q },
   ];
-  _aiHistory.push({ role: 'user', text: esc(q) });
+  _aiHistory.push({ role: 'user', text: q });
 
   try {
     const res = await fetch('/api/ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, context: sys }),
+      body: JSON.stringify({ messages, context: sys, temperature: 0.45 }),
     });
     document.getElementById(tid)?.remove();
     if (!res.ok) {
@@ -209,7 +231,7 @@ Ton style : direct, chaleureux et terre à terre — comme un ami de confiance q
 Ton objectif à chaque réponse : que l'utilisateur se sente à l'aise et bien accompagné (jamais jugé, jamais culpabilisé), et qu'il reparte motivé à passer à l'action concrètement.
 ${identityLine}
 Tu connais TOUTE la situation financière de l'utilisateur pour ${MONTHS[M]} ${Y}.
-Devise: ${cur.name} (${cur.symbol}).
+Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ convertis dans cette devise — exprime TOUS les montants de tes réponses dans cette devise (avec le symbole ${cur.symbol}), jamais en euros par défaut.
 
 ━━ REVENUS ━━
 ${revStr}
@@ -229,6 +251,8 @@ ${goalsStr}
 
 INSTRUCTIONS: Réponds en français. Sois précis, chiffré et actionnable. Maximum 180 mots.
 Base-toi UNIQUEMENT sur les données réelles ci-dessus — ne suppose rien qui n'y figure pas.
+Si une donnée nécessaire est absente, dis-le clairement et propose à l'utilisateur de la renseigner — n'invente aucun montant.
+Exprime tous les montants dans la devise de l'utilisateur (${cur.symbol}), jamais en euros par défaut.
 Utilise le prénom et le genre de l'utilisateur pour personnaliser chaque réponse.
 Si l'utilisateur a des objectifs d'épargne, intègre-les dans tes recommandations.
 Zéro humour, zéro blague, zéro analogie amusante — reste professionnel et humain.`;

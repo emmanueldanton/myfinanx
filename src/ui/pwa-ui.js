@@ -73,6 +73,7 @@ export function pushOverlayBackdrop(e) {
 
 export function confirmPushPermission() {
   closePushOverlay();
+  window.loadOneSignal?.();   // charge le SDK OneSignal maintenant (à la demande)
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(function(OneSignal) {
     OneSignal.Notifications.requestPermission();

@@ -166,21 +166,23 @@ export async function fetchAiGreetingSub() {
       }).join(', ')
     : 'aucun objectif défini';
 
-  const ctx      = `Tu es un conseiller financier bienveillant et direct. Réponds uniquement en français. Pas d'humour.`;
-  const question = `${identityLine}
+  const cur = getActiveCurrency();
+  const system = `Tu es le conseiller financier personnel de MyFinanx, bienveillant et direct. Réponds uniquement en français, sans humour.
+${identityLine}
+Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ dans cette devise — raisonne et exprime-toi exclusivement dans cette devise, jamais en euros par défaut.
 Situation de ${MONTHS[M]} ${Y} :
 - Revenus: ${fmt(totalR)} (${incomes.length} source${incomes.length > 1 ? 's' : ''}: ${incomes.map(r => r.name).join(', ')})
 - Budget alloué: ${fmt(totalB)} | Dépensé: ${fmt(totalE)} | Reste: ${fmt(reste)}
 - Taux d'épargne: ${tauxEpargne}%${dépassés.length ? `\n- Postes dépassés: ${dépassés.join(', ')}` : ''}
 - Objectifs: ${goalsStr}
-
-Écris UNE seule phrase courte et percutante (max 18 mots) qui pointe le fait le plus important ou urgent de cette situation. Commence par UN seul émoji adapté à la situation, puis l'observation directement. Pas de salutation, pas d'introduction.`;
+N'invente jamais un chiffre absent de ces données.`;
+  const question = `Écris UNE seule phrase courte et percutante (max 18 mots) qui pointe le fait le plus important ou urgent de cette situation. Commence par UN seul émoji adapté à la situation, puis l'observation directement. Pas de salutation, pas d'introduction.`;
 
   try {
     const res  = await fetch('/api/ai', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ messages: [{ role: 'user', content: question }], context: ctx }),
+      body:    JSON.stringify({ messages: [{ role: 'user', content: question }], context: system, temperature: 0.3, maxTokens: 60 }),
     });
     const data = await res.json();
     const msg  = (data.reply || '').trim().replace(/^["'«»]|["'«»]$/g, '').trim();

@@ -44,11 +44,14 @@
 
 <script defer src="/_vercel/insights/script.js"></script>
 
-<!-- ═══ ONESIGNAL PUSH NOTIFICATIONS ═══ -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<!-- ═══ ONESIGNAL PUSH NOTIFICATIONS (SDK chargé à la demande) ═══ -->
 <script>
+  // L'init est mise en file d'attente, mais le SDK (lourd) n'est PAS chargé ici.
+  // Il n'est injecté que lorsqu'il est réellement nécessaire (acceptation de
+  // l'overlay push, ou programmation de notif si la permission est déjà accordée),
+  // via window.loadOneSignal() — ça allège le chargement initial de l'app.
   window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
+  window.OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "72f38150-9fe6-4197-acf3-63278a8a86c9",
       notifyButton: { enable: false },
@@ -57,6 +60,15 @@
     const prenom = localStorage.getItem('monargent-username');
     if (prenom) OneSignal.User.addTag('prenom', prenom);
   });
+  // Injecte le SDK OneSignal une seule fois, à la demande.
+  window.loadOneSignal = function() {
+    if (window.__oneSignalLoading) return;
+    window.__oneSignalLoading = true;
+    var s = document.createElement('script');
+    s.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+    s.defer = true;
+    document.head.appendChild(s);
+  };
 </script>
 
 <script>
@@ -74,7 +86,10 @@
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Polices non bloquantes : on charge en media=print puis on bascule en all une fois prêtes (le thème est déjà appliqué avant le paint, swap géré par display=swap) -->
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap"></noscript>
 <style>
 /* ═══════════════════════════════════════════
    DESIGN TOKENS — LIGHT & AIRY (défaut)
@@ -863,6 +878,12 @@ nav::-webkit-scrollbar { display:none; }
   color:#fff;
   border-radius:18px 18px 4px 18px;
 }
+/* Markdown rendu dans les réponses IA */
+.ai-bubble ul { margin:6px 0; padding-left:18px; }
+.ai-bubble li { margin:2px 0; }
+.ai-bubble strong { font-weight:700; }
+.ai-bubble em { font-style:italic; }
+.ai-bubble code { font-family:var(--fh), monospace; background:var(--s2); padding:1px 5px; border-radius:5px; font-size:.92em; }
 
 /* Typing dots */
 .ai-typ-dots { display:flex; gap:5px; align-items:center; padding:4px 2px; }
