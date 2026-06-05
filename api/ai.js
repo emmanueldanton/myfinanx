@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
   }
 
-  const { messages, context, temperature, maxTokens } = req.body || {};
+  const { messages, context, temperature, maxTokens, json } = req.body || {};
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'INVALID_BODY', message: 'messages[] est requis et ne peut pas être vide.' });
@@ -52,7 +52,9 @@ Donne des conseils concrets, bienveillants et actionnables. Réponds exclusiveme
         messages: [systemMessage, ...messages],
         // Paramètres adaptables par appel (greeting court/déterministe vs chat développé), bornés côté serveur
         max_tokens: typeof maxTokens === 'number' ? Math.min(Math.max(maxTokens, 16), 600) : 500,
-        temperature: typeof temperature === 'number' ? Math.min(Math.max(temperature, 0), 1) : 0.5
+        temperature: typeof temperature === 'number' ? Math.min(Math.max(temperature, 0), 1) : 0.5,
+        // Sortie JSON stricte quand demandé (répartition de budget)
+        ...(json ? { response_format: { type: 'json_object' } } : {})
       })
     });
 

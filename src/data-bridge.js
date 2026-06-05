@@ -182,3 +182,33 @@ export function bridgeLoadPrefs() {
     gender:   localStorage.getItem('monargent-usergender') || 'neutral',
   };
 }
+
+// Moyenne des dépenses réelles par catégorie sur les `monthsBack` mois PRÉCÉDENTS
+// (lit directement les clés mensuelles du monolithe). Montants en EUR.
+// → { byCategory: { cat: avgEUR }, monthsWithData }
+export function getRecentMonthsExpenseAverages(Y, M, monthsBack = 3) {
+  const sums = {};
+  let monthsWithData = 0;
+
+  for (let i = 1; i <= monthsBack; i++) {
+    let m = M - i, y = Y;
+    while (m < 0) { m += 12; y--; }
+    let data;
+    try { data = JSON.parse(localStorage.getItem(monthKey(y, m)) || 'null'); } catch (e) { data = null; }
+    if (!data || !Array.isArray(data.expenses)) continue;
+
+    const expenses = data.expenses.filter(e => e.type !== 'income');
+    if (!expenses.length) continue;
+    monthsWithData++;
+    expenses.forEach(e => {
+      const cat = e.cat ?? e.category ?? 'Autre';
+      sums[cat] = (sums[cat] || 0) + (e.amount ?? 0);
+    });
+  }
+
+  const byCategory = {};
+  if (monthsWithData > 0) {
+    for (const [cat, total] of Object.entries(sums)) byCategory[cat] = total / monthsWithData;
+  }
+  return { byCategory, monthsWithData };
+}
