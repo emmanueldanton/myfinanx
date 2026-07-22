@@ -2710,6 +2710,8 @@ function closeAd() {
 
 
 
+/* Enregistrement SW manuel retiré — vite-plugin-pwa (registerType: 'autoUpdate')
+   injecte et gère l'enregistrement automatiquement. Voir vite.config.js.
 if('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -2733,6 +2735,7 @@ if('serviceWorker' in navigator) {
     });
   });
 }
+*/
 
 /* Tutorial functions → src/ui/tutorial.js (exposed on window via initTutorial()) */
 </script>
