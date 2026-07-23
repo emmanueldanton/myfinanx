@@ -5,8 +5,8 @@
   --bp-tablet: 1200px;
 
   /* Typography */
-  --fh: 'Gabarito', sans-serif;
-  --fb: 'DM Sans', sans-serif;
+  --fh: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --fb: 'Plus Jakarta Sans', system-ui, sans-serif;
 
   /* Border radius — généreux pour un rendu aéré */
   --r:  18px;
