@@ -16,9 +16,19 @@ export function initGoalsUI() {
   window.delGoal        = delGoal;
   window.toggleEditGoal = toggleEditGoal;
   window.saveEditGoal   = saveEditGoal;
+  window.openGoalForm   = openGoalForm;
 
   const ngD = document.getElementById('ng-d');
   if (ngD && !ngD.value) ngD.value = todayISO();
+}
+
+// Ouvre le formulaire de création depuis l'accueil : onglet Objectifs, focus nom
+export function openGoalForm() {
+  if (window.goTab) window.goTab('goals');
+  requestAnimationFrame(() => {
+    const el = document.getElementById('ng-n');
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+  });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────

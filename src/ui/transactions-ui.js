@@ -24,6 +24,7 @@ export function initTransactionsUI(getYM) {
   window.updateCatSel = updateCatSel;
   window.searchTx     = searchTx;
   window.filterTxCat  = filterTxCat;
+  window.openTxForm   = openTxForm;
 
   const txDt = document.getElementById('tx-dt');
   if (txDt && !txDt.value) txDt.value = todayISO();
@@ -200,6 +201,16 @@ export function updateTracker(state) {
 }
 
 // ── Form helpers ──────────────────────────────────────────────────
+
+// Ouvre le formulaire d'ajout depuis l'accueil : onglet Dépenses, type pré-réglé, focus description
+export function openTxForm(type) {
+  if (window.goTab) window.goTab('tracker');
+  setTxType(type || 'expense');
+  requestAnimationFrame(() => {
+    const el = document.getElementById('tx-d');
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+  });
+}
 
 export function setTxType(t) {
   _txType = t;
