@@ -17,6 +17,9 @@ export function renderAll(state) {
   if (month) { const p = month.split('-'); Y = parseInt(p[0], 10); M = parseInt(p[1], 10) - 1; }
   const mlEl = document.getElementById('ml');
   if (mlEl) mlEl.textContent = MONTHS[M] + ' ' + Y;
+  const MONTHS_SHORT = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'aoû', 'sep', 'oct', 'nov', 'déc'];
+  const mlBud = document.getElementById('ml-bud');
+  if (mlBud) mlBud.textContent = MONTHS_SHORT[M] + ' ' + Y;
 
   // Alerte budget (page Budget, #bud-al) — dépassement d'allocation / non-alloué / >90% dépensé
   const unallocatedEUR   = calcUnallocated(budget);

@@ -43,6 +43,11 @@ function findPreviousMonthData(Y, M) {
   return null;
 }
 
+// Données brutes (revenus + postes) du mois précédent, ou null. Pour « copier le mois précédent ».
+export function getPreviousMonthRawBudget(Y, M) {
+  return findPreviousMonthData(Y, M);
+}
+
 // Load month data from monolith localStorage → populate mfx_budget + mfx_transactions in store
 export function bridgeLoad(Y, M) {
   const raw = localStorage.getItem(monthKey(Y, M));

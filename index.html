@@ -393,77 +393,72 @@
 
 <!-- ─── BUDGET ─── -->
 <div id="page-budget" class="page">
-  <div class="page-ttl">Mes budgets</div>
-  <div class="sl">Sources de revenus</div>
-  <div class="rev-tbl">
-    <div class="tbl-th">
-      <span style="flex:1">Source</span>
-      <span style="width:110px;text-align:right;flex-shrink:0" id="rev-th-cur">Montant</span>
-      <span style="width:22px;flex-shrink:0"></span>
+  <header class="bud-head">
+    <button class="dash-icon-btn" onclick="openPlusPanel()" aria-label="Réglages">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <div class="dash-monthnav">
+      <button class="dash-month-arw" onclick="changeMonth(-1)" aria-label="Mois précédent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <span id="ml-bud">–</span>
+      <button class="dash-month-arw" onclick="changeMonth(1)" aria-label="Mois suivant"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
     </div>
+    <button class="dash-icon-btn" onclick="copyPrevMonth()" aria-label="Copier le mois précédent" title="Copier le mois précédent">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+  </header>
+  <h1 class="bud-title">Planning Budgétaire</h1>
+
+  <!-- REVENUS ATTENDUS -->
+  <div class="sec-hd">
+    <span class="sec-lbl">Revenus attendus</span>
+    <span class="sec-tot" id="rev-tot" style="color:var(--green)">0</span>
+  </div>
+  <div class="bud-card">
     <div id="rev-rows"></div>
+  </div>
+  <div class="add-reveal">
+    <button class="add-btn" onclick="this.parentElement.classList.toggle('open')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un revenu
+    </button>
     <div class="arf">
       <input class="an" type="text" id="nr-n" placeholder="Nouvelle source…">
       <input class="aa" type="text" inputmode="decimal" id="nr-a" placeholder="0" onkeydown="if(event.key==='Enter')addRev()">
-      <button class="btn bp bsm" onclick="addRev()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
-    </div>
-    <div class="tbl-foot">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
-      <div class="tf-lbl">Total revenus</div>
-      <div class="tf-val" id="rev-tot" style="color:var(--green)">0</div>
-      <div style="width:22px;flex-shrink:0;"></div>
-    </div>
-    <div class="tbl-foot" id="bud-ponctuel-row" style="display:none;border-top:none;">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-      <div class="tf-lbl" style="color:var(--green)">
-        Total avec ponctuels
-        <div id="bud-ponctuel-sub" style="font-size:.75rem;color:var(--muted);font-weight:500;margin-top:2px;"></div>
-      </div>
-      <div class="tf-val" id="bud-ponctuel-tot" style="color:var(--green)">0</div>
-      <div style="width:22px;flex-shrink:0;"></div>
+      <button class="btn bp bsm" onclick="addRev()">OK</button>
     </div>
   </div>
 
-  <div class="sl">Planification budgétaire</div>
-  <button class="ai-budget-btn" id="ai-budget-btn" onclick="suggestBudget()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z"/></svg>
-    <span>Répartir mon budget avec l'IA</span>
-  </button>
-  <div class="bud-tbl">
-    <div class="tbl-th">
-      <span style="width:20px;flex-shrink:0"></span>
-      <span style="flex:1">Poste</span>
-      <span style="width:110px;text-align:right;flex-shrink:0" id="bud-th-cur">Montant</span>
-      <span class="tf-pct">%</span>
-      <span style="width:22px;flex-shrink:0"></span>
-    </div>
-    <div id="bud-rows"></div>
+  <!-- POSTES DE DÉPENSES -->
+  <div class="sec-hd">
+    <span class="sec-lbl">Postes de dépenses</span>
+    <span class="sec-tot sec-tot-muted">Alloué : <span id="bud-tot">0</span></span>
+  </div>
+  <div id="bud-rows"></div>
+  <div class="add-reveal">
+    <button class="add-btn" onclick="this.parentElement.classList.toggle('open')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un poste
+    </button>
     <div class="arf">
       <input type="text" id="nb-n" placeholder="Nouveau poste…" class="an">
       <input class="aa" type="text" inputmode="decimal" id="nb-a" placeholder="0" onkeydown="if(event.key==='Enter')addBud()">
-      <button class="btn bp bsm" onclick="addBud()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
-    </div>
-    <div class="tbl-foot">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg></div>
-      <div class="tf-lbl">Total alloué</div>
-      <div class="tf-val" id="bud-tot" style="color:var(--red-l)">0</div>
-      <div class="tf-pct" id="bud-tot-pct">–</div>
-      <div style="width:22px;flex-shrink:0;"></div>
-    </div>
-    <div class="tbl-foot" style="border-top:none;">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="tf-lbl">Reste non alloué</div>
-      <div class="tf-val" id="bud-reste">0</div>
-      <div class="bp3" style="visibility:hidden;"></div>
-      <div style="width:22px;flex-shrink:0;"></div>
+      <button class="btn bp bsm" onclick="addBud()">OK</button>
     </div>
   </div>
+
+  <button class="bud-ai" id="ai-budget-btn" onclick="suggestBudget()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg>
+    <span>Répartir mon budget avec l'IA</span>
+  </button>
+
+  <!-- Éléments conservés pour la logique du footer (masqués) -->
+  <div class="bud-hidden-foot" style="display:none;">
+    <span id="bud-tot-pct">–</span>
+    <span id="bud-reste">0</span>
+    <span id="bud-ponctuel-tot">0</span>
+    <span id="bud-ponctuel-sub"></span>
+  </div>
+  <div id="bud-ponctuel-row" style="display:none;"></div>
 
   <!-- Currency note -->
   <div class="cur-note" id="cur-conv-note" style="display:none;">

@@ -61,7 +61,7 @@ function _buildState() {
 function _renderViews(b, t, g) {
   const state = _buildState();
   if (b || t) renderAll(state);                               // dashboard ← budget + transactions
-  if (b)      { renderRevRows(state); renderBudRows(state); } // budget page rows ← budget
+  if (b || t) { renderRevRows(state); renderBudRows(state); } // budget page rows ← budget + tx (status pills)
   if (b || t) renderBudgetFooter(state);                      // footer ← budget + ponctuels (transactions)
   if (t)      renderExpenses(state);                          // transaction list ← transactions
   if (b || t) updateTracker(state);                           // tracker totals ← budget + transactions

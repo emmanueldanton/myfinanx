@@ -1,7 +1,8 @@
 // ═══ Budget UI — revenue sources + budget items (onglet Budget) ═══
 import { store }      from '../store.js';
-import { bridgeSave, getRecentMonthsExpenseAverages } from '../data-bridge.js';
-import { uid, esc, parseAmt, catIco, COLS } from '../utils.js';
+import { bridgeSave, getRecentMonthsExpenseAverages, getPreviousMonthRawBudget } from '../data-bridge.js';
+import { uid, esc, parseAmt, catIco, COLS, catSubtitle } from '../utils.js';
+import { calcByCategory } from '../transactions.js';
 import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast }  from './toast.js';
 import { openOverlay, closeOverlay }        from './overlay.js';
@@ -25,6 +26,23 @@ export function initBudgetUI(getYM) {
   window.saveBud   = saveBud;
   window.cancelBud = cancelBud;
   window.suggestBudget = suggestBudget;
+  window.copyPrevMonth = copyPrevMonth;
+}
+
+// Copier revenus + postes du mois précédent (bouton ↻ de l'en-tête Budget)
+export function copyPrevMonth() {
+  const [Y, M] = _getYM();
+  const prev = getPreviousMonthRawBudget(Y, M);
+  if (!prev || ((prev.revenus?.length ?? 0) === 0 && (prev.budget?.length ?? 0) === 0)) {
+    showSuccessToast('Aucun budget le mois précédent');
+    return;
+  }
+  const b = _budget();
+  const snapshot = JSON.parse(JSON.stringify(b));
+  b.incomes     = (prev.revenus || []).map(r => ({ id: uid(), name: r.name, amountEUR: r.amount ?? 0 }));
+  b.budgetItems = (prev.budget  || []).map(x => ({ id: uid(), name: x.name, allocatedEUR: x.amount ?? 0 }));
+  _mutate(b);
+  showUndoToast('Budget copié du mois précédent', () => _mutate(snapshot));
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -65,6 +83,8 @@ function _rowActions(prefix, id) {
 
 // ── Render ────────────────────────────────────────────────────────
 
+const REV_ICO = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+
 export function renderRevRows(state) {
   const el = document.getElementById('rev-rows');
   if (!el) return;
@@ -72,6 +92,7 @@ export function renderRevRows(state) {
   el.innerHTML = incomes.map((r, i) => {
     const col = COLS[i % COLS.length];
     return `<div class="rev-row" data-rev-id="${r.id}">
+      <div class="rev-ico">${REV_ICO}</div>
       <div class="rn">
         <span class="row-view-txt">${esc(r.name)}</span>
         <input type="text" value="${esc(r.name)}" placeholder="Source">
@@ -91,24 +112,30 @@ export function renderBudRows(state) {
   const budget = state?.budget ?? { incomes: [], budgetItems: [] };
   const items  = budget.budgetItems ?? [];
   const totalR = (budget.incomes ?? []).reduce((s, r) => s + r.amountEUR, 0);
+  const spentByCat = calcByCategory(state?.transactions ?? []);
   el.innerHTML = items.map(b => {
     const pct = totalR > 0 ? Math.round((b.allocatedEUR / totalR) * 100) : 0;
-    const noBudget = !(b.allocatedEUR > 0);
-    const status = noBudget
-      ? '<span class="bud-status is-none">Pas de budget</span>'
-      : '<span class="bud-status is-set">Prévu</span>';
-    return `<div class="bud-row" data-bud-id="${b.id}">
+    const spent = spentByCat[b.name] || 0;
+    let status;
+    if (!(b.allocatedEUR > 0)) status = '<span class="bud-status is-none">Pas de budget</span>';
+    else if (spent > 0)        status = '<span class="bud-status is-ok">OK</span>';
+    else                       status = '<span class="bud-status is-plan">Prévu</span>';
+    const sub = catSubtitle(b.name);
+    return `<div class="poste-card bud-row" data-bud-id="${b.id}">
       <div class="b-ico-wrap" title="Catégorie">${catIco(b.name, 13)}</div>
       <div class="bn">
         <span class="row-view-txt">${esc(b.name)}</span>
-        ${status}
+        ${sub ? `<span class="poste-sub">${esc(sub)}</span>` : ''}
         <input type="text" value="${esc(b.name)}" placeholder="Nom du poste">
       </div>
-      <div class="ba">
-        <span class="row-view-txt amt" style="color:var(--red-l)">${fmt(b.allocatedEUR)}</span>
-        <input type="text" inputmode="decimal" value="${fmtInput(b.allocatedEUR)}">
+      <div class="ba-wrap">
+        <div class="ba">
+          <span class="row-view-txt amt" style="color:var(--red-l)">${fmt(b.allocatedEUR)}</span>
+          <input type="text" inputmode="decimal" value="${fmtInput(b.allocatedEUR)}">
+        </div>
+        ${status}
       </div>
-      <div class="bp3">${pct}%</div>
+      <div class="bp3" style="display:none">${pct}%</div>
       ${_rowActions('Bud', b.id)}
     </div>`;
   }).join('');
