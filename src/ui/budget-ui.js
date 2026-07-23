@@ -93,10 +93,15 @@ export function renderBudRows(state) {
   const totalR = (budget.incomes ?? []).reduce((s, r) => s + r.amountEUR, 0);
   el.innerHTML = items.map(b => {
     const pct = totalR > 0 ? Math.round((b.allocatedEUR / totalR) * 100) : 0;
+    const noBudget = !(b.allocatedEUR > 0);
+    const status = noBudget
+      ? '<span class="bud-status is-none">Pas de budget</span>'
+      : '<span class="bud-status is-set">Prévu</span>';
     return `<div class="bud-row" data-bud-id="${b.id}">
       <div class="b-ico-wrap" title="Catégorie">${catIco(b.name, 13)}</div>
       <div class="bn">
         <span class="row-view-txt">${esc(b.name)}</span>
+        ${status}
         <input type="text" value="${esc(b.name)}" placeholder="Nom du poste">
       </div>
       <div class="ba">

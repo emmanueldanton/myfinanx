@@ -1658,3 +1658,38 @@ body:has(#page-overview.active) > header { display: none; }
 
 /* FAB masque sur l accueil (action Ajouter dediee) */
 body:has(#page-overview.active) .fab { display: none; }
+
+/* ═══ Refonte epuree — composants partages a plat (sans ombres) ═══ */
+.kpi {
+  background: var(--s1);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  border: 1px solid var(--b1);
+  box-shadow: none;
+}
+.kpi:hover { transform: translateY(-2px); box-shadow: none; }
+.rev-tbl, .bud-tbl { box-shadow: none; }
+.ai-budget-btn { box-shadow: none; }
+
+/* ═══ Budget — refonte epuree (Planning Budgetaire, inspire Sleek) ═══ */
+.bud-row, .rev-row { padding: 11px 14px; gap: 11px; }
+.b-ico-wrap {
+  width: 34px; height: 34px; border-radius: 11px;
+  background: var(--s2); border: 1px solid var(--b1);
+}
+.b-ico-wrap svg { width: 16px; height: 16px; }
+.bud-row .bn .row-view-txt, .rev-row .rn .row-view-txt {
+  font-family: var(--fh); font-weight: 700; font-size: .9rem; color: var(--text);
+}
+.bn { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+.bn > .row-view-txt { max-width: 100%; }
+.bud-status {
+  align-self: flex-start;
+  font-family: var(--fb); font-weight: 700; font-size: .58rem;
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 999px; white-space: nowrap;
+}
+.bud-status.is-none { color: var(--muted); background: var(--s2); border: 1px solid var(--b1); }
+.bud-status.is-set  { color: var(--pr-l); background: color-mix(in srgb, var(--pr) 13%, transparent); }
+.bud-row.editing .bud-status { display: none; }
+.bud-row.editing .bn { flex-direction: row; }
+.bud-row .bn input { width: 100%; }
