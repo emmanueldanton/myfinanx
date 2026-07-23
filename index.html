@@ -329,120 +329,62 @@
 <!-- ─── OVERVIEW ─── -->
 <div id="page-overview" class="page active">
 
-  <!-- GREETING -->
-  <div id="greet-wrap"></div>
-
-  <!-- BIG STAT CARDS ROW -->
-  <div class="ov-hero">
-    <!-- Revenue card -->
-    <div class="ov-card ov-green">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        </div>
-        <span class="ov-card-lbl">Revenus du mois</span>
-      </div>
-      <div class="ov-card-val" id="ov-rev">0</div>
-      <div class="ov-card-sub" id="ov-rev-sub">–</div>
+  <!-- EN-TÊTE ACCUEIL -->
+  <header class="dash-head">
+    <div class="dash-head-l">
+      <div class="dash-avatar" id="dash-avatar"></div>
+      <div class="dash-hello" id="dash-hello">Compte principal</div>
     </div>
-    <!-- Spent card -->
-    <div class="ov-card ov-red">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-        </div>
-        <span class="ov-card-lbl">Dépenses réelles</span>
-      </div>
-      <div class="ov-card-val" id="ov-dep">0</div>
-      <div class="ov-card-sub" id="ov-dep-sub">–</div>
+    <div class="dash-head-r">
+      <button class="dash-month" id="dash-month" onclick="openMonthNav()" aria-label="Changer de mois"></button>
+      <button class="dash-icon-btn" id="dash-settings-btn" onclick="openPlusPanel()" aria-label="Réglages">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
-    <!-- Remaining card -->
-    <div class="ov-card ov-blue">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
-        <span class="ov-card-lbl">Reste disponible</span>
-      </div>
-      <div class="ov-card-val" id="ov-rest">0</div>
-      <div class="ov-card-sub" id="ov-rest-sub">–</div>
+  </header>
+
+  <!-- HÉROS : RESTE DISPONIBLE -->
+  <section class="dash-hero">
+    <div class="dash-hero-lbl">Reste disponible</div>
+    <div class="dash-hero-val" id="dash-hero-val">0</div>
+    <div class="dash-hero-delta" id="dash-hero-delta"></div>
+  </section>
+
+  <!-- ACTIONS RAPIDES -->
+  <section class="dash-actions">
+    <button class="dash-act dash-act-primary" onclick="openTxForm('expense')">
+      <span class="dash-act-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+      <span class="dash-act-lbl">Ajouter</span>
+    </button>
+    <button class="dash-act" onclick="openTxForm('income')">
+      <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+      <span class="dash-act-lbl">Revenu</span>
+    </button>
+    <button class="dash-act" onclick="openGoalForm()">
+      <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+      <span class="dash-act-lbl">Objectif</span>
+    </button>
+  </section>
+
+  <!-- CARTES RÉSUMÉ (scroll horizontal) -->
+  <section class="dash-cards">
+    <button class="dash-card dash-card-budget" onclick="goTab('budget')">
+      <div class="dash-card-hd">Budget restant</div>
+      <div class="dash-card-val" id="dash-budget-rest">0</div>
+      <div class="pt dash-card-gauge"><div class="pf" id="dash-budget-gauge" style="width:0%"></div></div>
+      <div class="dash-card-sub" id="dash-budget-sub">–</div>
+    </button>
+    <button class="dash-card dash-card-goal" id="dash-goal-card" onclick="goTab('goals')"></button>
+  </section>
+
+  <!-- RÉCENTS -->
+  <section class="dash-recent-wrap">
+    <div class="dash-recent-hd">
+      <span>Récents</span>
+      <button class="dash-see-all" onclick="goTab('tracker')">Voir tout</button>
     </div>
-    <!-- Savings card -->
-    <div class="ov-card ov-violet">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        </div>
-        <span class="ov-card-lbl">Budget non alloué</span>
-      </div>
-      <div class="ov-card-val" id="ov-na">0</div>
-      <div class="ov-card-sub" id="ov-na-sub">–</div>
-    </div>
-  </div>
-
-  <!-- DONUT + BUDGET USAGE -->
-  <div class="ov-mid">
-    <!-- Donut chart -->
-    <div class="ov-panel ov-donut-wrap">
-      <div class="ov-panel-hd">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 12L16.24 7.76"/><path d="M12 12v-4"/></svg>
-        Répartition du mois
-      </div>
-      <div class="donut-center-wrap">
-        <svg id="donut-svg" viewBox="0 0 130 130" style="width:100%;max-width:180px;height:auto;display:block;"></svg>
-        <div class="donut-label">
-          <div class="donut-pct" id="donut-pct">0%</div>
-          <div class="donut-sub">utilisé</div>
-        </div>
-      </div>
-      <div class="donut-legend" id="donut-legend"></div>
-    </div>
-
-    <!-- Budget progress bars -->
-    <div class="ov-panel ov-budget-bars">
-      <div class="ov-panel-hd">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-        Budget mensuel
-      </div>
-      <!-- Global progress -->
-      <div class="ov-glob-prog" style="margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">
-          <span style="font-size:.75rem;color:var(--muted)">Utilisation globale</span>
-          <span id="ov-pct-l" style="font-family:var(--fh);font-weight:800;font-size:.82rem;color:var(--pr-l)">0%</span>
-        </div>
-        <div class="pt" style="height:9px;"><div class="pf" id="ov-pct-b" style="width:0%;background:var(--pr)"></div></div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:.75rem;color:var(--muted);">
-          <span id="ov-all">0</span>
-          <span>/ <span id="ov-rev2">0</span></span>
-        </div>
-      </div>
-      <!-- Top budget lines breakdown -->
-      <div id="ov-budget-lines"></div>
-    </div>
-  </div>
-
-  <!-- REVENUES CARDS -->
-  <div class="sl">Sources de revenus</div>
-  <div class="g3" id="ov-cards"></div>
-
-  <!-- RECENT TRANSACTIONS -->
-  <div class="sl">Dernières transactions</div>
-  <div class="ov-panel" id="ov-recent-txs" style="padding:0;overflow:hidden;">
-    <div class="empty" style="padding:20px;">
-      <div class="empty-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      Aucune transaction ce mois-ci
-    </div>
-  </div>
-
-  <div id="ov-al" style="margin-top:10px;"></div>
-
-  <!-- GOALS -->
-  <div class="sl">Progression objectifs</div>
-  <div class="g2" id="ov-goals"></div>
+    <div id="dash-recent"></div>
+  </section>
 </div>
 
 <!-- ─── BUDGET ─── -->
