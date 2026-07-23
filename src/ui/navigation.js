@@ -25,8 +25,7 @@ export function goTabMobile(id) {
 
 export function syncBnavActive(id) {
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  const navId = id === 'ai' ? 'plus' : id;
-  document.getElementById('bn-' + navId)?.classList.add('active');
+  document.getElementById('bn-' + id)?.classList.add('active');
   moveBnavPill();
 }
 
@@ -41,12 +40,11 @@ export function moveBnavPill() {
 }
 
 export function openPlusPanel() {
+  // Panneau réglages ouvert depuis l'en-tête de l'accueil (overlay) — l'onglet actif
+  // de la navbar reste inchangé (Plus n'est plus un onglet).
   document.getElementById('plus-overlay')?.classList.add('open');
   document.getElementById('plus-panel')?.classList.add('open');
   document.body.style.overflow = 'hidden';
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('bn-plus')?.classList.add('active');
-  moveBnavPill();
 }
 
 export function closePlusPanel() {
