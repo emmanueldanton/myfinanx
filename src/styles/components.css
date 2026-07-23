@@ -1701,3 +1701,34 @@ body:has(#page-overview.active) .fab { display: none; }
   border: 1px solid var(--b1);
   box-shadow: none;
 }
+
+/* ═══ Icones style Sleek unifiees (carres arrondis coherents) sur toute l'app ═══ */
+.txii, .b-ico-wrap, .g-ico {
+  width: 38px; height: 38px; border-radius: 12px;
+}
+.txii svg, .b-ico-wrap svg, .g-ico svg { width: 17px; height: 17px; }
+.dash-recent-ico { width: 40px; height: 40px; border-radius: 12px; }
+.dash-recent-ico svg { width: 17px; height: 17px; }
+.gc:hover { box-shadow: none; }
+
+/* ═══ Objectifs — 1er objectif en carte vedette (esprit Sleek, coherent Accueil) ═══ */
+#goals-grid .gc:first-child {
+  background: linear-gradient(150deg, var(--pr), var(--pr-d));
+  border-color: transparent;
+}
+#goals-grid .gc:first-child .gn,
+#goals-grid .gc:first-child .gcur { color: #fff; }
+#goals-grid .gc:first-child .gcur { font-size: 1.9rem; }
+#goals-grid .gc:first-child .gtgt { color: rgba(255,255,255,.82); }
+#goals-grid .gc:first-child .gdl,
+#goals-grid .gc:first-child .gdl svg { color: rgba(255,255,255,.82); stroke: rgba(255,255,255,.82); }
+#goals-grid .gc:first-child .g-ico { background: rgba(255,255,255,.16); }
+#goals-grid .gc:first-child .g-ico svg { stroke: #fff; }
+#goals-grid .gc:first-child .gbadge { background: rgba(255,255,255,.2); color: #fff; }
+#goals-grid .gc:first-child .pt { background: rgba(255,255,255,.24); }
+#goals-grid .gc:first-child .gadd input {
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); color: #fff;
+}
+#goals-grid .gc:first-child .gadd input::placeholder { color: rgba(255,255,255,.72); }
+#goals-grid .gc:first-child .g-ed svg,
+#goals-grid .gc:first-child .g-del svg { stroke: rgba(255,255,255,.82); }
