@@ -183,6 +183,20 @@ export function bridgeLoadPrefs() {
   };
 }
 
+// Reste disponible (EUR) du mois PRÉCÉDENT, ou null si aucune donnée. Lecture read-only.
+export function getPreviousMonthAvailableEUR(Y, M) {
+  let pm = M - 1, py = Y;
+  if (pm < 0) { pm = 11; py--; }
+  let data;
+  try { data = JSON.parse(localStorage.getItem(monthKey(py, pm)) || 'null'); } catch (e) { data = null; }
+  if (!data) return null;
+  const revenus = Array.isArray(data.revenus) ? data.revenus.reduce((s, r) => s + (r.amount ?? 0), 0) : 0;
+  const exps = Array.isArray(data.expenses) ? data.expenses : [];
+  const punctual = exps.filter(e => e.type === 'income').reduce((s, e) => s + (e.amount ?? 0), 0);
+  const spent    = exps.filter(e => e.type !== 'income').reduce((s, e) => s + (e.amount ?? 0), 0);
+  return revenus + punctual - spent;
+}
+
 // Moyenne des dépenses réelles par catégorie sur les `monthsBack` mois PRÉCÉDENTS
 // (lit directement les clés mensuelles du monolithe). Montants en EUR.
 // → { byCategory: { cat: avgEUR }, monthsWithData }
