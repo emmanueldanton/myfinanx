@@ -1508,7 +1508,6 @@ body:has(#page-overview.active) > header { display: none; }
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(135deg, var(--pr), var(--pr-d));
   color: #fff; font-family: var(--fh); font-weight: 800; font-size: 1.1rem;
-  box-shadow: 0 6px 16px -6px var(--pr);
 }
 .dash-hello {
   font-family: var(--fh); font-weight: 700; font-size: 1.05rem; color: var(--text);
@@ -1518,7 +1517,7 @@ body:has(#page-overview.active) > header { display: none; }
 .dash-monthnav {
   display: flex; align-items: center; gap: 2px;
   background: var(--s1); border: 1px solid var(--b1); border-radius: 999px;
-  padding: 3px; box-shadow: var(--shadow-card);
+  padding: 3px;
 }
 .dash-monthnav > span {
   font-family: var(--fh); font-weight: 700; font-size: .8rem; color: var(--text);
@@ -1535,7 +1534,7 @@ body:has(#page-overview.active) > header { display: none; }
   width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
   background: var(--s1); border: 1px solid var(--b1); color: var(--text);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--shadow-card); transition: background .15s, transform .15s;
+  transition: background .15s, transform .15s;
 }
 .dash-icon-btn:hover { background: var(--s2); }
 .dash-icon-btn:active { transform: scale(.94); }
@@ -1570,13 +1569,13 @@ body:has(#page-overview.active) > header { display: none; }
   width: 56px; height: 56px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   background: var(--s1); border: 1px solid var(--b1); color: var(--text);
-  box-shadow: var(--shadow-card); transition: transform .18s cubic-bezier(.2,.8,.2,1), background .15s;
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), background .15s;
 }
-.dash-act:hover .dash-act-ico { transform: translateY(-3px); }
-.dash-act:active .dash-act-ico { transform: scale(.92); }
+.dash-act:hover .dash-act-ico { transform: translateY(-2px); }
+.dash-act:active .dash-act-ico { transform: scale(.93); }
 .dash-act-primary .dash-act-ico {
   background: linear-gradient(135deg, var(--pr), var(--pr-d)); color: #fff;
-  border-color: transparent; box-shadow: 0 10px 22px -8px var(--pr);
+  border-color: transparent;
 }
 .dash-act-lbl { font-family: var(--fb); font-weight: 600; font-size: .76rem; color: var(--muted); }
 
@@ -1591,11 +1590,11 @@ body:has(#page-overview.active) > header { display: none; }
   flex: 0 0 76%; max-width: 250px; scroll-snap-align: start;
   text-align: left; cursor: pointer; font-family: var(--fb);
   background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r3);
-  padding: 17px 18px; box-shadow: var(--shadow-card);
+  padding: 17px 18px;
   display: flex; flex-direction: column; gap: 9px;
-  transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s;
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s;
 }
-.dash-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-soft); }
+.dash-card:hover { transform: translateY(-2px); border-color: var(--b2); }
 .dash-card-hd {
   font-family: var(--fb); font-weight: 600; font-size: .82rem; color: var(--muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1608,7 +1607,6 @@ body:has(#page-overview.active) > header { display: none; }
 .dash-card-sub { font-family: var(--fb); font-size: .75rem; color: var(--muted); }
 .dash-card-goal {
   background: linear-gradient(150deg, var(--pr), var(--pr-d)); border-color: transparent;
-  box-shadow: 0 12px 26px -12px var(--pr);
 }
 .dash-card-goal .dash-card-val { color: #fff; }
 .dash-card-goal .dash-card-hd  { color: rgba(255,255,255,.78); }
@@ -1629,7 +1627,7 @@ body:has(#page-overview.active) > header { display: none; }
 .dash-recent-row {
   display: flex; align-items: center; gap: 12px;
   background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r);
-  padding: 11px 14px; margin-bottom: 8px; box-shadow: var(--shadow-card);
+  padding: 11px 14px; margin-bottom: 8px;
 }
 .dash-recent-ico {
   width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0;
