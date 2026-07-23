@@ -25,6 +25,7 @@ import { initDataManagementUI } from './ui/data-management-ui.js';
 import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
 import { scheduleDailyPush } from './ui/push-notify.js';
 import { initToast } from './ui/toast.js';
+import { initAds } from './ui/ads.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -167,6 +168,9 @@ function init() {
   initSettingsUI(() => _notifyAll());
   initDataManagementUI();
   initPwaUI();
+
+  // Wire ads module (exposes window.closeAd, triggers loadAd on init)
+  initAds();
 
   // Refresh currency DOM labels with saved currency (setActiveCurrency already set module state above)
   setCurrency(prefs.currency);
