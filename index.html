@@ -551,9 +551,18 @@
 
 <!-- ─── GOALS ─── -->
 <div id="page-goals" class="page">
-  <div class="page-ttl">Mes objectifs</div>
-  <div class="sl">Nouvel objectif</div>
-  <div class="ngform">
+  <header class="bud-head">
+    <button class="dash-icon-btn" onclick="openPlusPanel()" aria-label="Réglages">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <div style="flex:1"></div>
+    <button class="dash-icon-btn dash-add-primary" onclick="openGoalForm()" aria-label="Nouvel objectif" title="Nouvel objectif">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </header>
+  <h1 class="bud-title">Mes Objectifs</h1>
+
+  <div class="ngform" id="goal-form" style="display:none;">
     <div class="g2" style="margin-bottom:11px;">
       <div class="field"><label>Nom de l'objectif</label><input type="text" id="ng-n" placeholder="Ex: Caution appartement"></div>
       <div class="field"><label>Échéance</label><input type="date" id="ng-d"></div>
@@ -578,8 +587,8 @@
       Créer l'objectif
     </button>
   </div>
-  <div class="sl">Mes objectifs</div>
-  <div class="g2" id="goals-grid"></div>
+
+  <div id="goals-grid"></div>
 </div>
 
 <!-- ─── AI ─── -->

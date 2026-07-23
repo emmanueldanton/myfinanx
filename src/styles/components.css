@@ -1606,7 +1606,7 @@ body:has(#page-overview.active) > header { display: none; }
 .dash-card .dash-card-gauge { height: 7px; border-radius: 999px; background: var(--b1); }
 .dash-card-sub { font-family: var(--fb); font-size: .75rem; color: var(--muted); }
 .dash-card-goal {
-  background: linear-gradient(150deg, var(--pr), var(--pr-d)); border-color: transparent;
+  background: linear-gradient(155deg, #232c3f 0%, #12161f 100%); border-color: transparent;
 }
 .dash-card-goal .dash-card-val { color: #fff; }
 .dash-card-goal .dash-card-hd  { color: rgba(255,255,255,.78); }
@@ -1712,26 +1712,26 @@ body:has(#page-overview.active) .fab { display: none; }
 .gc:hover { box-shadow: none; }
 
 /* ═══ Objectifs — 1er objectif en carte vedette (esprit Sleek, coherent Accueil) ═══ */
-#goals-grid .gc:first-child {
+.gc-featured {
   background: linear-gradient(150deg, var(--pr), var(--pr-d));
   border-color: transparent;
 }
-#goals-grid .gc:first-child .gn,
-#goals-grid .gc:first-child .gcur { color: #fff; }
-#goals-grid .gc:first-child .gcur { font-size: 1.9rem; }
-#goals-grid .gc:first-child .gtgt { color: rgba(255,255,255,.82); }
-#goals-grid .gc:first-child .gdl,
-#goals-grid .gc:first-child .gdl svg { color: rgba(255,255,255,.82); stroke: rgba(255,255,255,.82); }
-#goals-grid .gc:first-child .g-ico { background: rgba(255,255,255,.16); }
-#goals-grid .gc:first-child .g-ico svg { stroke: #fff; }
-#goals-grid .gc:first-child .gbadge { background: rgba(255,255,255,.2); color: #fff; }
-#goals-grid .gc:first-child .pt { background: rgba(255,255,255,.24); }
-#goals-grid .gc:first-child .gadd input {
+.gc-featured .gn,
+.gc-featured .gcur { color: #fff; }
+.gc-featured .gcur { font-size: 1.9rem; }
+.gc-featured .gtgt { color: rgba(255,255,255,.82); }
+.gc-featured .gdl,
+.gc-featured .gdl svg { color: rgba(255,255,255,.82); stroke: rgba(255,255,255,.82); }
+.gc-featured .g-ico { background: rgba(255,255,255,.16); }
+.gc-featured .g-ico svg { stroke: #fff; }
+.gc-featured .gbadge { background: rgba(255,255,255,.2); color: #fff; }
+.gc-featured .pt { background: rgba(255,255,255,.24); }
+.gc-featured .gadd input {
   background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); color: #fff;
 }
-#goals-grid .gc:first-child .gadd input::placeholder { color: rgba(255,255,255,.72); }
-#goals-grid .gc:first-child .g-ed svg,
-#goals-grid .gc:first-child .g-del svg { stroke: rgba(255,255,255,.82); }
+.gc-featured .gadd input::placeholder { color: rgba(255,255,255,.72); }
+.gc-featured .g-ed svg,
+.gc-featured .g-del svg { stroke: rgba(255,255,255,.82); }
 
 /* ═══ Budget « Planning Budgetaire » — refonte fidele Sleek ═══ */
 body:has(#page-budget.active) > header { display: none; }
@@ -1817,3 +1817,46 @@ body:has(#page-budget.active) > header { display: none; }
 .bud-ai:hover { border-color: var(--pr); background: var(--s2); }
 .bud-ai svg { stroke: currentColor; }
 .bud-ai:disabled, .bud-ai.loading { opacity: .6; pointer-events: none; }
+
+/* ═══ Objectifs « Mes Objectifs » — refonte fidele Sleek ═══ */
+body:has(#page-goals.active) > header { display: none; }
+#page-goals.active { max-width: 560px; margin: 0 auto; padding: 10px 16px 28px; }
+
+.dash-add-primary {
+  background: linear-gradient(135deg, var(--pr), var(--pr-d)) !important;
+  border-color: transparent !important; color: #fff !important;
+}
+
+/* Carte vedette */
+.gc-featured {
+  background: linear-gradient(155deg, #232c3f 0%, #12161f 100%); border: 1px solid transparent;
+  border-radius: var(--r3); padding: 18px;
+}
+.gcur-big {
+  font-family: var(--fh); font-weight: 800; font-size: clamp(2.1rem, 10vw, 2.6rem);
+  color: #fff; letter-spacing: -0.03em; margin-top: 10px; line-height: 1;
+}
+.gf-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.gf-pct  { font-family: var(--fh); font-weight: 700; font-size: .82rem; color: #fff; }
+.gf-tgt  { font-family: var(--fb); font-size: .8rem; color: rgba(255,255,255,.82); }
+.gc-featured .gadd { margin-top: 14px; }
+
+/* Autres projets — grille 2 colonnes */
+.goals-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gc-grid {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r);
+  padding: 14px; display: flex; flex-direction: column;
+}
+.gc-grid:hover { border-color: var(--b2); transform: none; }
+.gc-grid-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.gc-grid .g-ctrl { display: flex; gap: 2px; }
+.gc-grid-name {
+  font-family: var(--fh); font-weight: 700; font-size: .86rem; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.gc-grid-amt { font-family: var(--fh); font-weight: 800; font-size: 1.15rem; margin-top: 3px; }
+.gc-grid-pct { font-family: var(--fb); font-size: .72rem; color: var(--muted); text-align: center; margin-top: 6px; }
+.gc-grid .g-edit-form { grid-column: 1 / -1; }
+
+/* FAB masque sur Budget et Objectifs (en-tete + dediee) */
+body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display: none; }

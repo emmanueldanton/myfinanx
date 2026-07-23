@@ -22,9 +22,11 @@ export function initGoalsUI() {
   if (ngD && !ngD.value) ngD.value = todayISO();
 }
 
-// Ouvre le formulaire de création depuis l'accueil : onglet Objectifs, focus nom
+// Ouvre le formulaire de création (onglet Objectifs) : révèle le formulaire + focus nom
 export function openGoalForm() {
   if (window.goTab) window.goTab('goals');
+  const form = document.getElementById('goal-form');
+  if (form) form.style.display = 'block';
   requestAnimationFrame(() => {
     const el = document.getElementById('ng-n');
     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
@@ -52,105 +54,93 @@ function _setHTML(id, html) {
 export function renderGoals(state) {
   const goals = state?.goals ?? [];
   const emptyGoals = `<div class="empty"><div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>Aucun objectif. Crée le premier !</div>`;
-  const emptyOv    = `<div class="empty" style="padding:12px">Aucun objectif défini.</div>`;
-  const htmlGoals  = goals.map(g => buildGoalCard(g, '')).join('');
-  const htmlOv     = goals.map(g => buildGoalCard(g, 'ov-')).join('');
-  _setHTML('goals-grid', htmlGoals || emptyGoals);
-  _setHTML('ov-goals',   htmlOv    || emptyOv);
+  let html = '';
+  if (!goals.length) {
+    html = emptyGoals;
+  } else {
+    html = buildGoalCard(goals[0], 'featured');
+    if (goals.length > 1) {
+      html += `<div class="sec-hd" style="margin-top:18px;"><span class="sec-lbl">Autres projets</span></div>`;
+      html += `<div class="goals-2col">` + goals.slice(1).map(g => buildGoalCard(g, 'grid')).join('') + `</div>`;
+    }
+  }
+  _setHTML('goals-grid', html);
+  // #ov-goals n'existe plus sur l'accueil épuré — nettoyage défensif
+  _setHTML('ov-goals', '');
 }
 
-export function buildGoalCard(g, prefix) {
-  const pct    = g.targetEUR > 0 ? Math.min(100, Math.round((g.savedEUR / g.targetEUR) * 100)) : 0;
-  const done   = g.savedEUR >= g.targetEUR;
-  const badge  = done
-    ? `<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
-    : `<span class="gbadge gb-p">${pct}% · En cours</span>`;
+export function buildGoalCard(g, mode) {
+  const pct  = g.targetEUR > 0 ? Math.min(100, Math.round((g.savedEUR / g.targetEUR) * 100)) : 0;
+  const done = g.savedEUR >= g.targetEUR;
   const clockIco = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const goalIco = (col) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`;
 
-  if (prefix === 'ov-') {
-    return `<div class="gc">
-    <div class="gt">
-      <div class="gt-left">
-        <div class="g-ico" style="background:${g.color}22">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-        </div>
-        <div style="min-width:0">
-          <div class="gn">${esc(g.name)}</div>
-          ${g.deadline ? `<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>` : ''}
+  // ── Mode grille (compact) ──
+  if (mode === 'grid') {
+    return `<div class="gc gc-grid" data-goal-id="${g.id}">
+      <div class="gc-grid-top">
+        <div class="g-ico" style="background:${g.color}22">${goalIco(g.color)}</div>
+        <div class="g-ctrl">
+          <button class="g-ed" onclick="toggleEditGoal('${g.id}','')" title="Modifier"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
       </div>
-      <div>${badge}</div>
-    </div>
-    <div class="pt" style="height:6px;margin-top:10px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
-    <div class="gam">
-      <div class="gcur" style="color:${g.color}">${fmt(g.savedEUR)}</div>
-      <div class="gtgt">/ ${fmt(g.targetEUR)}</div>
-    </div>
-  </div>`;
+      <div class="gc-grid-name">${esc(g.name)}</div>
+      <div class="gc-grid-amt" style="color:${g.color}">${fmt(g.savedEUR)}</div>
+      <div class="pt" style="height:6px;margin-top:8px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
+      <div class="gc-grid-pct">${pct}%</div>
+      ${_editForm(g)}
+    </div>`;
   }
 
-  const inputId = `${prefix}ga-${g.id}`;
-  return `<div class="gc">
+  // ── Mode vedette (1er objectif) ──
+  const badge = done
+    ? `<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
+    : `<span class="gbadge gb-p">${pct}% · En cours</span>`;
+  return `<div class="gc gc-featured" data-goal-id="${g.id}">
     <div class="gt">
       <div class="gt-left">
-        <div class="g-ico" style="background:${g.color}22">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-        </div>
-        <div>
+        <div class="g-ico" style="background:rgba(255,255,255,.16)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+        <div style="min-width:0">
           <div class="gn">${esc(g.name)}</div>
           ${g.deadline ? `<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>` : ''}
         </div>
       </div>
       <div class="g-ctrl">
         ${badge}
-        <button class="g-ed" onclick="toggleEditGoal('${g.id}','${prefix}')" title="Modifier">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <button class="g-ed" onclick="toggleEditGoal('${g.id}','')" title="Modifier"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
-    <div class="pt" style="height:6px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
-    <div class="gam">
-      <div class="gcur" style="color:${g.color}">${fmt(g.savedEUR)}</div>
-      <div class="gtgt">/ ${fmt(g.targetEUR)}</div>
+    <div class="gcur-big">${fmt(g.savedEUR)}</div>
+    <div class="pt" style="height:8px;margin-top:12px;"><div class="pf" style="width:${pct}%;background:#fff"></div></div>
+    <div class="gf-foot">
+      <span class="gf-pct">${pct}% complété</span>
+      <span class="gf-tgt">Sur ${fmt(g.targetEUR)}</span>
     </div>
     <div class="gadd">
-      <input type="text" inputmode="decimal" id="${inputId}" placeholder="Ajouter un montant…"
-             onkeydown="if(event.key==='Enter')addToGoal('${g.id}','${prefix}')">
-      <button class="btn bp bsm" onclick="addToGoal('${g.id}','${prefix}')">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
+      <input type="text" inputmode="decimal" id="ga-${g.id}" placeholder="Ajouter un montant…" onkeydown="if(event.key==='Enter')addToGoal('${g.id}','')">
+      <button class="btn bp bsm" onclick="addToGoal('${g.id}','')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter</button>
     </div>
-    <div class="g-edit-form" id="gef-${prefix}${g.id}" style="display:none;">
+    ${_editForm(g)}
+  </div>`;
+}
+
+function _editForm(g) {
+  return `<div class="g-edit-form" id="gef-${g.id}" style="display:none;">
       <div class="g-edit-row">
-        <div class="g-edit-field">
-          <div class="g-edit-lbl">Nom de l'objectif</div>
-          <input type="text" class="g-edit-name" value="${esc(g.name)}" placeholder="Nom">
-        </div>
-        <div class="g-edit-field">
-          <div class="g-edit-lbl">Échéance</div>
-          <input type="date" class="g-edit-dl" value="${g.deadline || ''}">
-        </div>
+        <div class="g-edit-field"><div class="g-edit-lbl">Nom de l'objectif</div><input type="text" class="g-edit-name" value="${esc(g.name)}" placeholder="Nom"></div>
+        <div class="g-edit-field"><div class="g-edit-lbl">Échéance</div><input type="date" class="g-edit-dl" value="${g.deadline || ''}"></div>
       </div>
       <div class="g-edit-row">
-        <div class="g-edit-field">
-          <div class="g-edit-lbl">Montant cible</div>
-          <input type="text" inputmode="decimal" class="g-edit-target" value="${fmtInput(g.targetEUR)}" placeholder="Cible">
-        </div>
-        <div class="g-edit-field">
-          <div class="g-edit-lbl">Déjà épargné</div>
-          <input type="text" inputmode="decimal" class="g-edit-saved" value="${fmtInput(g.savedEUR)}" placeholder="Épargné">
-        </div>
+        <div class="g-edit-field"><div class="g-edit-lbl">Montant cible</div><input type="text" inputmode="decimal" class="g-edit-target" value="${fmtInput(g.targetEUR)}" placeholder="Cible"></div>
+        <div class="g-edit-field"><div class="g-edit-lbl">Déjà épargné</div><input type="text" inputmode="decimal" class="g-edit-saved" value="${fmtInput(g.savedEUR)}" placeholder="Épargné"></div>
       </div>
       <div class="g-edit-actions">
-        <button class="btn bp bsm" onclick="saveEditGoal('${g.id}','${prefix}')">Enregistrer</button>
-        <button class="btn bsm" onclick="toggleEditGoal('${g.id}','${prefix}')">Annuler</button>
+        <button class="btn bp bsm" onclick="saveEditGoal('${g.id}','')">Enregistrer</button>
+        <button class="btn bsm" onclick="toggleEditGoal('${g.id}','')">Annuler</button>
       </div>
-    </div>
-  </div>`;
+    </div>`;
 }
 
 // ── Color picker ──────────────────────────────────────────────────
@@ -174,6 +164,8 @@ export function addGoal() {
   ['ng-n', 'ng-t', 'ng-c'].forEach(i => { document.getElementById(i).value = ''; });
   document.getElementById('ng-d').value = todayISO();
   _mutate(goals);
+  const form = document.getElementById('goal-form');
+  if (form) form.style.display = 'none';
   showSuccessToast(`Objectif "${n}" créé`);
 }
 
