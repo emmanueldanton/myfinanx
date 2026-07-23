@@ -1693,3 +1693,11 @@ body:has(#page-overview.active) .fab { display: none; }
 .bud-row.editing .bud-status { display: none; }
 .bud-row.editing .bn { flex-direction: row; }
 .bud-row .bn input { width: 100%; }
+
+/* ═══ Refonte epuree — conteneurs a plat (Depenses / Objectifs / Conseils IA) ═══ */
+.tx-panel, .ngform, .gc, .ai-box, .txl {
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  box-shadow: none;
+}
