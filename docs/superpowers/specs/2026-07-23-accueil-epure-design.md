@@ -36,6 +36,15 @@ catégories colorées (`CAT_COLORS` de `src/utils.js`). Les **3 thèmes existant
 (blue, violet, light) restent supportés via `src/styles/themes.css` — aucune couleur
 codée en dur, tout passe par les variables CSS. `font-size ≥ 16px` conservé partout.
 
+**Police — Plus Jakarta Sans** : nouvelle police principale de l'app (remplace
+Gabarito / DM Sans pour le corps et les titres, cohérente avec le style moderne de la
+référence). Chargée depuis Google Fonts (`Plus+Jakarta+Sans:wght@400;500;600;700;800`)
+via le `<link>` de préchargement dans `index.html`, et déclarée dans les variables de
+police CSS (`--fb`/`--fh`) de `src/styles/main.css`/`themes.css` — ainsi tout composant
+qui référence ces variables hérite automatiquement de la nouvelle police. Playfair
+Display peut être conservé ou retiré selon usage résiduel ; l'objectif est que l'app
+respire Plus Jakarta Sans partout.
+
 ## Structure de l'accueil (de haut en bas)
 
 1. **En-tête**
