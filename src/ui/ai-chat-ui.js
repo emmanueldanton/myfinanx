@@ -19,9 +19,18 @@ let _getYM     = () => { const n = new Date(); return [n.getFullYear(), n.getMon
 export function initAiChatUI(getYM) {
   _getYM = getYM;
   window.sendAI        = sendAI;
+  window.askAI         = askAI;
   window.clearAiHistory = clearAiHistory;
   window.typeWriter    = typeWriter;
   window.renderAiMsg   = renderAiMsg;
+}
+
+// Envoie une question prédéfinie (suggestions)
+export function askAI(text) {
+  const inp = document.getElementById('ai-q');
+  if (!inp || inp.disabled) return;
+  inp.value = text;
+  sendAI();
 }
 
 // ── Typewriter effect ─────────────────────────────────────────────

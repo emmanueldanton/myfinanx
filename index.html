@@ -534,27 +534,37 @@
 
 <!-- ─── AI ─── -->
 <div id="page-ai" class="page">
-  <div class="sl">Conseiller IA</div>
-  <div class="ai-box">
-    <div class="ai-hd">
-      <div class="ai-av">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 2v4"/><circle cx="12" cy="6" r="1.5" fill="white" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="white" stroke="none"/><path d="M9 19h6"/></svg>
-      </div>
-      <div><h3>Conseiller financier IA</h3><p>Analyse ta situation · Conseils personnalisés</p></div>
-      <div class="ai-hd-right">
-        <button class="btn bg2 bsm" onclick="clearAiHistory()" title="Effacer la conversation" style="opacity:.85;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Effacer
-        </button>
-      </div>
+  <!-- En-tête -->
+  <div class="ai-hero">
+    <div class="ai-hero-av">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 2v4"/><circle cx="12" cy="6" r="1.5" fill="white" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="white" stroke="none"/><path d="M9 19h6"/></svg>
     </div>
-    <div class="ai-msgs" id="ai-msgs"></div>
-    <div class="ai-ir">
-      <input type="text" id="ai-q" placeholder="Ex: Comment rembourser ma dette plus vite ?" onkeydown="if(event.key==='Enter')sendAI()">
-      <button class="ai-send" id="ai-btn" onclick="sendAI()" title="Envoyer">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
+    <div class="ai-hero-txt">
+      <div class="ai-hero-title">Conseiller IA</div>
+      <div class="ai-hero-sub">Il connaît tes vrais chiffres</div>
     </div>
+    <button class="ai-clear" onclick="clearAiHistory()" title="Effacer la conversation" aria-label="Effacer la conversation">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+  </div>
+
+  <!-- Fil de messages -->
+  <div class="ai-msgs" id="ai-msgs"></div>
+
+  <!-- Suggestions -->
+  <div class="ai-suggest" id="ai-suggest">
+    <button class="ai-chip" onclick="askAI('Comment épargner plus ce mois-ci ?')">Épargner plus</button>
+    <button class="ai-chip" onclick="askAI('Où part mon argent ce mois-ci ?')">Où part mon argent</button>
+    <button class="ai-chip" onclick="askAI('Comment atteindre mon objectif plus vite ?')">Atteindre mon objectif</button>
+    <button class="ai-chip" onclick="askAI('Comment réduire mes dépenses ?')">Réduire mes dépenses</button>
+  </div>
+
+  <!-- Saisie -->
+  <div class="ai-ir">
+    <input type="text" id="ai-q" placeholder="Pose ta question…" onkeydown="if(event.key==='Enter')sendAI()">
+    <button class="ai-send" id="ai-btn" onclick="sendAI()" title="Envoyer" aria-label="Envoyer">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
 </div>
 
