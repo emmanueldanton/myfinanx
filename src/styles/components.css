@@ -1662,11 +1662,17 @@ body:has(#page-overview.active) .fab { display: none; }
 
 /* Revenus : une carte avec lignes */
 .bud-card {
-  background: var(--s1); border: 1px solid var(--b1);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--green) 15%, var(--s1)) 0%,
+      color-mix(in srgb, var(--green) 5%, var(--s1)) 55%,
+      var(--s1) 100%);
+  border: 1px solid color-mix(in srgb, var(--green) 22%, var(--b1));
   border-radius: var(--r); overflow: hidden;
 }
-.bud-card .rev-row { border-bottom: 1px solid var(--b1); }
+.bud-card .rev-row { border-bottom: 1px solid color-mix(in srgb, var(--green) 14%, var(--b1)); }
 .bud-card .rev-row:last-child { border-bottom: none; }
+.bud-card .rev-row:hover { background: color-mix(in srgb, var(--green) 10%, transparent); }
 .rev-ico {
   width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
