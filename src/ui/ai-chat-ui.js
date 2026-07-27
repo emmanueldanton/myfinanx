@@ -8,7 +8,7 @@ const GENDER_KEY  = 'monargent-usergender';
 const MONTHS      = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 const AI_WELCOME  = '👋 Bonjour ! Je connais ta situation complète (revenus, budget, objectifs). Pose-moi n\'importe quelle question sur ta gestion financière !';
-const BOT_AV_SVG  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 2v4"/><circle cx="12" cy="6" r="1.5" fill="white" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="white" stroke="none"/><path d="M9 19h6"/></svg>';
+const BOT_AV_SVG  = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2.6" x2="12" y2="5"/><circle cx="12" cy="2" r="0.95" fill="white" stroke="none"/><rect x="4" y="5" width="16" height="13" rx="4.5"/><line x1="4" y1="10.5" x2="2.4" y2="10.5"/><line x1="20" y1="10.5" x2="21.6" y2="10.5"/><circle cx="9" cy="11" r="1.4" fill="white" stroke="none"/><circle cx="15" cy="11" r="1.4" fill="white" stroke="none"/><path d="M9 14.5c.8.7 1.9 1 3 1s2.2-.3 3-1"/></svg>';
 
 let _aiHistory = [];
 let _twTimer   = null;
