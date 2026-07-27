@@ -118,7 +118,7 @@ export function scheduleAiGreeting() {
     if (aiMsg) {
       sessionStorage.setItem('greetingDone', '1');
       const sub = document.querySelector('#greet-wrap .greet-sub');
-      if (sub && window.typeWriter) window.typeWriter(sub, aiMsg);
+      if (sub) sub.textContent = aiMsg;   // affichage direct, sans animation (app plus stable)
     }
   }, 3000);
 }
@@ -169,16 +169,16 @@ export async function fetchAiGreetingSub() {
     : 'aucun objectif défini';
 
   const cur = getActiveCurrency();
-  const system = `Tu es le conseiller financier personnel de MyFinanx, bienveillant et direct. Réponds uniquement en français, sans humour.
+  const system = `Tu es le conseiller financier personnel de MyFinanx, bienveillant, direct et terre à terre. Réponds uniquement en français, sans humour, dans un langage simple et courant que tout le monde comprend, sans jargon. N'utilise jamais de tiret cadratin (—) ni de tiret demi-cadratin (–) : sépare tes idées avec une virgule ou un point.
 ${identityLine}
-Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ dans cette devise — raisonne et exprime-toi exclusivement dans cette devise, jamais en euros par défaut.
+Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ dans cette devise, raisonne et exprime-toi exclusivement dans cette devise, jamais en euros par défaut.
 Situation de ${MONTHS[M]} ${Y} :
 - Revenus: ${fmt(totalR)} (${incomes.length} source${incomes.length > 1 ? 's' : ''}: ${incomes.map(r => r.name).join(', ')})
 - Budget alloué: ${fmt(totalB)} | Dépensé: ${fmt(totalE)} | Reste: ${fmt(reste)}
 - Taux d'épargne: ${tauxEpargne}%${dépassés.length ? `\n- Postes dépassés: ${dépassés.join(', ')}` : ''}
 - Objectifs: ${goalsStr}
 N'invente jamais un chiffre absent de ces données.`;
-  const question = `Écris UNE seule phrase courte et percutante (max 18 mots) qui pointe le fait le plus important ou urgent de cette situation. Commence par UN seul émoji adapté à la situation, puis l'observation directement. Pas de salutation, pas d'introduction.`;
+  const question = `Écris UNE seule phrase courte (max 18 mots), simple et terre à terre, avec des mots de tous les jours. Pointe le fait le plus important ou urgent de la situation. Commence par UN seul émoji adapté, puis l'observation directement. Pas de salutation, pas d'introduction. Interdiction d'utiliser un tiret cadratin (—) ou demi-cadratin (–) : utilise une virgule ou un point.`;
 
   try {
     const res  = await fetch('/api/ai', {
@@ -187,7 +187,10 @@ N'invente jamais un chiffre absent de ces données.`;
       body:    JSON.stringify({ messages: [{ role: 'user', content: question }], context: system, temperature: 0.3, maxTokens: 60 }),
     });
     const data = await res.json();
-    const msg  = (data.reply || '').trim().replace(/^["'«»]|["'«»]$/g, '').trim();
+    const msg  = (data.reply || '').trim()
+      .replace(/^["'«»]|["'«»]$/g, '')
+      .replace(/\s*[—–]\s*/g, ', ')   // filet de sécurité : aucun tiret cadratin/demi-cadratin
+      .trim();
     if (msg) {
       try { localStorage.setItem(GREETING_CACHE_KEY, JSON.stringify({ hash, msg })); } catch (e) {}
       return msg;
