@@ -13,23 +13,63 @@ body::before {
 .ico svg { display:block; }
 
 /* ════ GREETING ════ */
-/* Salutation en bannière colorée (dégradé d'accent) — apporte de la couleur à l'accueil */
+/* Salutation en bannière « ciel » — le dégradé suit l'état du soleil selon l'heure */
 .greet-wrap {
   position: relative;
   overflow: hidden;
+  /* Fallback : dégradé d'accent du thème (avant que le JS pose data-daypart) */
   background: linear-gradient(135deg, var(--pr), var(--pr-d));
   border-radius: var(--r3);
   padding: 15px 18px 16px;
   margin-bottom: 20px;
+  transition: background .6s ease;
 }
 .greet-wrap:empty { display: none; }
-/* Reflet doux décoratif (pas d'ombre) */
+/* Halo = soleil / lune ; couleur et position affinées par moment */
 .greet-wrap::after {
   content: '';
-  position: absolute; top: -55%; right: -12%;
-  width: 190px; height: 190px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.20), transparent 68%);
+  position: absolute;
+  width: 180px; height: 180px; border-radius: 50%;
+  top: -55%; right: -12%;
+  background: radial-gradient(circle, rgba(255,255,255,.22), transparent 68%);
   pointer-events: none;
+  transition: background .6s ease, top .6s ease, right .6s ease;
+}
+
+/* 🌅 Matin — aube chaude, soleil bas qui se lève (halo doré en bas à droite) */
+.greet-wrap[data-daypart="morning"] {
+  background: linear-gradient(135deg, #f7a65a 0%, #f56d8f 55%, #8f77e0 100%);
+}
+.greet-wrap[data-daypart="morning"]::after {
+  top: auto; bottom: -60%; right: 6%;
+  background: radial-gradient(circle, rgba(255,240,205,.60), transparent 66%);
+}
+
+/* ⛅ Après-midi — plein jour, ciel bleu lumineux, soleil haut */
+.greet-wrap[data-daypart="afternoon"] {
+  background: linear-gradient(135deg, #38b7f2 0%, #2f7fed 100%);
+}
+.greet-wrap[data-daypart="afternoon"]::after {
+  top: -50%; right: -8%; width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,.50), transparent 60%);
+}
+
+/* 🌆 Soir — coucher de soleil orangé/rose/violet, soleil bas */
+.greet-wrap[data-daypart="evening"] {
+  background: linear-gradient(135deg, #ff7e5f 0%, #eb5286 50%, #7b3fa0 100%);
+}
+.greet-wrap[data-daypart="evening"]::after {
+  top: auto; bottom: -55%; right: 8%;
+  background: radial-gradient(circle, rgba(255,222,175,.55), transparent 64%);
+}
+
+/* 🌙 Nuit — ciel profond, lune froide */
+.greet-wrap[data-daypart="night"] {
+  background: linear-gradient(135deg, #1c2c5e 0%, #24306e 45%, #12152e 100%);
+}
+.greet-wrap[data-daypart="night"]::after {
+  top: -48%; right: -6%; width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(214,227,255,.38), transparent 70%);
 }
 .greet-title {
   position: relative; z-index: 1;

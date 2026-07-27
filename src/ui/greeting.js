@@ -26,11 +26,13 @@ export function renderGreeting() {
   if (!wrap) return;
 
   const hour = new Date().getHours();
-  let greet, emoji;
-  if      (hour >= 5  && hour < 12) { greet = 'Bon matin';      emoji = '🌅'; }
-  else if (hour >= 12 && hour < 18) { greet = 'Bon après-midi'; emoji = '⛅'; }
-  else if (hour >= 18 && hour < 22) { greet = 'Bonsoir';        emoji = '🌆'; }
-  else                               { greet = 'Bonne nuit';     emoji = '🌙'; }
+  let greet, emoji, daypart;
+  if      (hour >= 5  && hour < 12) { greet = 'Bon matin';      emoji = '🌅'; daypart = 'morning';   }
+  else if (hour >= 12 && hour < 18) { greet = 'Bon après-midi'; emoji = '⛅'; daypart = 'afternoon'; }
+  else if (hour >= 18)              { greet = 'Bonne soirée';   emoji = '🌆'; daypart = 'evening';   } // 18h–23h
+  else                               { greet = 'Bonne nuit';     emoji = '🌙'; daypart = 'night';     } // 0h–4h
+  // Le fond de la bannière suit l'état du ciel selon l'heure (voir .greet-wrap[data-daypart] en CSS)
+  wrap.dataset.daypart = daypart;
 
   const name = localStorage.getItem(USER_KEY) || 'toi';
   let sub = _greetFinancialSub();
