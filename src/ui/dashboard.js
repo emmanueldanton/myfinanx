@@ -4,6 +4,7 @@ import { calcTotalIncomes, calcTotalAllocated } from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes, getRecent } from '../transactions.js';
 import { catIco, esc, fmtDate } from '../utils.js';
 import { getPreviousMonthAvailableEUR, bridgeLoadPrefs } from '../data-bridge.js';
+import { ico } from './icons.js';
 
 // initDashboard (ResizeObserver du donut) reste défini dans index.js
 export { initDashboard } from './index.js';
@@ -51,7 +52,7 @@ export function renderDashboard(state) {
       const d = available - prevAvail;
       const up = d >= 0;
       deltaEl.className = 'dash-hero-delta ' + (up ? 'is-up' : 'is-down');
-      deltaEl.textContent = `${up ? '↗' : '↘'} ${up ? '+' : '−'}${fmt(Math.abs(d))} ce mois-ci`;
+      deltaEl.innerHTML = `${ico(up ? 'arrowUp' : 'arrowDown', 15)}<span>${up ? '+' : '−'}${fmt(Math.abs(d))} ce mois-ci</span>`;
     }
   }
 
