@@ -14,45 +14,43 @@ body::before {
 
 /* ════ GREETING ════ */
 .greet-wrap {
-  padding: 8px 0 28px;
+  padding: 2px 0 14px;
 }
 .greet-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-family: var(--fh);
+  font-size: 1.2rem;
   font-weight: 800;
   color: var(--text);
-  line-height: 1.2;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   flex-wrap: wrap;
 }
 .greet-emoji { font-style: normal; }
 .greet-name {
-  color: var(--pr-l);
+  color: var(--pr);
   cursor: pointer;
-  border-bottom: 2px dashed var(--pr);
-  padding-bottom: 1px;
-  transition: color .15s;
+  transition: opacity .15s;
 }
-.greet-name:hover { color: var(--pr); }
+.greet-name:hover { opacity: .7; }
 .greet-name-input {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--fh);
   font-size: inherit;
   font-weight: 800;
-  color: var(--pr-l);
+  color: var(--pr);
   background: transparent;
   border: none;
   border-bottom: 2px solid var(--pr);
   outline: none;
-  width: 160px;
+  width: 150px;
   padding-bottom: 1px;
 }
 .greet-sub {
-  font-size: .78rem;
+  font-size: .8rem;
   color: var(--muted);
-  margin-top: 6px;
-  margin-bottom: 14px;
+  margin-top: 5px;
   display: flex;
   align-items: center;
   gap: 6px;
