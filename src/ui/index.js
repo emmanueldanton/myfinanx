@@ -31,7 +31,7 @@ export function renderAll(state) {
   const infoIco = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
   let al = '';
   if (unallocatedEUR < 0)        al += `<div class="alert ab">${warnIco} Tu as alloué <strong>${fmt(Math.abs(unallocatedEUR))}</strong> de plus que tes revenus.</div>`;
-  else if (unallocatedEUR > 100) al += `<div class="alert ag">${infoIco} <strong>${fmt(unallocatedEUR)}</strong> non alloués — affecte-les à tes priorités.</div>`;
+  else if (unallocatedEUR > 100) al += `<div class="alert ag">${infoIco} <strong>${fmt(unallocatedEUR)}</strong> non alloués, affecte-les à tes priorités.</div>`;
   if (pct > 90 && totalRevenueEUR > 0) al += `<div class="alert ab">${warnIco} Plus de 90% de tes revenus dépensés ce mois !</div>`;
   const budAl = document.getElementById('bud-al');
   if (budAl) budAl.innerHTML = al;

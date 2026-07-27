@@ -86,7 +86,7 @@ export function saveAiHistory() {
   try {
     localStorage.setItem(AI_KEY, JSON.stringify(_aiHistory));
   } catch (e) {
-    if (e.name === 'QuotaExceededError') console.warn('localStorage plein — historique IA non sauvegardé');
+    if (e.name === 'QuotaExceededError') console.warn('localStorage plein, historique IA non sauvegardé');
   }
 }
 
@@ -157,18 +157,19 @@ export async function sendAI() {
     document.getElementById(tid)?.remove();
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      const errMsg  = errData.message || `Erreur ${res.status} — réessayez dans quelques instants.`;
+      const errMsg  = errData.message || `Erreur ${res.status}, réessayez dans quelques instants.`;
       renderAiMsg('ai', '⚠️ ' + errMsg);
     } else {
       const data  = await res.json();
-      const reply = data.reply || 'Pas de réponse.';
+      // Filet de sécurité : aucun tiret cadratin/demi-cadratin dans les réponses
+      const reply = (data.reply || 'Pas de réponse.').replace(/\s*[—–]\s*/g, ', ');
       _aiHistory.push({ role: 'ai', text: reply });
       saveAiHistory();
       renderAiMsg('ai', reply);
     }
   } catch (e) {
     document.getElementById(tid)?.remove();
-    renderAiMsg('ai', '⚠️ Connexion impossible — vérifiez votre réseau et réessayez.');
+    renderAiMsg('ai', '⚠️ Connexion impossible, vérifiez votre réseau et réessayez.');
   }
 
   btn.disabled = false; inp.disabled = false; inp.focus();
@@ -214,7 +215,7 @@ function _buildSystemPrompt() {
   const goalsStr = goals.length
     ? goals.map(g => {
         const pct = g.targetEUR > 0 ? Math.round((g.savedEUR / g.targetEUR) * 100) : 0;
-        const dl  = g.deadline ? ` — échéance: ${g.deadline}` : '';
+        const dl  = g.deadline ? `, échéance: ${g.deadline}` : '';
         return `  • ${g.name}: ${fmt(g.savedEUR)} / ${fmt(g.targetEUR)} (${pct}%${dl})`;
       }).join('\n')
     : '  • Aucun objectif défini';
@@ -227,11 +228,11 @@ Utilise son prénom pour t'adresser à lui/elle directement et accorde correctem
     : '';
 
   return `Tu es un conseiller financier personnel expert et bienveillant.
-Ton style : direct, chaleureux et terre à terre — comme un ami de confiance qui s'y connaît en finances. Tu parles simplement, sans jargon inutile, sans blague ni humour. Tu vas droit au but avec des conseils concrets basés sur les vrais chiffres de l'utilisateur.
+Ton style : direct, chaleureux et terre à terre, comme un ami de confiance qui s'y connaît en finances. Tu parles simplement, sans jargon inutile, sans blague ni humour. Tu vas droit au but avec des conseils concrets basés sur les vrais chiffres de l'utilisateur.
 Ton objectif à chaque réponse : que l'utilisateur se sente à l'aise et bien accompagné (jamais jugé, jamais culpabilisé), et qu'il reparte motivé à passer à l'action concrètement.
 ${identityLine}
 Tu connais TOUTE la situation financière de l'utilisateur pour ${MONTHS[M]} ${Y}.
-Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ convertis dans cette devise — exprime TOUS les montants de tes réponses dans cette devise (avec le symbole ${cur.symbol}), jamais en euros par défaut.
+Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ convertis dans cette devise, exprime TOUS les montants de tes réponses dans cette devise (avec le symbole ${cur.symbol}), jamais en euros par défaut.
 
 ━━ REVENUS ━━
 ${revStr}
@@ -250,10 +251,11 @@ Taux d'épargne implicite: ${tauxEpargne}%
 ${goalsStr}
 
 INSTRUCTIONS: Réponds en français. Sois précis, chiffré et actionnable. Maximum 180 mots.
-Base-toi UNIQUEMENT sur les données réelles ci-dessus — ne suppose rien qui n'y figure pas.
-Si une donnée nécessaire est absente, dis-le clairement et propose à l'utilisateur de la renseigner — n'invente aucun montant.
+Base-toi UNIQUEMENT sur les données réelles ci-dessus, ne suppose rien qui n'y figure pas.
+Si une donnée nécessaire est absente, dis-le clairement et propose à l'utilisateur de la renseigner, n'invente aucun montant.
 Exprime tous les montants dans la devise de l'utilisateur (${cur.symbol}), jamais en euros par défaut.
 Utilise le prénom et le genre de l'utilisateur pour personnaliser chaque réponse.
 Si l'utilisateur a des objectifs d'épargne, intègre-les dans tes recommandations.
-Zéro humour, zéro blague, zéro analogie amusante — reste professionnel et humain.`;
+Zéro humour, zéro blague, zéro analogie amusante, reste professionnel et humain.
+N'utilise jamais de tiret cadratin (—) ni de tiret demi-cadratin (–) : sépare tes idées avec une virgule ou un point.`;
 }

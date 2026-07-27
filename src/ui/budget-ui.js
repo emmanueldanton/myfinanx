@@ -135,7 +135,7 @@ export function renderBudgetFooter(state) {
 
   // Per-row percentages — update in-place to avoid resetting focused inputs
   document.querySelectorAll('.bp3').forEach((el, i) => {
-    if (items[i]) el.textContent = totalIncome > 0 ? Math.round((items[i].allocatedEUR / totalIncome) * 100) + '%' : '–';
+    if (items[i]) el.textContent = totalIncome > 0 ? Math.round((items[i].allocatedEUR / totalIncome) * 100) + '%' : '…';
   });
 }
 
@@ -346,9 +346,9 @@ export async function suggestBudget() {
   try {
     const suggestion = await _fetchBudgetSuggestion(b, totalR);
     if (suggestion) _openBudgetPreview(suggestion, totalR);
-    else showSuccessToast('L\'IA n\'a pas pu proposer de répartition — réessaie');
+    else showSuccessToast('L\'IA n\'a pas pu proposer de répartition, réessaie');
   } catch (e) {
-    showSuccessToast('Connexion à l\'IA impossible — réessaie');
+    showSuccessToast('Connexion à l\'IA impossible, réessaie');
   } finally {
     if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
   }
@@ -437,7 +437,7 @@ function _openBudgetPreview({ allocations, note }, totalR) {
         </div>`).join('')}
       </div>
       <div class="aib-total"><span>Total réparti</span><span><strong id="aib-sum">0</strong> / ${revStr}</span></div>
-      <div class="aib-warn" id="aib-warn" style="display:none;">⚠️ La répartition dépasse ton revenu — ajuste les montants.</div>
+      <div class="aib-warn" id="aib-warn" style="display:none;">⚠️ La répartition dépasse ton revenu, ajuste les montants.</div>
       <div class="aib-foot">
         <button class="btn bsm aib-cancel">Annuler</button>
         <button class="btn bp bsm aib-apply">Appliquer au budget</button>
