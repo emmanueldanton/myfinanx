@@ -1176,6 +1176,12 @@ nav::-webkit-scrollbar { display:none; }
   stroke:currentColor; flex-shrink:0; width:24px; height:24px;
   transition:transform .4s cubic-bezier(.34,1.5,.5,1);
 }
+/* Icônes jumelées : line (défaut) / fill (onglet actif) */
+.bnav-ico { display:inline-flex; }
+.bnav-ico-fill { display:none; }
+.bnav-ico-fill svg { stroke:none; }        /* les tracés sont déjà en fill=currentColor */
+.bnav-btn.active .bnav-ico-line { display:none; }
+.bnav-btn.active .bnav-ico-fill { display:inline-flex; }
 /* Le nom de l'onglet n'apparaît que sur l'onglet actif (au clic) */
 .bnav-btn .bnav-lbl { display:none; white-space:nowrap; letter-spacing:-.01em; }
 /* Actif : la pilule s'élargit pour révéler le label */
