@@ -675,13 +675,8 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .ai-msgs::-webkit-scrollbar { width: 3px; }
 .ai-msgs::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 99px; }
 
-.ai-row { display: flex; align-items: flex-end; gap: 7px; margin-bottom: 2px; animation: fadeUp .18s ease; }
+.ai-row { display: flex; align-items: flex-end; margin-bottom: 2px; animation: fadeUp .18s ease; }
 .ai-row.usr { flex-direction: row-reverse; }
-.ai-bot-av {
-  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-  background: var(--ai-grad); display: flex; align-items: center; justify-content: center;
-  align-self: flex-end; margin-bottom: 2px;
-}
 
 /* Bulles */
 .ai-bubble { max-width: 80%; padding: 10px 14px; font-size: .82rem; line-height: 1.55; word-break: break-word; }

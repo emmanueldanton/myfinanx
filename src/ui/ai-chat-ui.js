@@ -8,7 +8,6 @@ const GENDER_KEY  = 'monargent-usergender';
 const MONTHS      = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 const AI_WELCOME  = '👋 Bonjour ! Je connais ta situation complète (revenus, budget, objectifs). Pose-moi n\'importe quelle question sur ta gestion financière !';
-const BOT_AV_SVG  = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2.6" x2="12" y2="5"/><circle cx="12" cy="2" r="0.95" fill="white" stroke="none"/><rect x="4" y="5" width="16" height="13" rx="4.5"/><line x1="4" y1="10.5" x2="2.4" y2="10.5"/><line x1="20" y1="10.5" x2="21.6" y2="10.5"/><circle cx="9" cy="11" r="1.4" fill="white" stroke="none"/><circle cx="15" cy="11" r="1.4" fill="white" stroke="none"/><path d="M9 14.5c.8.7 1.9 1 3 1s2.2-.3 3-1"/></svg>';
 
 let _aiHistory = [];
 let _twTimer   = null;
@@ -75,12 +74,6 @@ export function renderAiMsg(role, text) {
   if (!msgs) return;
   const row = document.createElement('div');
   row.className = 'ai-row' + (role === 'user' ? ' usr' : '');
-  if (role !== 'user') {
-    const av = document.createElement('div');
-    av.className = 'ai-bot-av';
-    av.innerHTML = BOT_AV_SVG;
-    row.appendChild(av);
-  }
   const bubble = document.createElement('div');
   bubble.className = 'ai-bubble ' + (role === 'user' ? 'usr' : 'bot');
   bubble.innerHTML = renderMarkdown(text);   // texte BRUT → échappé + formaté ici
@@ -139,12 +132,10 @@ export async function sendAI() {
   const tid    = 'ty' + Date.now();
   const typRow = document.createElement('div');
   typRow.className = 'ai-row'; typRow.id = tid;
-  const typAv  = document.createElement('div');
-  typAv.className = 'ai-bot-av'; typAv.innerHTML = BOT_AV_SVG;
   const typBub = document.createElement('div');
   typBub.className = 'ai-bubble bot ai-typ';
   typBub.innerHTML = '<div class="ai-typ-dots"><div class="ai-typ-dot"></div><div class="ai-typ-dot"></div><div class="ai-typ-dot"></div></div>';
-  typRow.appendChild(typAv); typRow.appendChild(typBub);
+  typRow.appendChild(typBub);
   msgs.appendChild(typRow);
   msgs.scrollTop = msgs.scrollHeight;
 
