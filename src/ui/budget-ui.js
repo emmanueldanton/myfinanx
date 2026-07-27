@@ -1,7 +1,7 @@
 // ═══ Budget UI — revenue sources + budget items (onglet Budget) ═══
 import { store }      from '../store.js';
 import { bridgeSave, getRecentMonthsExpenseAverages } from '../data-bridge.js';
-import { uid, esc, parseAmt, catIco, COLS, catSubtitle } from '../utils.js';
+import { uid, esc, parseAmt, catIco, catSubtitle } from '../utils.js';
 import { calcByCategory } from '../transactions.js';
 import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast }  from './toast.js';
@@ -22,6 +22,10 @@ export function initBudgetUI(getYM) {
   window.openBudgetScreen     = openBudgetScreen;
   window.openBudgetScreenEdit = openBudgetScreenEdit;
   window.saveBudgetScreen     = saveBudgetScreen;
+  // Écran de détail (visualisation) + actions
+  window.openItemDetail    = openItemDetail;
+  window.editCurrentItem   = editCurrentItem;
+  window.deleteCurrentItem = deleteCurrentItem;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -43,43 +47,27 @@ function _setText(id, v) {
   if (el) el.textContent = v;
 }
 
-// ── Row action buttons (édition / valider / annuler / supprimer) ──
-const ICO = {
-  edit:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
-  save:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  cancel: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-  del:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
-};
-
-function _rowActions(prefix, id) {
-  const kind = prefix === 'Rev' ? 'rev' : 'bud';
-  return `<div class="row-acts">
-      <button class="r-edit" onclick="openBudgetScreenEdit('${kind}','${id}')" title="Modifier">${ICO.edit}</button>
-      <button class="r-del"  onclick="del${prefix}('${id}')" title="Supprimer">${ICO.del}</button>
-    </div>`;
-}
-
 // ── Render ────────────────────────────────────────────────────────
 
 const REV_ICO = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+const CHEV    = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5l6 7l-6 7"/></svg>';
 
 export function renderRevRows(state) {
   const el = document.getElementById('rev-rows');
   if (!el) return;
   const incomes = state?.budget?.incomes ?? [];
-  el.innerHTML = incomes.map((r, i) => {
-    const col = COLS[i % COLS.length];
-    return `<div class="rev-row" data-rev-id="${r.id}">
+  el.innerHTML = incomes.map((r) =>
+    `<div class="rev-row" data-rev-id="${r.id}" role="button" tabindex="0" onclick="openItemDetail('rev','${r.id}')">
       <div class="rev-ico">${REV_ICO}</div>
       <div class="rn">
         <span class="row-view-txt">${esc(r.name)}</span>
       </div>
       <div class="ra">
-        <span class="row-view-txt amt" style="color:${col}">${fmt(r.amountEUR ?? 0)}</span>
+        <span class="row-view-txt amt">${fmt(r.amountEUR ?? 0)}</span>
       </div>
-      ${_rowActions('Rev', r.id)}
-    </div>`;
-  }).join('');
+      <span class="card-chev">${CHEV}</span>
+    </div>`
+  ).join('');
 }
 
 export function renderBudRows(state) {
@@ -97,7 +85,7 @@ export function renderBudRows(state) {
     else if (spent > 0)        status = '<span class="bud-status is-ok">OK</span>';
     else                       status = '<span class="bud-status is-plan">Prévu</span>';
     const sub = catSubtitle(b.name);
-    return `<div class="poste-card bud-row" data-bud-id="${b.id}">
+    return `<div class="poste-card bud-row" data-bud-id="${b.id}" role="button" tabindex="0" onclick="openItemDetail('bud','${b.id}')">
       <div class="b-ico-wrap" title="Catégorie">${catIco(b.name, 13)}</div>
       <div class="bn">
         <span class="row-view-txt">${esc(b.name)}</span>
@@ -110,7 +98,7 @@ export function renderBudRows(state) {
         ${status}
       </div>
       <div class="bp3" style="display:none">${pct}%</div>
-      ${_rowActions('Bud', b.id)}
+      <span class="card-chev">${CHEV}</span>
     </div>`;
   }).join('');
 }
@@ -173,6 +161,83 @@ export function delBud(id) {
   b.budgetItems  = b.budgetItems.filter(x => x.id !== id);
   _mutate(b);
   showUndoToast(`"${item.name}" supprimé`, () => _mutate(snapshot));
+}
+
+// ── Écran de détail (visualisation) d'un revenu ou d'un poste ─────
+let _detailKind = 'rev';
+let _detailId   = null;
+
+export function openItemDetail(kind, id) {
+  _detailKind = kind === 'bud' ? 'bud' : 'rev';
+  _detailId   = id;
+  const cont = document.getElementById('isc-content');
+  if (!cont) return;
+  const b   = _budget();
+  const tx  = store.get('mfx_transactions') || [];
+  const incomes = b.incomes ?? [];
+  const items   = b.budgetItems ?? [];
+  const totalIncome = incomes.reduce((s, r) => s + r.amountEUR, 0)
+    + tx.filter(t => t.type === 'income').reduce((s, t) => s + t.amountEUR, 0);
+
+  if (_detailKind === 'rev') {
+    const r = incomes.find(x => x.id === id);
+    if (!r) return;
+    const part = totalIncome > 0 ? Math.round((r.amountEUR / totalIncome) * 100) : 0;
+    _setText('isc-title', 'Revenu attendu');
+    cont.innerHTML = `
+      <div class="isc-hero isc-rev">
+        <div class="isc-ico">${REV_ICO}</div>
+        <div class="isc-name">${esc(r.name)}</div>
+        <div class="isc-amt">${fmt(r.amountEUR ?? 0)}</div>
+        <div class="isc-amt-lbl">par mois</div>
+      </div>
+      <div class="isc-stats">
+        <div class="isc-stat"><span>Part des revenus attendus</span><strong>${part}%</strong></div>
+        <div class="isc-stat"><span>Total des revenus</span><strong>${fmt(totalIncome)}</strong></div>
+      </div>`;
+  } else {
+    const it = items.find(x => x.id === id);
+    if (!it) return;
+    const spent   = calcByCategory(tx)[it.name] || 0;
+    const reste   = it.allocatedEUR - spent;
+    const usePct  = it.allocatedEUR > 0 ? Math.min(100, Math.round((spent / it.allocatedEUR) * 100)) : 0;
+    const overPct = it.allocatedEUR > 0 ? Math.round((spent / it.allocatedEUR) * 100) : 0;
+    const part    = totalIncome > 0 ? Math.round((it.allocatedEUR / totalIncome) * 100) : 0;
+    const sub     = catSubtitle(it.name);
+    const over    = spent > it.allocatedEUR;
+    _setText('isc-title', 'Poste de dépense');
+    cont.innerHTML = `
+      <div class="isc-hero isc-bud">
+        <div class="isc-ico">${catIco(it.name, 22)}</div>
+        <div class="isc-name">${esc(it.name)}</div>
+        ${sub ? `<div class="isc-sub">${esc(sub)}</div>` : ''}
+        <div class="isc-amt">${fmt(it.allocatedEUR ?? 0)}</div>
+        <div class="isc-amt-lbl">budget alloué</div>
+      </div>
+      <div class="isc-usage">
+        <div class="isc-usage-top">
+          <span>${fmt(spent)} dépensé</span>
+          <span class="${over ? 'is-over' : ''}">${overPct}%</span>
+        </div>
+        <div class="isc-bar"><div class="isc-bar-fill ${over ? 'is-over' : ''}" style="width:${usePct}%"></div></div>
+      </div>
+      <div class="isc-stats">
+        <div class="isc-stat"><span>${over ? 'Dépassement' : 'Reste à dépenser'}</span><strong class="${over ? 'v-red' : 'v-green'}">${fmt(Math.abs(reste))}</strong></div>
+        <div class="isc-stat"><span>Part des revenus attendus</span><strong>${part}%</strong></div>
+      </div>`;
+  }
+  window.openScreen?.('screen-item');
+}
+
+export function editCurrentItem() {
+  if (_detailId) openBudgetScreenEdit(_detailKind, _detailId);
+}
+
+export function deleteCurrentItem() {
+  if (!_detailId) return;
+  const id = _detailId, kind = _detailKind;
+  window.closeScreen?.();
+  if (kind === 'bud') delBud(id); else delRev(id);
 }
 
 // ── Écran dédié Revenu / Poste de budget (ajout + édition) ────────

@@ -1999,3 +1999,72 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
   background: linear-gradient(135deg, var(--pr), var(--pr-d));
   border-color: transparent; color: #fff;
 }
+
+/* ═══ Budget : cartes cliquables (revenu vert / poste) + chevron ═══ */
+.rev-row, .poste-card { cursor: pointer; }
+.rev-row { transition: background .15s; }
+.rev-row:hover { background: var(--s2); }
+.poste-card:hover { background: var(--s2); border-color: var(--b2); }
+.rev-row:focus-visible, .poste-card:focus-visible { outline: 2px solid var(--pr); outline-offset: 2px; }
+/* Identité « revenu » = icône verte (montant garde --text pour le contraste) */
+.rev-row .rev-ico {
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 13%, var(--s1));
+  border-color: color-mix(in srgb, var(--green) 22%, var(--b1));
+}
+.card-chev { display: flex; align-items: center; color: var(--faint); flex-shrink: 0; margin-left: 2px; }
+.card-chev svg { width: 18px; height: 18px; stroke: currentColor; }
+
+/* ═══ Écran de détail (visualisation revenu / poste) ═══ */
+.isc-hero {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 10px 0 24px; gap: 3px;
+}
+.isc-ico {
+  width: 62px; height: 62px; border-radius: 19px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.isc-ico svg { width: 27px; height: 27px; }
+.isc-rev .isc-ico { color: var(--green); background: color-mix(in srgb, var(--green) 13%, var(--s1)); }
+.isc-bud .isc-ico { background: var(--s2); border: 1px solid var(--b1); }
+.isc-name { font-family: var(--fh); font-weight: 800; font-size: 1.3rem; color: var(--text); letter-spacing: -0.01em; }
+.isc-sub { font-family: var(--fb); font-size: .82rem; color: var(--muted); }
+.isc-amt { font-family: var(--fh); font-weight: 800; font-size: 2.5rem; letter-spacing: -0.035em; margin-top: 12px; line-height: 1; }
+.isc-rev .isc-amt { color: var(--green); }
+.isc-bud .isc-amt { color: var(--text); }
+.isc-amt-lbl { font-family: var(--fb); font-size: .8rem; color: var(--muted); margin-top: 7px; }
+
+/* Barre d'utilisation (poste) */
+.isc-usage { margin: 4px 0 22px; }
+.isc-usage-top {
+  display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 9px;
+  font-family: var(--fh); font-weight: 700; font-size: .85rem; color: var(--text);
+}
+.isc-usage-top .is-over { color: var(--red-l); }
+.isc-bar { height: 10px; border-radius: 999px; background: var(--b1); overflow: hidden; }
+.isc-bar-fill { height: 100%; border-radius: 999px; background: var(--pr); transition: width .55s cubic-bezier(.22,1,.36,1); }
+.isc-bar-fill.is-over { background: var(--red-l); }
+
+/* Statistiques (une carte-liste, pas de cartes imbriquées) */
+.isc-stats { background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r); overflow: hidden; }
+.isc-stat { display: flex; align-items: center; justify-content: space-between; padding: 15px 16px; }
+.isc-stat + .isc-stat { border-top: 1px solid var(--b1); }
+.isc-stat > span { font-family: var(--fb); font-size: .86rem; color: var(--muted); }
+.isc-stat > strong { font-family: var(--fh); font-weight: 800; font-size: .92rem; color: var(--text); }
+.isc-stat .v-green { color: var(--green); }
+.isc-stat .v-red { color: var(--red-l); }
+
+/* Pied : Supprimer + Modifier */
+.isc-foot { display: flex; gap: 10px; }
+.isc-foot .scr-save { max-width: none; margin: 0; }
+.isc-edit-btn { flex: 1; }
+.isc-del-btn {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 15px 18px; border-radius: var(--r); cursor: pointer;
+  background: color-mix(in srgb, var(--red-l) 10%, var(--s1));
+  border: 1px solid color-mix(in srgb, var(--red-l) 28%, transparent);
+  color: var(--red-l); font-family: var(--fh); font-weight: 700; font-size: .9rem;
+  transition: background .15s;
+}
+.isc-del-btn:hover { background: color-mix(in srgb, var(--red-l) 16%, var(--s1)); }
+.isc-del-btn svg { width: 17px; height: 17px; stroke: currentColor; }
