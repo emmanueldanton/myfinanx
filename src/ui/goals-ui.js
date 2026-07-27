@@ -10,6 +10,7 @@ import { showSuccessToast, showUndoToast } from './toast.js';
 export function initGoalsUI() {
   window.addToGoal      = addToGoal;
   window.delGoal        = delGoal;
+  window.pinGoal        = pinGoal;
   // Écran dédié Objectif (ajout + édition)
   window.openGoalScreen     = openGoalScreen;
   window.openGoalScreenEdit = openGoalScreenEdit;
@@ -53,6 +54,8 @@ export function renderGoals(state) {
   _setHTML('ov-goals', '');
 }
 
+const PIN_ICO = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6"/><path d="M10 4v6l-3 3v2h10v-2l-3-3V4"/><line x1="12" y1="18" x2="12" y2="22"/></svg>';
+
 export function buildGoalCard(g, mode) {
   const pct  = g.targetEUR > 0 ? Math.min(100, Math.round((g.savedEUR / g.targetEUR) * 100)) : 0;
   const done = g.savedEUR >= g.targetEUR;
@@ -65,6 +68,7 @@ export function buildGoalCard(g, mode) {
       <div class="gc-grid-top">
         <div class="g-ico" style="background:${g.color}22">${goalIco(g.color)}</div>
         <div class="g-ctrl">
+          <button class="g-pin" onclick="pinGoal('${g.id}')" title="Épingler en haut">${PIN_ICO}</button>
           <button class="g-ed" onclick="openGoalScreenEdit('${g.id}')" title="Modifier"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
           <button class="g-del" onclick="delGoal('${g.id}')" title="Supprimer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
@@ -85,7 +89,7 @@ export function buildGoalCard(g, mode) {
       <div class="gt-left">
         <div class="g-ico" style="background:rgba(255,255,255,.16)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
         <div style="min-width:0">
-          <div class="gn">${esc(g.name)}</div>
+          <div class="gn">${esc(g.name)} <span class="g-pinned-tag" title="Objectif épinglé">${PIN_ICO}</span></div>
           ${g.deadline ? `<div class="gdl">${clockIco} ${fmtDate(g.deadline)}</div>` : ''}
         </div>
       </div>
@@ -109,6 +113,17 @@ export function buildGoalCard(g, mode) {
 }
 
 // ── Mutations ─────────────────────────────────────────────────────
+
+// Épingle un objectif tout en haut (devient la carte vedette = goals[0])
+export function pinGoal(id) {
+  const goals = _goals();
+  const idx = goals.findIndex(g => g.id === id);
+  if (idx <= 0) return;   // déjà épinglé ou introuvable
+  const [g] = goals.splice(idx, 1);
+  goals.unshift(g);
+  _mutate(goals);
+  showSuccessToast(`"${g.name}" épinglé en haut`);
+}
 
 export function addToGoal(id, prefix = '') {
   const inp   = document.getElementById(prefix + 'ga-' + id);
