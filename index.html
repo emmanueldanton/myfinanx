@@ -192,7 +192,7 @@
   <button class="hdr-help-btn" onclick="openTuto()" title="Aide / Tutoriel">?</button>
   <div class="chip" id="chip">✓ Sauvegardé</div>
 </header>
-<div style="height:56px;flex-shrink:0"></div>
+<div class="hdr-spacer" style="height:56px;flex-shrink:0"></div>
 
 <!-- ════ DRAWER (mobile) ════ -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
@@ -538,10 +538,11 @@
   <div class="ai-hero">
     <div class="ai-hero-av">
       <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2.6" x2="12" y2="5"/><circle cx="12" cy="2" r="0.95" fill="white" stroke="none"/><rect x="4" y="5" width="16" height="13" rx="4.5"/><line x1="4" y1="10.5" x2="2.4" y2="10.5"/><line x1="20" y1="10.5" x2="21.6" y2="10.5"/><circle cx="9" cy="11" r="1.4" fill="white" stroke="none"/><circle cx="15" cy="11" r="1.4" fill="white" stroke="none"/><path d="M9 14.5c.8.7 1.9 1 3 1s2.2-.3 3-1"/></svg>
+      <span class="ai-hero-online" aria-hidden="true"></span>
     </div>
     <div class="ai-hero-txt">
       <div class="ai-hero-title">Conseiller IA</div>
-      <div class="ai-hero-sub">Il connaît tes vrais chiffres</div>
+      <div class="ai-hero-sub"><span class="ai-online-dot"></span>En ligne</div>
     </div>
     <button class="ai-clear" onclick="clearAiHistory()" title="Effacer la conversation" aria-label="Effacer la conversation">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
