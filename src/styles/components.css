@@ -2103,3 +2103,55 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
 /* Popups natifs (calendrier / listes) alignés au thème via color-scheme ; icône interactive */
 input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .6; transition: opacity .15s; }
 input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+/* ═══ Menu « … » (options) dans l'en-tête des écrans de détail ═══ */
+.screen-menu-wrap { position: relative; width: 38px; height: 38px; flex-shrink: 0; }
+.screen-menu-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.screen-menu-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+.screen-menu-btn:hover { background: var(--s2); }
+.screen-menu-btn:active { transform: scale(.94); }
+.screen-menu {
+  position: absolute; top: 46px; right: 0; z-index: 5; min-width: 194px;
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r);
+  overflow: hidden; padding: 6px;
+  display: none;
+}
+.screen-menu.open { display: block; animation: screenIn .14s ease; }
+.screen-menu-item {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 11px 12px; border: none; background: transparent; border-radius: var(--r2);
+  color: var(--text); font-family: var(--fh); font-weight: 600; font-size: .88rem;
+  cursor: pointer; text-align: left; transition: background .12s;
+}
+.screen-menu-item svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; color: var(--muted); }
+.screen-menu-item:hover { background: var(--s2); }
+.screen-menu-item.danger { color: var(--red-l); }
+.screen-menu-item.danger svg { color: var(--red-l); }
+
+/* ═══ Pied « Ajouter des fonds » (détail objectif) ═══ */
+.gd-add { display: flex; gap: 10px; max-width: 560px; margin: 0 auto; }
+.gd-add input {
+  flex: 1; min-width: 0; padding: 14px 15px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fb); font-weight: 600;
+}
+.gd-add input:focus { outline: none; border-color: var(--pr); }
+.gd-add-btn {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 14px 20px; border-radius: var(--r); border: none; cursor: pointer;
+  background: linear-gradient(135deg, var(--pr), var(--pr-d)); color: #fff;
+  font-family: var(--fh); font-weight: 800; font-size: .9rem; transition: filter .15s;
+}
+.gd-add-btn svg { width: 16px; height: 16px; stroke: currentColor; }
+.gd-add-btn:hover { filter: brightness(1.06); }
+
+/* Cartes objectifs cliquables */
+.gc-featured, .gc-grid { cursor: pointer; }
+.gc-featured:focus-visible, .gc-grid:focus-visible { outline: 2px solid var(--pr); outline-offset: 2px; }
+.gc-grid-chev { width: 16px; height: 16px; color: var(--faint); stroke: currentColor; }
+.gd-add input.invalid { border-color: var(--red); background: color-mix(in srgb, var(--red) 6%, var(--s1)); }

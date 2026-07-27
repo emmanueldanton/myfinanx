@@ -25,9 +25,35 @@ export function openScreen(id) {
 export function closeScreen() {
   const open = document.querySelector('.screen.open');
   if (!open) return;
+  document.querySelectorAll('.screen-menu.open').forEach(m => m.classList.remove('open'));
   open.classList.remove('open');
   open.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
+}
+
+// ── Menu « … » (options) dans l'en-tête d'un écran de détail ──
+export function toggleScreenMenu(btn) {
+  const menu = btn.nextElementSibling;
+  if (!menu) return;
+  const willOpen = !menu.classList.contains('open');
+  document.querySelectorAll('.screen-menu.open').forEach(m => m.classList.remove('open'));
+  menu.classList.toggle('open', willOpen);
+  if (willOpen) {
+    setTimeout(() => {
+      const off = (e) => {
+        if (!menu.parentElement.contains(e.target)) {
+          menu.classList.remove('open');
+          document.removeEventListener('click', off);
+        }
+      };
+      document.addEventListener('click', off);
+    }, 0);
+  }
+}
+
+// Ferme tout menu ouvert (appelé avant une action de menu)
+export function closeScreenMenus() {
+  document.querySelectorAll('.screen-menu.open').forEach(m => m.classList.remove('open'));
 }
 
 // ── Ligne dépliable (Thème, Devise) — une seule ouverte à la fois dans son groupe ──
@@ -96,6 +122,8 @@ export function saveAccountName(v) {
 export function initScreens() {
   window.openScreen      = openScreen;
   window.closeScreen     = closeScreen;
+  window.toggleScreenMenu = toggleScreenMenu;
+  window.closeScreenMenus = closeScreenMenus;
   window.syncSettings    = syncSettings;
   window.toggleSetRow    = toggleSetRow;
   window.editSettingsName = editSettingsName;

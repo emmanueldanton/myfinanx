@@ -926,18 +926,61 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
     <div class="screen-title" id="isc-title">Détail</div>
-    <span class="screen-head-spacer"></span>
+    <div class="screen-menu-wrap">
+      <button class="screen-menu-btn" onclick="toggleScreenMenu(this)" aria-label="Options">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <div class="screen-menu">
+        <button class="screen-menu-item" onclick="closeScreenMenus();editCurrentItem()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifier
+        </button>
+        <button class="screen-menu-item danger" onclick="closeScreenMenus();deleteCurrentItem()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Supprimer
+        </button>
+      </div>
+    </div>
   </div>
   <div class="screen-body" id="isc-content"></div>
-  <div class="screen-foot isc-foot">
-    <button class="isc-del-btn" onclick="deleteCurrentItem()">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      Supprimer
+</div>
+
+<!-- ════ ÉCRAN DÉTAIL OBJECTIF ════ -->
+<div class="screen" id="screen-goal-detail" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
-    <button class="scr-save isc-edit-btn" onclick="editCurrentItem()">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Modifier
-    </button>
+    <div class="screen-title">Objectif</div>
+    <div class="screen-menu-wrap">
+      <button class="screen-menu-btn" onclick="toggleScreenMenu(this)" aria-label="Options">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg>
+      </button>
+      <div class="screen-menu">
+        <button class="screen-menu-item" onclick="closeScreenMenus();editCurrentGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifier
+        </button>
+        <button class="screen-menu-item" onclick="closeScreenMenus();pinCurrentGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6"/><path d="M10 4v6l-3 3v2h10v-2l-3-3V4"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+          Épingler en haut
+        </button>
+        <button class="screen-menu-item danger" onclick="closeScreenMenus();deleteCurrentGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="screen-body" id="gdc-content"></div>
+  <div class="screen-foot">
+    <div class="gd-add">
+      <input type="text" inputmode="decimal" id="gdc-add" placeholder="Ajouter un montant…" onkeydown="if(event.key==='Enter')addFundsCurrentGoal()">
+      <button class="gd-add-btn" onclick="addFundsCurrentGoal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter
+      </button>
+    </div>
   </div>
 </div>
 
