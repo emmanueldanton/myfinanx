@@ -861,75 +861,103 @@
 
 <!-- ════ ÉCRAN RÉGLAGES ════ -->
 <div class="screen" id="screen-settings" aria-hidden="true">
-  <header class="screen-head">
+  <div class="screen-head">
     <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
     <div class="screen-title">Réglages</div>
     <span class="screen-head-spacer"></span>
-  </header>
+  </div>
   <div class="screen-body">
-    <!-- Compte -->
-    <div class="set-section">
-      <div class="set-label">Compte</div>
-      <label class="set-field">
-        <span>Ton prénom</span>
-        <input type="text" id="set-name" maxlength="30" placeholder="Ton prénom" onchange="saveAccountName(this.value)">
-      </label>
-    </div>
-    <!-- Thème -->
-    <div class="set-section">
-      <div class="set-label">Thème</div>
-      <div class="set-theme-row">
-        <button class="set-theme" onclick="setTheme('light')">
-          <span class="set-swatch dtdot" data-theme="light" style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)"></span>Clair
-        </button>
-        <button class="set-theme" onclick="setTheme('blue')">
-          <span class="set-swatch dtdot" data-theme="blue" style="background:linear-gradient(135deg,#4D78D4,#0d1628)"></span>Bleu nuit
-        </button>
-        <button class="set-theme" onclick="setTheme('violet')">
-          <span class="set-swatch dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)"></span>Violet
-        </button>
+
+    <!-- Carte profil -->
+    <button class="set-profile" onclick="editSettingsName()">
+      <span class="set-avatar" id="set-avatar">M</span>
+      <span class="set-profile-txt">
+        <span class="set-name-display" id="set-name-display">Ton prénom</span>
+        <span class="set-profile-sub">Compte personnel</span>
+      </span>
+      <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+    </button>
+
+    <!-- Apparence -->
+    <div class="set-sec-label">Apparence</div>
+    <div class="set-group">
+      <button class="set-row" onclick="toggleSetRow(this)">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></g></svg></span>
+        <span class="set-row-label">Thème</span>
+        <span class="set-row-value" id="set-theme-val">Clair</span>
+        <svg class="set-chev set-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-panel">
+        <div class="set-theme-row">
+          <button class="set-theme" onclick="setTheme('light');syncSettings();">
+            <span class="set-swatch dtdot" data-theme="light" style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)"></span>Clair
+          </button>
+          <button class="set-theme" onclick="setTheme('blue');syncSettings();">
+            <span class="set-swatch dtdot" data-theme="blue" style="background:linear-gradient(135deg,#4D78D4,#0d1628)"></span>Bleu nuit
+          </button>
+          <button class="set-theme" onclick="setTheme('violet');syncSettings();">
+            <span class="set-swatch dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)"></span>Violet
+          </button>
+        </div>
+      </div>
+      <div class="set-divider"></div>
+      <button class="set-row" onclick="toggleSetRow(this)">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.6c0-1 1.1-1.6 2.5-1.6s2.5.5 2.5 1.6-1.1 1.6-2.5 1.6-2.5.6-2.5 1.6 1.1 1.6 2.5 1.6 2.5-.6 2.5-1.6"/></g></svg></span>
+        <span class="set-row-label">Devise</span>
+        <span class="set-row-value" id="set-cur-val">EUR €</span>
+        <svg class="set-chev set-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-panel">
+        <div class="set-cur-grid">
+          <button class="set-cur-btn" data-cur="EUR" onclick="setCurrency('EUR');syncSettings();"><span>🇪🇺</span> EUR</button>
+          <button class="set-cur-btn" data-cur="USD" onclick="setCurrency('USD');syncSettings();"><span>🇺🇸</span> USD</button>
+          <button class="set-cur-btn" data-cur="GBP" onclick="setCurrency('GBP');syncSettings();"><span>🇬🇧</span> GBP</button>
+          <button class="set-cur-btn" data-cur="CAD" onclick="setCurrency('CAD');syncSettings();"><span>🇨🇦</span> CAD</button>
+          <button class="set-cur-btn" data-cur="XOF" onclick="setCurrency('XOF');syncSettings();"><span>🌍</span> XOF</button>
+          <button class="set-cur-btn" data-cur="MAD" onclick="setCurrency('MAD');syncSettings();"><span>🇲🇦</span> MAD</button>
+        </div>
       </div>
     </div>
-    <!-- Devise -->
-    <div class="set-section">
-      <div class="set-label">Devise</div>
-      <div class="set-cur-grid">
-        <button class="set-cur-btn" data-cur="EUR" onclick="setCurrency('EUR');syncSettings();"><span>🇪🇺</span> EUR</button>
-        <button class="set-cur-btn" data-cur="USD" onclick="setCurrency('USD');syncSettings();"><span>🇺🇸</span> USD</button>
-        <button class="set-cur-btn" data-cur="GBP" onclick="setCurrency('GBP');syncSettings();"><span>🇬🇧</span> GBP</button>
-        <button class="set-cur-btn" data-cur="CAD" onclick="setCurrency('CAD');syncSettings();"><span>🇨🇦</span> CAD</button>
-        <button class="set-cur-btn" data-cur="XOF" onclick="setCurrency('XOF');syncSettings();"><span>🌍</span> XOF</button>
-        <button class="set-cur-btn" data-cur="MAD" onclick="setCurrency('MAD');syncSettings();"><span>🇲🇦</span> MAD</button>
-      </div>
-    </div>
+
     <!-- Données -->
-    <div class="set-section">
-      <div class="set-label">Données</div>
-      <div class="set-data-list">
-        <button class="set-data-btn" onclick="exportData()">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Exporter une sauvegarde
-        </button>
-        <button class="set-data-btn" onclick="document.getElementById('import-input').click()">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Importer une sauvegarde
-        </button>
-        <button class="set-data-btn" onclick="openTuto()">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Revoir le tutoriel
-        </button>
-        <button class="set-data-btn danger" onclick="openResetModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Réinitialiser les données
-        </button>
-      </div>
+    <div class="set-sec-label">Données</div>
+    <div class="set-group">
+      <button class="set-row" onclick="exportData()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+        <span class="set-row-label">Exporter une sauvegarde</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-divider"></div>
+      <button class="set-row" onclick="document.getElementById('import-input').click()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+        <span class="set-row-label">Importer une sauvegarde</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-divider"></div>
+      <button class="set-row" onclick="openTuto()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="set-row-label">Revoir le tutoriel</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
     </div>
+
+    <!-- Zone de danger -->
+    <div class="set-sec-label">Zone de danger</div>
+    <div class="set-group">
+      <button class="set-row danger" onclick="openResetModal()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span>
+        <span class="set-row-label">Réinitialiser les données</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+    </div>
+
   </div>
 </div>
 
 <!-- ════ PLUS PANEL ════ -->
+
 <div class="plus-overlay" id="plus-overlay" onclick="closePlusPanel()"></div>
 <div class="plus-panel" id="plus-panel">
   <div style="width:36px;height:4px;border-radius:99px;background:var(--b2);margin:12px auto 4px;"></div>

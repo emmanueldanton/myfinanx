@@ -1993,62 +1993,94 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
   max-width: 560px; width: 100%; margin: 0 auto;
 }
 
-/* Sections de réglages */
-.set-section { margin-bottom: 26px; }
-.set-section:last-child { margin-bottom: 0; }
-.set-label {
+/* ─── Réglages façon « Settings » (cartes groupées, lignes, profil) ─── */
+
+/* Carte profil */
+.set-profile {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 14px 16px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  cursor: pointer; text-align: left; margin-bottom: 26px;
+  transition: border-color .15s;
+}
+.set-profile:hover { border-color: var(--b2); }
+.set-avatar {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--pr), var(--pr-d));
+  color: #fff; font-family: var(--fh); font-weight: 800; font-size: 1.15rem;
+}
+.set-profile-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.set-name-display {
+  font-family: var(--fh); font-weight: 800; font-size: 1rem; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.set-profile-sub { font-family: var(--fb); font-size: .78rem; color: var(--muted); }
+.set-name-input {
+  font-family: var(--fh); font-weight: 800; font-size: 1rem; color: var(--text);
+  background: transparent; border: none; border-bottom: 2px solid var(--pr);
+  outline: none; width: 100%; padding: 0 0 2px;
+}
+.set-chev { width: 18px; height: 18px; color: var(--faint); flex-shrink: 0; }
+
+/* Label de section */
+.set-sec-label {
   font-family: var(--fh); font-size: .72rem; font-weight: 700;
   letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
-  margin-bottom: 12px;
+  margin: 0 4px 10px;
 }
-.set-field > span {
-  display: block; font-family: var(--fb); font-size: .8rem; color: var(--muted); margin-bottom: 6px;
-}
-.set-field input {
-  width: 100%; padding: 12px 14px; border-radius: var(--r);
-  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
-  font-family: var(--fb); font-weight: 600;
-}
-.set-field input:focus { outline: none; border-color: var(--pr); }
 
-/* Thème — cartes sélectionnables */
+/* Groupe de lignes (carte arrondie) */
+.set-group {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r);
+  overflow: hidden; margin-bottom: 26px;
+}
+.set-group:last-child { margin-bottom: 0; }
+.set-divider { height: 1px; background: var(--b1); margin-left: 54px; }
+
+/* Ligne */
+.set-row {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 14px 16px; background: transparent; border: none; cursor: pointer;
+  color: var(--text); font-family: var(--fh); font-weight: 600; font-size: .9rem;
+  text-align: left; transition: background .15s;
+}
+.set-row:hover { background: var(--s2); }
+.set-row-ico { width: 22px; height: 22px; flex-shrink: 0; color: var(--muted); display: flex; }
+.set-row-ico svg { width: 22px; height: 22px; stroke: currentColor; }
+.set-row-label { flex: 1; min-width: 0; }
+.set-row-value { font-family: var(--fb); font-weight: 600; font-size: .82rem; color: var(--muted); }
+.set-row-chev { transition: transform .2s ease; }
+.set-row.open .set-row-chev { transform: rotate(90deg); }
+.set-row.danger { color: var(--red-l); }
+.set-row.danger .set-row-ico { color: var(--red-l); }
+
+/* Panneau dépliable (Thème, Devise) */
+.set-panel { display: none; padding: 2px 16px 16px; }
+.set-panel.open { display: block; }
+
+/* Thème — cartes sélectionnables (dans le panneau) */
 .set-theme-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .set-theme {
   display: flex; flex-direction: column; align-items: center; gap: 9px;
-  padding: 14px 8px; border-radius: var(--r);
-  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
-  font-family: var(--fh); font-weight: 700; font-size: .78rem; cursor: pointer;
+  padding: 12px 8px; border-radius: var(--r2);
+  border: 1px solid var(--b1); background: var(--s0); color: var(--text);
+  font-family: var(--fh); font-weight: 700; font-size: .76rem; cursor: pointer;
   transition: border-color .15s, background .15s;
 }
 .set-theme:hover { border-color: var(--b2); }
-.set-theme:has(.dtdot.on) { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s1)); }
-.set-swatch {
-  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--b2);
-}
+.set-theme:has(.dtdot.on) { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s0)); }
+.set-swatch { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--b2); }
 .set-swatch.dtdot.on { outline: 2px solid var(--pr); outline-offset: 2px; }
 
-/* Devise — grille sélectionnable */
+/* Devise — grille sélectionnable (dans le panneau) */
 .set-cur-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .set-cur-btn {
   display: flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 12px 8px; border-radius: var(--r);
-  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  padding: 11px 8px; border-radius: var(--r2);
+  border: 1px solid var(--b1); background: var(--s0); color: var(--text);
   font-family: var(--fh); font-weight: 700; font-size: .82rem; cursor: pointer;
   transition: border-color .15s, background .15s, color .15s;
 }
 .set-cur-btn:hover { border-color: var(--b2); }
-.set-cur-btn.on { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s1)); color: var(--pr); }
-
-/* Données — liste d'actions */
-.set-data-list { display: flex; flex-direction: column; gap: 10px; }
-.set-data-btn {
-  display: flex; align-items: center; gap: 12px; width: 100%;
-  padding: 14px; border-radius: var(--r);
-  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
-  font-family: var(--fh); font-weight: 700; font-size: .85rem; cursor: pointer;
-  transition: border-color .15s, background .15s;
-}
-.set-data-btn svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
-.set-data-btn:hover { border-color: var(--b2); }
-.set-data-btn.danger { color: var(--red-l); }
-.set-data-btn.danger svg { color: var(--red-l); }
+.set-cur-btn.on { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s0)); color: var(--pr); }
