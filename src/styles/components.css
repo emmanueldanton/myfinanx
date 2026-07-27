@@ -1383,6 +1383,28 @@ nav::-webkit-scrollbar { display:none; }
 }
 .hdr-help-btn:hover { background:var(--s2); color:var(--text); }
 
+/* ════ ACTIONS RONDES DU HEADER (stats + paramètres) — mobile ════ */
+.hdr-actions { display:none; align-items:center; gap:8px; flex-shrink:0; }
+.hdr-circle-btn {
+  width:38px; height:38px; border-radius:50%; cursor:pointer;
+  background:var(--s1); border:1px solid var(--b1); color:var(--text);
+  display:flex; align-items:center; justify-content:center;
+  transition:background .15s, transform .15s; flex-shrink:0;
+}
+.hdr-circle-btn svg { stroke:currentColor; }
+.hdr-circle-btn:hover { background:var(--s2); }
+.hdr-circle-btn:active { transform:scale(.94); }
+
+/* Composition mobile de la barre : logo à gauche · mois centré · actions à droite */
+@media(max-width:620px){
+  header { justify-content:space-between; gap:8px; }
+  .brand { flex:0 0 auto; min-width:0; }
+  .hdr-actions { display:flex; margin-left:auto; }
+  /* Mois parfaitement centré dans la barre, indépendamment de la largeur du logo */
+  .month-nav { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); }
+  .cur-pick, .hdr-help-btn { display:none; }
+}
+
 /* ════ RÉPARTITION BUDGET PAR L'IA ════ */
 .ai-budget-btn {
   display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
@@ -1498,9 +1520,7 @@ nav::-webkit-scrollbar { display:none; }
    ACCUEIL ÉPURÉ — dashboard style banque mobile (dash-*)
 ═══════════════════════════════════════════════════════════════ */
 
-/* Sur l'accueil, l'en-tete compte (dash-head) remplace la barre globale */
-body:has(#page-overview.active) > header { display: none; }
-
+/* L'accueil affiche la barre globale fixe (logo · mois · stats + paramètres) */
 #page-overview.active { max-width: 560px; margin: 0 auto; padding: 10px 16px 28px; }
 
 /* En-tete compte */
