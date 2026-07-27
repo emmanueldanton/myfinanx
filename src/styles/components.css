@@ -1829,7 +1829,6 @@ body:has(#page-overview.active) .fab { display: none; }
 .gc-featured .g-del svg { stroke: rgba(255,255,255,.82); }
 
 /* ═══ Budget « Planning Budgetaire » — refonte fidele Sleek ═══ */
-body:has(#page-budget.active) > header { display: none; }
 #page-budget.active { max-width: 560px; margin: 0 auto; padding: 10px 16px 28px; }
 
 .bud-head {
@@ -1914,7 +1913,6 @@ body:has(#page-budget.active) > header { display: none; }
 .bud-ai:disabled, .bud-ai.loading { opacity: .6; pointer-events: none; }
 
 /* ═══ Objectifs « Mes Objectifs » — refonte fidele Sleek ═══ */
-body:has(#page-goals.active) > header { display: none; }
 #page-goals.active { max-width: 560px; margin: 0 auto; padding: 10px 16px 28px; }
 
 .dash-add-primary {
@@ -2176,3 +2174,25 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
 .gsw:active { transform: scale(.9); }
 .gsw.on { outline: 2px solid var(--text); outline-offset: 3px; }
 .dash-goal-empty { cursor: pointer; }
+
+/* Ligne de titre de page (avec action propre) — pages sous la barre globale */
+.page-hd {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 40px; margin: 2px 0 18px;
+}
+.page-hd .bud-title { margin: 0; }
+.page-hd-btn {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+  background: var(--s1); border: 1px solid var(--b1); color: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, transform .12s;
+}
+.page-hd-btn svg { stroke: currentColor; }
+.page-hd-btn:hover { background: var(--s2); }
+.page-hd-btn:active { transform: translateY(-50%) scale(.94); }
+.page-hd-btn.primary {
+  background: linear-gradient(135deg, var(--pr), var(--pr-d));
+  border-color: transparent; color: #fff;
+}
