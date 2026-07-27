@@ -25,10 +25,17 @@ body::before {
   transition: background .6s ease;
 }
 .greet-wrap:empty { display: none; }
+/* Voile sombre dégradé derrière le texte → lisibilité garantie sur ciels clairs.
+   Fort à gauche (où se trouve le texte), transparent à droite (le ciel reste vif). */
+.greet-wrap::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(105deg, rgba(0,0,0,.36) 0%, rgba(0,0,0,.16) 55%, rgba(0,0,0,0) 82%);
+}
 /* Halo = soleil / lune ; couleur et position affinées par moment */
 .greet-wrap::after {
   content: '';
-  position: absolute;
+  position: absolute; z-index: 1;
   width: 180px; height: 180px; border-radius: 50%;
   top: -55%; right: -12%;
   background: radial-gradient(circle, rgba(255,255,255,.22), transparent 68%);
@@ -38,7 +45,7 @@ body::before {
 
 /* 🌅 Matin — aube chaude, soleil bas qui se lève (halo doré en bas à droite) */
 .greet-wrap[data-daypart="morning"] {
-  background: linear-gradient(135deg, #f7a65a 0%, #f56d8f 55%, #8f77e0 100%);
+  background: linear-gradient(135deg, #ec8f4c 0%, #e85c86 55%, #7d63d8 100%);
 }
 .greet-wrap[data-daypart="morning"]::after {
   top: auto; bottom: -60%; right: 6%;
@@ -47,7 +54,7 @@ body::before {
 
 /* ⛅ Après-midi — plein jour, ciel bleu lumineux, soleil haut */
 .greet-wrap[data-daypart="afternoon"] {
-  background: linear-gradient(135deg, #38b7f2 0%, #2f7fed 100%);
+  background: linear-gradient(135deg, #2f9bde 0%, #2a67d2 100%);
 }
 .greet-wrap[data-daypart="afternoon"]::after {
   top: -50%; right: -8%; width: 200px; height: 200px;
@@ -56,7 +63,7 @@ body::before {
 
 /* 🌆 Soir — coucher de soleil orangé/rose/violet, soleil bas */
 .greet-wrap[data-daypart="evening"] {
-  background: linear-gradient(135deg, #ff7e5f 0%, #eb5286 50%, #7b3fa0 100%);
+  background: linear-gradient(135deg, #f0664a 0%, #d5407e 50%, #6a3596 100%);
 }
 .greet-wrap[data-daypart="evening"]::after {
   top: auto; bottom: -55%; right: 8%;
@@ -72,7 +79,7 @@ body::before {
   background: radial-gradient(circle, rgba(214,227,255,.38), transparent 70%);
 }
 .greet-title {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   font-family: var(--fh);
   font-size: 1.2rem;
   font-weight: 800;
@@ -106,16 +113,16 @@ body::before {
   padding-bottom: 1px;
 }
 .greet-sub {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   font-size: .8rem;
-  color: rgba(255,255,255,.85);
+  color: rgba(255,255,255,.94);
   margin-top: 5px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 .greet-gender-pick {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   display: flex; gap: 6px; margin-top: 10px;
 }
 .greet-gender-btn {
