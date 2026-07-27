@@ -19,7 +19,9 @@ export function fmtDate(iso) {
 
 // Accept comma or dot as decimal separator
 export function parseAmt(str) {
-  return parseFloat(String(str).replace(',', '.')) || 0;
+  // Retire les espaces (normal, insécable, fin) utilisés comme séparateurs de milliers,
+  // puis convertit la virgule décimale. Robuste au round-trip fmtInput → parseAmt (édition).
+  return parseFloat(String(str).replace(/[\s  ]/g, '').replace(',', '.')) || 0;
 }
 
 export function catIco(cat, size = 14) {

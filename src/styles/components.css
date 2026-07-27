@@ -2166,3 +2166,13 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
 }
 .scr-amt input:focus { outline: none; }
 .scr-amt input.invalid { color: var(--red); }
+
+/* Pastilles de couleur (écran Objectif) */
+.gsw-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.gsw {
+  width: 34px; height: 34px; border-radius: 50%; border: none; padding: 0; cursor: pointer;
+  transition: transform .12s;
+}
+.gsw:active { transform: scale(.9); }
+.gsw.on { outline: 2px solid var(--text); outline-offset: 3px; }
+.dash-goal-empty { cursor: pointer; }

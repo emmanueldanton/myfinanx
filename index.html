@@ -359,7 +359,7 @@
       <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
       <span class="dash-act-lbl">Revenu</span>
     </button>
-    <button class="dash-act" onclick="openGoalForm()">
+    <button class="dash-act" onclick="openGoalScreen()">
       <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
       <span class="dash-act-lbl">Objectif</span>
     </button>
@@ -551,7 +551,7 @@
       <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M13.765 2.152C13.398 2 12.932 2 12 2s-1.398 0-1.765.152a2 2 0 0 0-1.083 1.083c-.092.223-.129.484-.143.863a1.62 1.62 0 0 1-.79 1.353a1.62 1.62 0 0 1-1.567.008c-.336-.178-.579-.276-.82-.308a2 2 0 0 0-1.478.396C4.04 5.79 3.806 6.193 3.34 7s-.7 1.21-.751 1.605a2 2 0 0 0 .396 1.479c.148.192.355.353.676.555c.473.297.777.803.777 1.361s-.304 1.064-.777 1.36c-.321.203-.529.364-.676.556a2 2 0 0 0-.396 1.479c.052.394.285.798.75 1.605c.467.807.7 1.21 1.015 1.453a2 2 0 0 0 1.479.396c.24-.032.483-.13.819-.308a1.62 1.62 0 0 1 1.567.008c.483.28.77.795.79 1.353c.014.38.05.64.143.863a2 2 0 0 0 1.083 1.083C10.602 22 11.068 22 12 22s1.398 0 1.765-.152a2 2 0 0 0 1.083-1.083c.092-.223.129-.483.143-.863c.02-.558.307-1.074.79-1.353a1.62 1.62 0 0 1 1.567-.008c.336.178.579.276.819.308a2 2 0 0 0 1.479-.396c.315-.242.548-.646 1.014-1.453s.7-1.21.751-1.605a2 2 0 0 0-.396-1.479c-.148-.192-.355-.353-.676-.555A1.62 1.62 0 0 1 19.562 12c0-.558.304-1.064.777-1.36c.321-.203.529-.364.676-.556a2 2 0 0 0 .396-1.479c-.052-.394-.285-.798-.75-1.605c-.467-.807-.7-1.21-1.015-1.453a2 2 0 0 0-1.479-.396c-.24.032-.483.13-.82.308a1.62 1.62 0 0 1-1.566-.008a1.62 1.62 0 0 1-.79-1.353c-.014-.38-.05-.64-.143-.863a2 2 0 0 0-1.083-1.083Z"/></g></svg>
     </button>
     <div style="flex:1"></div>
-    <button class="dash-icon-btn dash-add-primary" onclick="openGoalForm()" aria-label="Nouvel objectif" title="Nouvel objectif">
+    <button class="dash-icon-btn dash-add-primary" onclick="openGoalScreen()" aria-label="Nouvel objectif" title="Nouvel objectif">
       <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m.75-13a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25z" clip-rule="evenodd"/></svg>
     </button>
   </header>
@@ -970,6 +970,54 @@
 
     <div class="set-appver">MyFinanx · version 1.0.0</div>
 
+  </div>
+</div>
+
+<!-- ════ ÉCRAN OBJECTIF ════ -->
+<div class="screen" id="screen-goal" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="gsc-title">Nouvel objectif</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <div class="scr-field">
+      <label for="gsc-name">Nom de l'objectif</label>
+      <input type="text" id="gsc-name" placeholder="Ex : Caution appartement" onkeydown="if(event.key==='Enter')document.getElementById('gsc-target').focus()">
+    </div>
+    <div class="scr-field">
+      <label for="gsc-deadline">Échéance</label>
+      <input type="date" id="gsc-deadline">
+    </div>
+    <div class="scr-field">
+      <label for="gsc-target">Montant cible</label>
+      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-target" placeholder="1 800"></div>
+    </div>
+    <div class="scr-field">
+      <label for="gsc-saved">Déjà épargné</label>
+      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-saved" placeholder="0"></div>
+    </div>
+    <div class="scr-field">
+      <label>Couleur</label>
+      <div class="gsw-row">
+        <button class="gsw on" data-c="#4D78D4" style="background:#4D78D4" onclick="selGoalColor(this)" aria-label="Bleu"></button>
+        <button class="gsw" data-c="#7BA3F0" style="background:#7BA3F0" onclick="selGoalColor(this)" aria-label="Bleu clair"></button>
+        <button class="gsw" data-c="#C43A3A" style="background:#C43A3A" onclick="selGoalColor(this)" aria-label="Rouge"></button>
+        <button class="gsw" data-c="#E87A7A" style="background:#E87A7A" onclick="selGoalColor(this)" aria-label="Rose"></button>
+        <button class="gsw" data-c="#f59e0b" style="background:#f59e0b" onclick="selGoalColor(this)" aria-label="Orange"></button>
+        <button class="gsw" data-c="#34d399" style="background:#34d399" onclick="selGoalColor(this)" aria-label="Vert"></button>
+        <button class="gsw" data-c="#a78bfa" style="background:#a78bfa" onclick="selGoalColor(this)" aria-label="Violet"></button>
+        <button class="gsw" data-c="#e879f9" style="background:#e879f9" onclick="selGoalColor(this)" aria-label="Magenta"></button>
+      </div>
+    </div>
+  </div>
+  <div class="screen-foot">
+    <button class="scr-save" onclick="saveGoalScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="gsc-save-lbl">Créer l'objectif</span>
+    </button>
   </div>
 </div>
 

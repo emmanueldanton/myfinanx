@@ -77,7 +77,7 @@ function renderGoalCard(goals) {
   const el = document.getElementById('dash-goal-card');
   if (!el) return;
   if (!goals.length) {
-    el.innerHTML = `<div class="dash-card-hd">Objectif</div><div class="dash-goal-empty">Créer un objectif</div>`;
+    el.innerHTML = `<div class="dash-card-hd">Objectif</div><div class="dash-goal-empty" onclick="openGoalScreen()">Créer un objectif</div>`;
     return;
   }
   const g = goals[0];
