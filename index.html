@@ -412,6 +412,10 @@
     <span class="sec-lbl">Postes de dépenses</span>
     <span class="sec-tot sec-tot-muted">Alloué : <span id="bud-tot">0</span></span>
   </div>
+  <button class="bud-ai" id="ai-budget-btn" onclick="suggestBudget()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg>
+    <span>Répartir mon budget avec l'IA</span>
+  </button>
   <div id="bud-rows"></div>
   <div class="add-reveal">
     <button class="add-btn" onclick="openBudgetScreen('bud')">
@@ -419,11 +423,6 @@
       Ajouter un poste
     </button>
   </div>
-
-  <button class="bud-ai" id="ai-budget-btn" onclick="suggestBudget()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg>
-    <span>Répartir mon budget avec l'IA</span>
-  </button>
 
   <!-- Éléments conservés pour la logique du footer (masqués) -->
   <div class="bud-hidden-foot" style="display:none;">
@@ -439,8 +438,6 @@
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10z"/></svg>
     <span id="cur-conv-txt"></span>
   </div>
-
-  <div id="bud-al" style="margin-top:11px;"></div>
 </div>
 
 <!-- ─── TRACKER ─── -->

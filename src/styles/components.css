@@ -1598,13 +1598,6 @@ body:has(#page-overview.active) .fab { display: none; }
 }
 .bn { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
 .bn > .row-view-txt { max-width: 100%; }
-.bud-status {
-  align-self: flex-start;
-  font-family: var(--fb); font-weight: 700; font-size: .58rem;
-  text-transform: uppercase; letter-spacing: .04em;
-  padding: 2px 7px; border-radius: 999px; white-space: nowrap;
-}
-.bud-status.is-none { color: var(--muted); background: var(--s2); border: 1px solid var(--b1); }
 
 /* ═══ Refonte epuree — conteneurs a plat (Depenses / Objectifs / Conseils IA) ═══ */
 .tx-panel, .gc, .ai-box, .txl {
