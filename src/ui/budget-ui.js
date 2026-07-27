@@ -27,6 +27,10 @@ export function initBudgetUI(getYM) {
   window.cancelBud = cancelBud;
   window.suggestBudget = suggestBudget;
   window.copyPrevMonth = copyPrevMonth;
+  // Écran dédié Revenu / Poste de budget (ajout + édition)
+  window.openBudgetScreen     = openBudgetScreen;
+  window.openBudgetScreenEdit = openBudgetScreenEdit;
+  window.saveBudgetScreen     = saveBudgetScreen;
 }
 
 // Copier revenus + postes du mois précédent (bouton ↻ de l'en-tête Budget)
@@ -73,11 +77,10 @@ const ICO = {
 };
 
 function _rowActions(prefix, id) {
+  const kind = prefix === 'Rev' ? 'rev' : 'bud';
   return `<div class="row-acts">
-      <button class="r-edit"   onclick="edit${prefix}('${id}')"   title="Modifier">${ICO.edit}</button>
-      <button class="r-save"   onclick="save${prefix}('${id}')"   title="Valider">${ICO.save}</button>
-      <button class="r-cancel" onclick="cancel${prefix}('${id}')" title="Annuler">${ICO.cancel}</button>
-      <button class="r-del"    onclick="del${prefix}('${id}')"    title="Supprimer">${ICO.del}</button>
+      <button class="r-edit" onclick="openBudgetScreenEdit('${kind}','${id}')" title="Modifier">${ICO.edit}</button>
+      <button class="r-del"  onclick="del${prefix}('${id}')" title="Supprimer">${ICO.del}</button>
     </div>`;
 }
 
@@ -271,6 +274,87 @@ export function delBud(id) {
   _mutate(b);
   showUndoToast(`"${item.name}" supprimé`, () => _mutate(snapshot));
 }
+
+// ── Écran dédié Revenu / Poste de budget (ajout + édition) ────────
+let _budScrKind = 'rev';   // 'rev' (source de revenu) | 'bud' (poste de dépense)
+let _budEditId  = null;
+
+export function openBudgetScreen(kind) {
+  _budScrKind = kind === 'bud' ? 'bud' : 'rev';
+  _budEditId  = null;
+  _bsSetVal('bsc-name', '');
+  _bsSetVal('bsc-amount', '');
+  _applyBudScreenLabels();
+  _bsText('bsc-save-lbl', 'Ajouter');
+  _setBudCurSym();
+  window.openScreen?.('screen-budget');
+  setTimeout(() => document.getElementById('bsc-name')?.focus(), 60);
+}
+
+export function openBudgetScreenEdit(kind, id) {
+  _budScrKind = kind === 'bud' ? 'bud' : 'rev';
+  _budEditId  = id;
+  const b    = _budget();
+  const item = _budScrKind === 'bud'
+    ? (b.budgetItems ?? []).find(x => x.id === id)
+    : (b.incomes ?? []).find(x => x.id === id);
+  if (!item) return;
+  _bsSetVal('bsc-name', item.name || '');
+  const amt = _budScrKind === 'bud' ? item.allocatedEUR : item.amountEUR;
+  _bsSetVal('bsc-amount', amt != null ? fmtInput(amt) : '');
+  _applyBudScreenLabels();
+  _bsText('bsc-save-lbl', 'Enregistrer');
+  _setBudCurSym();
+  window.openScreen?.('screen-budget');
+}
+
+export function saveBudgetScreen() {
+  const name = (document.getElementById('bsc-name')?.value || '').trim();
+  const amt  = fromDisplay(parseAmt(document.getElementById('bsc-amount')?.value || ''));
+  if (!name) {
+    const el = document.getElementById('bsc-name');
+    if (el) { el.classList.add('invalid'); setTimeout(() => el.classList.remove('invalid'), 1400); }
+    return;
+  }
+  const b = _budget();
+  if (_budScrKind === 'bud') {
+    if (_budEditId) {
+      const it = (b.budgetItems ?? []).find(x => x.id === _budEditId);
+      if (it) { it.name = name; it.allocatedEUR = amt; }
+    } else {
+      (b.budgetItems ?? (b.budgetItems = [])).push({ id: uid(), name, allocatedEUR: amt });
+    }
+  } else {
+    if (_budEditId) {
+      const r = (b.incomes ?? []).find(x => x.id === _budEditId);
+      if (r) { r.name = name; r.amountEUR = amt; }
+    } else {
+      (b.incomes ?? (b.incomes = [])).push({ id: uid(), name, amountEUR: amt });
+    }
+  }
+  _mutate(b);
+  window.closeScreen?.();
+  showSuccessToast(_budEditId ? 'Modifié' : (_budScrKind === 'bud' ? 'Poste ajouté' : 'Revenu ajouté'));
+  _budEditId = null;
+}
+
+function _applyBudScreenLabels() {
+  const isBud = _budScrKind === 'bud';
+  _bsText('bsc-title', _budEditId
+    ? (isBud ? 'Modifier le poste' : 'Modifier le revenu')
+    : (isBud ? 'Nouveau poste'    : 'Nouveau revenu'));
+  _bsText('bsc-name-lbl',   isBud ? 'Nom du poste'   : 'Source de revenu');
+  _bsText('bsc-amount-lbl', isBud ? 'Budget alloué'  : 'Montant');
+  const nameInp = document.getElementById('bsc-name');
+  if (nameInp) nameInp.placeholder = isBud ? 'Ex : Alimentation' : 'Ex : Salaire';
+}
+
+function _setBudCurSym() {
+  const s = getActiveCurrency().symbol;
+  document.querySelectorAll('#screen-budget .scr-cur').forEach(el => { el.textContent = s; });
+}
+function _bsSetVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+function _bsText(id, v)   { const el = document.getElementById(id); if (el) el.textContent = v; }
 
 // ── Répartition de budget assistée par l'IA ───────────────────────
 

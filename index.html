@@ -412,15 +412,10 @@
     <div id="rev-rows"></div>
   </div>
   <div class="add-reveal">
-    <button class="add-btn" onclick="this.parentElement.classList.toggle('open')">
+    <button class="add-btn" onclick="openBudgetScreen('rev')">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Ajouter un revenu
     </button>
-    <div class="arf">
-      <input class="an" type="text" id="nr-n" placeholder="Nouvelle source…">
-      <input class="aa" type="text" inputmode="decimal" id="nr-a" placeholder="0" onkeydown="if(event.key==='Enter')addRev()">
-      <button class="btn bp bsm" onclick="addRev()">OK</button>
-    </div>
   </div>
 
   <!-- POSTES DE DÉPENSES -->
@@ -430,15 +425,10 @@
   </div>
   <div id="bud-rows"></div>
   <div class="add-reveal">
-    <button class="add-btn" onclick="this.parentElement.classList.toggle('open')">
+    <button class="add-btn" onclick="openBudgetScreen('bud')">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Ajouter un poste
     </button>
-    <div class="arf">
-      <input type="text" id="nb-n" placeholder="Nouveau poste…" class="an">
-      <input class="aa" type="text" inputmode="decimal" id="nb-a" placeholder="0" onkeydown="if(event.key==='Enter')addBud()">
-      <button class="btn bp bsm" onclick="addBud()">OK</button>
-    </div>
   </div>
 
   <button class="bud-ai" id="ai-budget-btn" onclick="suggestBudget()">
@@ -970,6 +960,33 @@
 
     <div class="set-appver">MyFinanx · version 1.0.0</div>
 
+  </div>
+</div>
+
+<!-- ════ ÉCRAN REVENU / POSTE ════ -->
+<div class="screen" id="screen-budget" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="bsc-title">Nouveau revenu</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <div class="scr-field">
+      <label id="bsc-name-lbl" for="bsc-name">Source de revenu</label>
+      <input type="text" id="bsc-name" placeholder="Ex : Salaire" onkeydown="if(event.key==='Enter')document.getElementById('bsc-amount').focus()">
+    </div>
+    <div class="scr-field">
+      <label id="bsc-amount-lbl" for="bsc-amount">Montant</label>
+      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="bsc-amount" placeholder="0" onkeydown="if(event.key==='Enter')saveBudgetScreen()"></div>
+    </div>
+  </div>
+  <div class="screen-foot">
+    <button class="scr-save" onclick="saveBudgetScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="bsc-save-lbl">Ajouter</span>
+    </button>
   </div>
 </div>
 
