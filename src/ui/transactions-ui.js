@@ -17,14 +17,10 @@ export function initTransactionsUI(getYM) {
   _getYM = getYM;
   window.addTx        = addTx;
   window.delTx        = delTx;
-  window.openEditTx   = openEditTx;
-  window.closeEditTx  = closeEditTx;
-  window.saveEditTx   = saveEditTx;
   window.setTxType    = setTxType;
   window.updateCatSel = updateCatSel;
   window.searchTx     = searchTx;
   window.filterTxCat  = filterTxCat;
-  window.openTxForm   = openTxForm;
   // Écran dédié Dépense / Revenu (ajout + édition)
   window.openTxScreen     = openTxScreen;
   window.openTxScreenEdit = openTxScreenEdit;
@@ -182,16 +178,6 @@ export function updateTracker(state) {
 
 // ── Form helpers ──────────────────────────────────────────────────
 
-// Ouvre le formulaire d'ajout depuis l'accueil : onglet Dépenses, type pré-réglé, focus description
-export function openTxForm(type) {
-  if (window.goTab) window.goTab('tracker');
-  setTxType(type || 'expense');
-  requestAnimationFrame(() => {
-    const el = document.getElementById('tx-d');
-    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
-  });
-}
-
 export function setTxType(t) {
   _txType = t;
   document.getElementById('ty-e')?.classList.toggle('on', t === 'expense');
@@ -242,35 +228,6 @@ export function delTx(id) {
   const snapshot = [...txs];
   _mutate(txs.filter(t => t.id !== id));
   showUndoToast(`"${tx.description}" supprimée`, () => _mutate(snapshot));
-}
-
-export function openEditTx(id) {
-  document.querySelectorAll('.tx-edit-form').forEach(f => { f.style.display = 'none'; });
-  const form = document.getElementById('txef-' + id);
-  if (form) form.style.display = 'block';
-}
-
-export function closeEditTx(id) {
-  const form = document.getElementById('txef-' + id);
-  if (form) form.style.display = 'none';
-}
-
-export function saveEditTx(id) {
-  const txs = _txs();
-  const tx  = txs.find(t => t.id === id);
-  if (!tx) return;
-  const form = document.getElementById('txef-' + id);
-  if (!form) return;
-  const desc = form.querySelector('.tx-edit-desc').value.trim();
-  const cat  = form.querySelector('.tx-edit-cat').value;
-  const amt  = fromDisplay(parseAmt(form.querySelector('.tx-edit-amt').value));
-  const date = form.querySelector('.tx-edit-date').value;
-  if (!desc || amt <= 0) return;
-  tx.description = desc;
-  tx.category    = cat;
-  tx.amountEUR   = amt;
-  if (date) tx.date = date;
-  _mutate(txs);
 }
 
 // ── Écran dédié Dépense / Revenu (ajout + édition) ────────────────

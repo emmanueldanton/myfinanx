@@ -1,6 +1,6 @@
 // ═══ Budget UI — revenue sources + budget items (onglet Budget) ═══
 import { store }      from '../store.js';
-import { bridgeSave, getRecentMonthsExpenseAverages, getPreviousMonthRawBudget } from '../data-bridge.js';
+import { bridgeSave, getRecentMonthsExpenseAverages } from '../data-bridge.js';
 import { uid, esc, parseAmt, catIco, COLS, catSubtitle } from '../utils.js';
 import { calcByCategory } from '../transactions.js';
 import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
@@ -15,38 +15,13 @@ let _getYM = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()
 
 export function initBudgetUI(getYM) {
   _getYM = getYM;
-  window.addRev    = addRev;
   window.delRev    = delRev;
-  window.editRev   = editRev;
-  window.saveRev   = saveRev;
-  window.cancelRev = cancelRev;
-  window.addBud    = addBud;
   window.delBud    = delBud;
-  window.editBud   = editBud;
-  window.saveBud   = saveBud;
-  window.cancelBud = cancelBud;
   window.suggestBudget = suggestBudget;
-  window.copyPrevMonth = copyPrevMonth;
   // Écran dédié Revenu / Poste de budget (ajout + édition)
   window.openBudgetScreen     = openBudgetScreen;
   window.openBudgetScreenEdit = openBudgetScreenEdit;
   window.saveBudgetScreen     = saveBudgetScreen;
-}
-
-// Copier revenus + postes du mois précédent (bouton ↻ de l'en-tête Budget)
-export function copyPrevMonth() {
-  const [Y, M] = _getYM();
-  const prev = getPreviousMonthRawBudget(Y, M);
-  if (!prev || ((prev.revenus?.length ?? 0) === 0 && (prev.budget?.length ?? 0) === 0)) {
-    showSuccessToast('Aucun budget le mois précédent');
-    return;
-  }
-  const b = _budget();
-  const snapshot = JSON.parse(JSON.stringify(b));
-  b.incomes     = (prev.revenus || []).map(r => ({ id: uid(), name: r.name, amountEUR: r.amount ?? 0 }));
-  b.budgetItems = (prev.budget  || []).map(x => ({ id: uid(), name: x.name, allocatedEUR: x.amount ?? 0 }));
-  _mutate(b);
-  showUndoToast('Budget copié du mois précédent', () => _mutate(snapshot));
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -98,11 +73,9 @@ export function renderRevRows(state) {
       <div class="rev-ico">${REV_ICO}</div>
       <div class="rn">
         <span class="row-view-txt">${esc(r.name)}</span>
-        <input type="text" value="${esc(r.name)}" placeholder="Source">
       </div>
       <div class="ra">
         <span class="row-view-txt amt" style="color:${col}">${fmt(r.amountEUR ?? 0)}</span>
-        <input type="text" inputmode="decimal" value="${fmtInput(r.amountEUR)}" style="color:${col}">
       </div>
       ${_rowActions('Rev', r.id)}
     </div>`;
@@ -129,12 +102,10 @@ export function renderBudRows(state) {
       <div class="bn">
         <span class="row-view-txt">${esc(b.name)}</span>
         ${sub ? `<span class="poste-sub">${esc(sub)}</span>` : ''}
-        <input type="text" value="${esc(b.name)}" placeholder="Nom du poste">
       </div>
       <div class="ba-wrap">
         <div class="ba">
           <span class="row-view-txt amt" style="color:var(--red-l)">${fmt(b.allocatedEUR)}</span>
-          <input type="text" inputmode="decimal" value="${fmtInput(b.allocatedEUR)}">
         </div>
         ${status}
       </div>
@@ -182,42 +153,6 @@ export function renderBudgetFooter(state) {
 
 // ── Revenue mutations ─────────────────────────────────────────────
 
-export function editRev(id) {
-  const row = document.querySelector(`.rev-row[data-rev-id="${id}"]`);
-  if (!row) return;
-  row.classList.add('editing');
-  const inp = row.querySelector('.rn input');
-  if (inp) { inp.focus(); inp.select(); }
-}
-
-export function saveRev(id) {
-  const row = document.querySelector(`.rev-row[data-rev-id="${id}"]`);
-  if (!row) return;
-  const b = _budget();
-  const r = b.incomes.find(x => x.id === id);
-  if (r) {
-    r.name      = row.querySelector('.rn input').value.trim() || 'Revenu';
-    r.amountEUR = fromDisplay(parseAmt(row.querySelector('.ra input').value));
-  }
-  _mutate(b);   // commit + re-render → la ligne repasse en mode lecture
-}
-
-export function cancelRev() {
-  // Aucun commit pendant l'édition → on re-rend l'état stocké (annule les saisies)
-  renderRevRows({ budget: store.get('mfx_budget') });
-}
-
-export function addRev() {
-  const n = document.getElementById('nr-n').value.trim() || 'Revenu';
-  const a = fromDisplay(parseAmt(document.getElementById('nr-a').value));
-  const b = _budget();
-  b.incomes.push({ id: uid(), name: n, amountEUR: a });
-  document.getElementById('nr-n').value = '';
-  document.getElementById('nr-a').value = '';
-  _mutate(b);
-  showSuccessToast('Revenu ajouté');
-}
-
 export function delRev(id) {
   const b        = _budget();
   const r        = b.incomes.find(x => x.id === id);
@@ -229,41 +164,6 @@ export function delRev(id) {
 }
 
 // ── Budget item mutations ─────────────────────────────────────────
-
-export function editBud(id) {
-  const row = document.querySelector(`.bud-row[data-bud-id="${id}"]`);
-  if (!row) return;
-  row.classList.add('editing');
-  const inp = row.querySelector('.bn input');
-  if (inp) { inp.focus(); inp.select(); }
-}
-
-export function saveBud(id) {
-  const row = document.querySelector(`.bud-row[data-bud-id="${id}"]`);
-  if (!row) return;
-  const b = _budget();
-  const item = b.budgetItems.find(x => x.id === id);
-  if (item) {
-    item.name         = row.querySelector('.bn input').value.trim() || 'Nouveau poste';
-    item.allocatedEUR = fromDisplay(parseAmt(row.querySelector('.ba input').value));
-  }
-  _mutate(b);   // commit + re-render (met aussi à jour l'icône de catégorie)
-}
-
-export function cancelBud() {
-  renderBudRows({ budget: store.get('mfx_budget') });
-}
-
-export function addBud() {
-  const n = document.getElementById('nb-n').value.trim() || 'Nouveau poste';
-  const a = fromDisplay(parseAmt(document.getElementById('nb-a').value));
-  const b = _budget();
-  b.budgetItems.push({ id: uid(), name: n, allocatedEUR: a });
-  document.getElementById('nb-n').value = '';
-  document.getElementById('nb-a').value = '';
-  _mutate(b);
-  showSuccessToast('Poste budgétaire ajouté');
-}
 
 export function delBud(id) {
   const b        = _budget();

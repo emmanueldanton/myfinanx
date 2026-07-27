@@ -5,37 +5,16 @@ import { uid, esc, parseAmt, fmtDate, todayISO } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
 
-let _gColor = '#4D78D4';
-
 // ── Init ──────────────────────────────────────────────────────────
 
 export function initGoalsUI() {
-  window.selC           = selC;
-  window.addGoal        = addGoal;
   window.addToGoal      = addToGoal;
   window.delGoal        = delGoal;
-  window.toggleEditGoal = toggleEditGoal;
-  window.saveEditGoal   = saveEditGoal;
-  window.openGoalForm   = openGoalForm;
   // Écran dédié Objectif (ajout + édition)
   window.openGoalScreen     = openGoalScreen;
   window.openGoalScreenEdit = openGoalScreenEdit;
   window.selGoalColor       = selGoalColor;
   window.saveGoalScreen     = saveGoalScreen;
-
-  const ngD = document.getElementById('ng-d');
-  if (ngD && !ngD.value) ngD.value = todayISO();
-}
-
-// Ouvre le formulaire de création (onglet Objectifs) : révèle le formulaire + focus nom
-export function openGoalForm() {
-  if (window.goTab) window.goTab('goals');
-  const form = document.getElementById('goal-form');
-  if (form) form.style.display = 'block';
-  requestAnimationFrame(() => {
-    const el = document.getElementById('ng-n');
-    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
-  });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -129,48 +108,7 @@ export function buildGoalCard(g, mode) {
   </div>`;
 }
 
-function _editForm(g) {
-  return `<div class="g-edit-form" id="gef-${g.id}" style="display:none;">
-      <div class="g-edit-row">
-        <div class="g-edit-field"><div class="g-edit-lbl">Nom de l'objectif</div><input type="text" class="g-edit-name" value="${esc(g.name)}" placeholder="Nom"></div>
-        <div class="g-edit-field"><div class="g-edit-lbl">Échéance</div><input type="date" class="g-edit-dl" value="${g.deadline || ''}"></div>
-      </div>
-      <div class="g-edit-row">
-        <div class="g-edit-field"><div class="g-edit-lbl">Montant cible</div><input type="text" inputmode="decimal" class="g-edit-target" value="${fmtInput(g.targetEUR)}" placeholder="Cible"></div>
-        <div class="g-edit-field"><div class="g-edit-lbl">Déjà épargné</div><input type="text" inputmode="decimal" class="g-edit-saved" value="${fmtInput(g.savedEUR)}" placeholder="Épargné"></div>
-      </div>
-      <div class="g-edit-actions">
-        <button class="btn bp bsm" onclick="saveEditGoal('${g.id}','')">Enregistrer</button>
-        <button class="btn bsm" onclick="toggleEditGoal('${g.id}','')">Annuler</button>
-      </div>
-    </div>`;
-}
-
-// ── Color picker ──────────────────────────────────────────────────
-
-export function selC(el) {
-  document.querySelectorAll('.sw').forEach(s => s.classList.remove('on'));
-  el.classList.add('on');
-  _gColor = el.dataset.c;
-}
-
 // ── Mutations ─────────────────────────────────────────────────────
-
-export function addGoal() {
-  const n = document.getElementById('ng-n').value.trim();
-  const t = fromDisplay(parseAmt(document.getElementById('ng-t').value));
-  const s = fromDisplay(parseAmt(document.getElementById('ng-c').value));
-  const d = document.getElementById('ng-d').value.trim();
-  if (!n || t <= 0) return;
-  const goals = _goals();
-  goals.push({ id: uid(), name: n, targetEUR: t, savedEUR: s, deadline: d, color: _gColor });
-  ['ng-n', 'ng-t', 'ng-c'].forEach(i => { document.getElementById(i).value = ''; });
-  document.getElementById('ng-d').value = todayISO();
-  _mutate(goals);
-  const form = document.getElementById('goal-form');
-  if (form) form.style.display = 'none';
-  showSuccessToast(`Objectif "${n}" créé`);
-}
 
 export function addToGoal(id, prefix = '') {
   const inp   = document.getElementById(prefix + 'ga-' + id);
@@ -205,30 +143,6 @@ export function delGoal(id) {
   const snapshot = [...goals];
   _mutate(goals.filter(x => x.id !== id));
   showUndoToast(`"${g.name}" supprimé`, () => _mutate(snapshot));
-}
-
-export function toggleEditGoal(id, prefix) {
-  const form = document.getElementById('gef-' + prefix + id);
-  if (!form) return;
-  form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
-
-export function saveEditGoal(id, prefix) {
-  const goals = _goals();
-  const g     = goals.find(g => g.id === id);
-  if (!g) return;
-  const form = document.getElementById('gef-' + prefix + id);
-  if (!form) return;
-  const name   = form.querySelector('.g-edit-name').value.trim();
-  const target = fromDisplay(parseAmt(form.querySelector('.g-edit-target').value));
-  const saved  = fromDisplay(parseAmt(form.querySelector('.g-edit-saved').value));
-  const dl     = form.querySelector('.g-edit-dl').value;
-  if (!name || target <= 0) return;
-  g.name      = name;
-  g.targetEUR = target;
-  g.savedEUR  = Math.min(saved, target);
-  g.deadline  = dl;
-  _mutate(goals);
 }
 
 // ── Écran dédié Objectif (ajout + édition) ────────────────────────
