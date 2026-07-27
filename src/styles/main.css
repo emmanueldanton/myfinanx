@@ -13,6 +13,8 @@
   --r2: 12px;
   --r3: 22px;
 
+  color-scheme: light;   /* défaut ; surchargé par le thème actif (voir themes.css) */
+
   /* Default design tokens — light & airy theme = Sleek (overridden by setTheme() at runtime) */
   --bg:      #F7F9FC;
   --s0:      #F7F9FC;

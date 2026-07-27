@@ -11,6 +11,7 @@
 
 /* ─── Clair & aéré (défaut, = Sleek) ─── */
 :root[data-theme="light"] {
+  color-scheme: light;   /* popups natifs (calendrier, listes, scrollbars) en clair */
   --bg:          #F7F9FC;
   --s0:          #F7F9FC;
   --s1:          #FFFFFF;
@@ -50,6 +51,7 @@
 
 /* ─── Sombre bleu nuit (fond neutre partagé, accent bleu) ─── */
 :root[data-theme="blue"] {
+  color-scheme: dark;   /* popups natifs (calendrier, listes, scrollbars) en sombre */
   --bg:          #0B0E14;
   --s0:          #0E121A;
   --s1:          #151A23;
@@ -89,6 +91,7 @@
 
 /* ─── Sombre violet (MÊME fond neutre, accent violet) ─── */
 :root[data-theme="violet"] {
+  color-scheme: dark;   /* popups natifs (calendrier, listes, scrollbars) en sombre */
   --bg:          #0B0E14;
   --s0:          #0E121A;
   --s1:          #151A23;

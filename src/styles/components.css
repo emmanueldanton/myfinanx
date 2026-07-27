@@ -994,7 +994,7 @@ nav::-webkit-scrollbar { display:none; }
 
 /* ════ RESET MODAL ════ */
 .reset-overlay {
-  display:none; position:fixed; inset:0; z-index:400;
+  display:none; position:fixed; inset:0; z-index:1200;   /* au-dessus des écrans (450) et de l'aperçu IA (1000) */
   background:rgba(0,0,0,.62); backdrop-filter:blur(4px);
   align-items:center; justify-content:center; padding:20px;
 }
@@ -2100,3 +2100,7 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
 .scr-hero.is-income  .scr-hero-ico { color: var(--green);  background: color-mix(in srgb, var(--green) 13%, var(--s1)); border-color: color-mix(in srgb, var(--green) 22%, var(--b1)); }
 .scr-hero.is-goal    .scr-hero-ico,
 .scr-hero.is-poste   .scr-hero-ico { color: var(--pr);     background: color-mix(in srgb, var(--pr) 12%, var(--s1)); border-color: color-mix(in srgb, var(--pr) 22%, var(--b1)); }
+
+/* Popups natifs (calendrier / listes) alignés au thème via color-scheme ; icône interactive */
+input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .6; transition: opacity .15s; }
+input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
