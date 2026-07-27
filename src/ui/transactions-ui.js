@@ -25,6 +25,11 @@ export function initTransactionsUI(getYM) {
   window.searchTx     = searchTx;
   window.filterTxCat  = filterTxCat;
   window.openTxForm   = openTxForm;
+  // Écran dédié Dépense / Revenu (ajout + édition)
+  window.openTxScreen     = openTxScreen;
+  window.openTxScreenEdit = openTxScreenEdit;
+  window.setTxScreenType  = setTxScreenType;
+  window.saveTxScreen     = saveTxScreen;
 
   const txDt = document.getElementById('tx-dt');
   if (txDt && !txDt.value) txDt.value = todayISO();
@@ -119,9 +124,6 @@ export function renderExpenses(state) {
     const ibg  = isE ? 'rgba(196,58,58,.14)' : 'rgba(52,211,153,.12)';
     const sign = isE ? '−' : '+';
     const ico  = catIco(t.category, 14);
-    const cats = (isE ? CATS_E : CATS_I).map(c =>
-      `<option value="${c}"${c === t.category ? ' selected' : ''}>${c}</option>`
-    ).join('');
     return `<div class="txi" id="txi-${t.id}">
       <div class="txii" style="background:${ibg};color:${col}">${ico}</div>
       <div class="txif">
@@ -132,34 +134,12 @@ export function renderExpenses(state) {
         </div>
       </div>
       <div class="txam" style="color:${col}">${sign} ${fmt(t.amountEUR ?? 0)}</div>
-      <button class="txed" onclick="openEditTx('${t.id}')" title="Modifier">
+      <button class="txed" onclick="openTxScreenEdit('${t.id}')" title="Modifier">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
       <button class="txdl" onclick="delTx('${t.id}')" title="Supprimer">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
-      <div class="tx-edit-form" id="txef-${t.id}" style="display:none;">
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Description</div>
-          <input type="text" class="tx-edit-desc" value="${esc(t.description || '')}" placeholder="Description">
-        </div>
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Catégorie</div>
-          <select class="tx-edit-cat">${cats}</select>
-        </div>
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Montant</div>
-          <input type="text" inputmode="decimal" class="tx-edit-amt" value="${fmtInput(t.amountEUR ?? 0)}" placeholder="Montant">
-        </div>
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Date</div>
-          <input type="date" class="tx-edit-date" value="${t.date || ''}">
-        </div>
-        <div class="tx-edit-actions">
-          <button class="btn bp bsm" onclick="saveEditTx('${t.id}')">Enregistrer</button>
-          <button class="btn bsm" onclick="closeEditTx('${t.id}')">Annuler</button>
-        </div>
-      </div>
     </div>`;
   }).join('');
   renderCatBk(allTxs.filter(t => t.type !== 'income'));
@@ -292,3 +272,78 @@ export function saveEditTx(id) {
   if (date) tx.date = date;
   _mutate(txs);
 }
+
+// ── Écran dédié Dépense / Revenu (ajout + édition) ────────────────
+let _txScrType = 'expense';
+let _txEditId  = null;
+
+export function openTxScreen(type) {
+  _txEditId  = null;
+  _txScrType = type === 'income' ? 'income' : 'expense';
+  setTxScreenType(_txScrType);
+  _setVal('txs-desc', '');
+  _setVal('txs-amt', '');
+  _setVal('txs-date', todayISO());
+  _setText('txs-title', _txScrType === 'income' ? 'Nouveau revenu' : 'Nouvelle dépense');
+  _setText('txs-save-lbl', 'Ajouter');
+  const sym = document.getElementById('txs-cur-sym');
+  if (sym) sym.textContent = getActiveCurrency().symbol;
+  window.openScreen?.('screen-tx');
+  setTimeout(() => document.getElementById('txs-desc')?.focus(), 60);
+}
+
+export function openTxScreenEdit(id) {
+  const tx = _txs().find(t => t.id === id);
+  if (!tx) return;
+  _txEditId  = id;
+  _txScrType = tx.type === 'income' ? 'income' : 'expense';
+  setTxScreenType(_txScrType, tx.category);
+  _setVal('txs-desc', tx.description || '');
+  _setVal('txs-amt', tx.amountEUR != null ? fmtInput(tx.amountEUR) : '');
+  _setVal('txs-date', tx.date || todayISO());
+  _setText('txs-title', 'Modifier la transaction');
+  _setText('txs-save-lbl', 'Enregistrer');
+  const sym = document.getElementById('txs-cur-sym');
+  if (sym) sym.textContent = getActiveCurrency().symbol;
+  window.openScreen?.('screen-tx');
+}
+
+export function setTxScreenType(t, keepCat) {
+  _txScrType = t === 'income' ? 'income' : 'expense';
+  document.getElementById('txs-ty-e')?.classList.toggle('on', _txScrType === 'expense');
+  document.getElementById('txs-ty-i')?.classList.toggle('on', _txScrType === 'income');
+  const sel = document.getElementById('txs-cat');
+  if (sel) {
+    const cats = _txScrType === 'expense' ? CATS_E : CATS_I;
+    const prev = keepCat || sel.value;
+    sel.innerHTML = cats.map(c => `<option value="${c}"${c === prev ? ' selected' : ''}>${c}</option>`).join('');
+  }
+}
+
+export function saveTxScreen() {
+  const desc = (document.getElementById('txs-desc')?.value || '').trim();
+  const cat  = document.getElementById('txs-cat')?.value || '';
+  const amt  = fromDisplay(parseAmt(document.getElementById('txs-amt')?.value || ''));
+  const date = document.getElementById('txs-date')?.value || todayISO();
+  if (!desc || !amt || amt <= 0) {
+    const a = document.getElementById('txs-amt');
+    if (a) { a.classList.add('invalid'); setTimeout(() => a.classList.remove('invalid'), 1400); }
+    return;
+  }
+  const txs = _txs();
+  if (_txEditId) {
+    const tx = txs.find(t => t.id === _txEditId);
+    if (tx) { tx.description = desc; tx.category = cat; tx.amountEUR = amt; tx.date = date; tx.type = _txScrType; }
+  } else {
+    txs.unshift({
+      id: uid(), description: desc, category: cat, amountEUR: amt,
+      date, type: _txScrType, curCode: getActiveCurrency().code,
+    });
+  }
+  _mutate(txs);
+  window.closeScreen?.();
+  showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
+  _txEditId = null;
+}
+
+function _setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }

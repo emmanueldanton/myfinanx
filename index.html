@@ -351,11 +351,11 @@
 
   <!-- ACTIONS RAPIDES -->
   <section class="dash-actions">
-    <button class="dash-act dash-act-primary" onclick="openTxForm('expense')">
+    <button class="dash-act dash-act-primary" onclick="openTxScreen('expense')">
       <span class="dash-act-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
       <span class="dash-act-lbl">Ajouter</span>
     </button>
-    <button class="dash-act" onclick="openTxForm('income')">
+    <button class="dash-act" onclick="openTxScreen('income')">
       <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
       <span class="dash-act-lbl">Revenu</span>
     </button>
@@ -973,6 +973,56 @@
   </div>
 </div>
 
+<!-- ════ ÉCRAN DÉPENSE / REVENU ════ -->
+<div class="screen" id="screen-tx" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="txs-title">Nouvelle dépense</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <!-- Type -->
+    <div class="txs-type">
+      <button class="txs-ty on" id="txs-ty-e" onclick="setTxScreenType('expense')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        Dépense
+      </button>
+      <button class="txs-ty" id="txs-ty-i" onclick="setTxScreenType('income')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Revenu
+      </button>
+    </div>
+
+    <div class="scr-field">
+      <label for="txs-desc">Description</label>
+      <input type="text" id="txs-desc" placeholder="Ex : Courses Lidl" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
+    </div>
+    <div class="scr-field">
+      <label for="txs-cat">Catégorie</label>
+      <select id="txs-cat"></select>
+    </div>
+    <div class="scr-field">
+      <label for="txs-amt">Montant</label>
+      <div class="scr-amt">
+        <span class="scr-cur" id="txs-cur-sym">€</span>
+        <input type="text" inputmode="decimal" id="txs-amt" placeholder="0,00" onkeydown="if(event.key==='Enter')saveTxScreen()">
+      </div>
+    </div>
+    <div class="scr-field">
+      <label for="txs-date">Date</label>
+      <input type="date" id="txs-date">
+    </div>
+  </div>
+  <div class="screen-foot">
+    <button class="scr-save" onclick="saveTxScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="txs-save-lbl">Ajouter</span>
+    </button>
+  </div>
+</div>
+
 <!-- ════ PLUS PANEL ════ -->
 
 <div class="plus-overlay" id="plus-overlay" onclick="closePlusPanel()"></div>
@@ -1061,7 +1111,7 @@
 </div>
 
 <!-- FAB -->
-<button class="fab" onclick="goTabMobile('tracker');setTimeout(()=>document.getElementById('tx-d').focus(),100)" title="Ajouter une dépense">
+<button class="fab" onclick="openTxScreen('expense')" title="Ajouter une dépense">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 
