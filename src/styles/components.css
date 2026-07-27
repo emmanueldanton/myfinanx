@@ -2084,3 +2084,25 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
 }
 .set-cur-btn:hover { border-color: var(--b2); }
 .set-cur-btn.on { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s0)); color: var(--pr); }
+
+/* À propos — carte concepteur + version */
+.set-about { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; }
+.set-about-pp {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  object-fit: cover; border: 1px solid var(--b2);
+}
+.set-about-txt {
+  font-family: var(--fb); font-size: .82rem; line-height: 1.5; color: var(--muted);
+}
+.set-about-txt strong { color: var(--text); font-weight: 800; }
+.set-about-li {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+  font-family: var(--fh); font-weight: 700; font-size: .78rem;
+  color: var(--pr); text-decoration: none;
+}
+.set-about-li svg { width: 15px; height: 15px; }
+.set-about-li:hover { text-decoration: underline; }
+.set-appver {
+  text-align: center; margin-top: 22px;
+  font-family: var(--fb); font-size: .74rem; color: var(--faint);
+}
