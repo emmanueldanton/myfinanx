@@ -45,7 +45,8 @@ body::before {
 
 /* 🌅 Matin — aube chaude, soleil bas qui se lève (halo doré en bas à droite) */
 .greet-wrap[data-daypart="morning"] {
-  background: linear-gradient(135deg, #ec8f4c 0%, #e85c86 55%, #7d63d8 100%);
+  /* Aube : lumière chaude qui monte vers le bleu du jour (fini bleu = mène à l'après-midi) */
+  background: linear-gradient(135deg, #f5a15c 0%, #ec7ba0 48%, #7ea6e8 100%);
 }
 .greet-wrap[data-daypart="morning"]::after {
   top: auto; bottom: -60%; right: 6%;
@@ -63,7 +64,8 @@ body::before {
 
 /* 🌆 Soir — coucher de soleil orangé/rose/violet, soleil bas */
 .greet-wrap[data-daypart="evening"] {
-  background: linear-gradient(135deg, #f0664a 0%, #d5407e 50%, #6a3596 100%);
+  /* Coucher : chaud saturé qui plonge vers le violet profond (mène à la nuit) */
+  background: linear-gradient(135deg, #ef6b4a 0%, #c43c74 50%, #55287f 100%);
 }
 .greet-wrap[data-daypart="evening"]::after {
   top: auto; bottom: -55%; right: 8%;
