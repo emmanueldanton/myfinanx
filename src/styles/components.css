@@ -1955,3 +1955,100 @@ body:has(#page-goals.active) > header { display: none; }
 
 /* FAB masque sur Budget et Objectifs (en-tete + dediee) */
 body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display: none; }
+
+/* ════ SOUS-ÉCRANS PLEIN ÉCRAN (configuration / édition) — style « vraie app » ════ */
+.screen {
+  position: fixed; inset: 0; z-index: 450;
+  background: var(--bg);
+  display: none; flex-direction: column;
+}
+.screen.open { display: flex; animation: screenIn .18s ease; }
+@keyframes screenIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.screen-head {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+  height: 56px; padding: 0 12px;
+  border-bottom: 1px solid var(--b1);
+  background: var(--s0);
+}
+.screen-back {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .15s, transform .15s; flex-shrink: 0;
+}
+.screen-back svg { width: 18px; height: 18px; stroke: currentColor; }
+.screen-back:hover { background: var(--s2); }
+.screen-back:active { transform: scale(.94); }
+.screen-title {
+  flex: 1; text-align: center;
+  font-family: var(--fh); font-weight: 800; font-size: 1.05rem; color: var(--text);
+  letter-spacing: -0.01em;
+}
+.screen-head-spacer { width: 38px; flex-shrink: 0; }
+.screen-body {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 20px 16px calc(30px + env(safe-area-inset-bottom));
+  max-width: 560px; width: 100%; margin: 0 auto;
+}
+
+/* Sections de réglages */
+.set-section { margin-bottom: 26px; }
+.set-section:last-child { margin-bottom: 0; }
+.set-label {
+  font-family: var(--fh); font-size: .72rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 12px;
+}
+.set-field > span {
+  display: block; font-family: var(--fb); font-size: .8rem; color: var(--muted); margin-bottom: 6px;
+}
+.set-field input {
+  width: 100%; padding: 12px 14px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fb); font-weight: 600;
+}
+.set-field input:focus { outline: none; border-color: var(--pr); }
+
+/* Thème — cartes sélectionnables */
+.set-theme-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.set-theme {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding: 14px 8px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fh); font-weight: 700; font-size: .78rem; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.set-theme:hover { border-color: var(--b2); }
+.set-theme:has(.dtdot.on) { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s1)); }
+.set-swatch {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--b2);
+}
+.set-swatch.dtdot.on { outline: 2px solid var(--pr); outline-offset: 2px; }
+
+/* Devise — grille sélectionnable */
+.set-cur-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.set-cur-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px 8px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fh); font-weight: 700; font-size: .82rem; cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.set-cur-btn:hover { border-color: var(--b2); }
+.set-cur-btn.on { border-color: var(--pr); background: color-mix(in srgb, var(--pr) 8%, var(--s1)); color: var(--pr); }
+
+/* Données — liste d'actions */
+.set-data-list { display: flex; flex-direction: column; gap: 10px; }
+.set-data-btn {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 14px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fh); font-weight: 700; font-size: .85rem; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.set-data-btn svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
+.set-data-btn:hover { border-color: var(--b2); }
+.set-data-btn.danger { color: var(--red-l); }
+.set-data-btn.danger svg { color: var(--red-l); }
