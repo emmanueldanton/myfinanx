@@ -95,21 +95,24 @@ header {
 .brand-name { color:var(--text); font-size:.88rem; }
 
 /* Month nav */
-.month-nav { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+/* Pastille de mois épurée (identique à l'onglet Budget / Sleek) */
+.month-nav {
+  display:flex; align-items:center; gap:1px; flex-shrink:0;
+  background:var(--s1); border:1px solid var(--b1); border-radius:999px; padding:2px;
+}
 .mnb {
   width:26px; height:26px; border-radius:50%;
-  background:var(--s1); border:1px solid var(--b1); color:var(--muted);
+  background:transparent; border:none; color:var(--muted);
   display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:.15s;
+  cursor:pointer; transition:background .15s, color .15s;
 }
-.mnb:hover { background:var(--b1); color:var(--text); }
+.mnb svg { width:15px; height:15px; }
+.mnb:hover { background:var(--s2); color:var(--text); }
 .mnb svg { stroke:currentColor; }
 #ml {
-  font-family:var(--fh); font-size:.8rem; font-weight:700;
-  color:var(--pr-l); min-width:106px; text-align:center;
+  font-family:var(--fh); font-size:.76rem; font-weight:700;
+  color:var(--text); min-width:54px; text-align:center; text-transform:capitalize;
 }
-@media(max-width:480px){ #ml { min-width:88px; font-size:.75rem; } }
-@media(max-width:360px){ #ml { min-width:70px; font-size:.75rem; } }
 
 /* Currency picker */
 .cur-pick {
