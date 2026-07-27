@@ -951,13 +951,21 @@
     <span class="screen-head-spacer"></span>
   </div>
   <div class="screen-body">
+    <!-- Hero : montant en grand -->
+    <div class="scr-hero is-income" id="bsc-hero">
+      <div class="scr-hero-ico" id="bsc-hero-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div class="scr-amount-input">
+        <span class="scr-cur">€</span>
+        <input type="text" inputmode="decimal" id="bsc-amount" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')saveBudgetScreen()">
+      </div>
+      <div class="scr-hero-lbl" id="bsc-amount-lbl">Montant</div>
+    </div>
+
     <div class="scr-field">
       <label id="bsc-name-lbl" for="bsc-name">Source de revenu</label>
-      <input type="text" id="bsc-name" placeholder="Ex : Salaire" onkeydown="if(event.key==='Enter')document.getElementById('bsc-amount').focus()">
-    </div>
-    <div class="scr-field">
-      <label id="bsc-amount-lbl" for="bsc-amount">Montant</label>
-      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="bsc-amount" placeholder="0" onkeydown="if(event.key==='Enter')saveBudgetScreen()"></div>
+      <input type="text" id="bsc-name" placeholder="Ex : Salaire">
     </div>
   </div>
   <div class="screen-foot">
@@ -978,17 +986,25 @@
     <span class="screen-head-spacer"></span>
   </div>
   <div class="screen-body">
+    <!-- Hero : montant cible en grand -->
+    <div class="scr-hero is-goal" id="gsc-hero">
+      <div class="scr-hero-ico" id="gsc-hero-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </div>
+      <div class="scr-amount-input">
+        <span class="scr-cur">€</span>
+        <input type="text" inputmode="decimal" id="gsc-target" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')document.getElementById('gsc-name').focus()">
+      </div>
+      <div class="scr-hero-lbl">Montant cible</div>
+    </div>
+
     <div class="scr-field">
       <label for="gsc-name">Nom de l'objectif</label>
-      <input type="text" id="gsc-name" placeholder="Ex : Caution appartement" onkeydown="if(event.key==='Enter')document.getElementById('gsc-target').focus()">
+      <input type="text" id="gsc-name" placeholder="Ex : Caution appartement">
     </div>
     <div class="scr-field">
       <label for="gsc-deadline">Échéance</label>
       <input type="date" id="gsc-deadline">
-    </div>
-    <div class="scr-field">
-      <label for="gsc-target">Montant cible</label>
-      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-target" placeholder="1 800"></div>
     </div>
     <div class="scr-field">
       <label for="gsc-saved">Déjà épargné</label>
@@ -1026,6 +1042,18 @@
     <span class="screen-head-spacer"></span>
   </div>
   <div class="screen-body">
+    <!-- Hero : montant en grand -->
+    <div class="scr-hero is-expense" id="txs-hero">
+      <div class="scr-hero-ico" id="txs-hero-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+      </div>
+      <div class="scr-amount-input">
+        <span class="scr-cur" id="txs-cur-sym">€</span>
+        <input type="text" inputmode="decimal" id="txs-amt" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')saveTxScreen()">
+      </div>
+      <div class="scr-hero-lbl" id="txs-hero-lbl">Montant de la dépense</div>
+    </div>
+
     <!-- Type -->
     <div class="txs-type">
       <button class="txs-ty on" id="txs-ty-e" onclick="setTxScreenType('expense')">
@@ -1045,13 +1073,6 @@
     <div class="scr-field">
       <label for="txs-cat">Catégorie</label>
       <select id="txs-cat"></select>
-    </div>
-    <div class="scr-field">
-      <label for="txs-amt">Montant</label>
-      <div class="scr-amt">
-        <span class="scr-cur" id="txs-cur-sym">€</span>
-        <input type="text" inputmode="decimal" id="txs-amt" placeholder="0,00" onkeydown="if(event.key==='Enter')saveTxScreen()">
-      </div>
     </div>
     <div class="scr-field">
       <label for="txs-date">Date</label>

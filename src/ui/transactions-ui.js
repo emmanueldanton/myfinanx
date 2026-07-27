@@ -265,10 +265,24 @@ export function openTxScreenEdit(id) {
   window.openScreen?.('screen-tx');
 }
 
+const _TX_ICO = {
+  expense: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>',
+  income:  '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+};
+
 export function setTxScreenType(t, keepCat) {
   _txScrType = t === 'income' ? 'income' : 'expense';
   document.getElementById('txs-ty-e')?.classList.toggle('on', _txScrType === 'expense');
   document.getElementById('txs-ty-i')?.classList.toggle('on', _txScrType === 'income');
+  // Hero : couleur, icône et libellé selon le type
+  const hero = document.getElementById('txs-hero');
+  if (hero) {
+    hero.classList.toggle('is-expense', _txScrType === 'expense');
+    hero.classList.toggle('is-income',  _txScrType === 'income');
+  }
+  const heroIco = document.getElementById('txs-hero-ico');
+  if (heroIco) heroIco.innerHTML = _TX_ICO[_txScrType];
+  _setText('txs-hero-lbl', _txScrType === 'income' ? 'Montant du revenu' : 'Montant de la dépense');
   const sel = document.getElementById('txs-cat');
   if (sel) {
     const cats = _txScrType === 'expense' ? CATS_E : CATS_I;

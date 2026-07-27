@@ -210,6 +210,13 @@ export function saveGoalScreen() {
 
 function _syncGoalSwatches() {
   document.querySelectorAll('#screen-goal .gsw').forEach(s => s.classList.toggle('on', s.dataset.c === _gScrColor));
+  // Le hero reflète la couleur choisie de l'objectif
+  const ico = document.getElementById('gsc-hero-ico');
+  if (ico) {
+    ico.style.color = _gScrColor;
+    ico.style.background = `color-mix(in srgb, ${_gScrColor} 14%, var(--s1))`;
+    ico.style.borderColor = `color-mix(in srgb, ${_gScrColor} 26%, var(--b1))`;
+  }
 }
 function _setGoalCurSym() {
   const sym = getActiveCurrency().symbol;

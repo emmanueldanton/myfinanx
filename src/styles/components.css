@@ -2068,3 +2068,35 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab { display:
 }
 .isc-del-btn:hover { background: color-mix(in srgb, var(--red-l) 16%, var(--s1)); }
 .isc-del-btn svg { width: 17px; height: 17px; stroke: currentColor; }
+
+/* ═══ Hero des écrans de formulaire (montant en grand, comme la page détail) ═══ */
+.scr-hero {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 6px 0 22px;
+}
+.scr-hero-ico {
+  width: 58px; height: 58px; border-radius: 18px; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--s2); border: 1px solid var(--b1); color: var(--muted);
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.scr-hero-ico svg { width: 26px; height: 26px; stroke: currentColor; }
+.scr-amount-input { display: inline-flex; align-items: baseline; justify-content: center; gap: 4px; max-width: 100%; }
+.scr-amount-input .scr-cur {
+  font-family: var(--fh); font-weight: 800; font-size: 1.5rem; color: var(--muted); flex-shrink: 0;
+}
+.scr-big-amt {
+  border: none; background: transparent; outline: none;
+  font-family: var(--fh); font-weight: 800;
+  font-size: clamp(2.4rem, 12vw, 3rem) !important;   /* prime sur input{font-size:14px!important} */
+  letter-spacing: -0.035em; color: var(--text); text-align: center;
+  width: 100%; max-width: 240px; padding: 0; line-height: 1.05;
+}
+.scr-big-amt::placeholder { color: var(--faint); }
+.scr-hero-lbl { font-family: var(--fb); font-size: .82rem; color: var(--muted); margin-top: 9px; }
+
+/* Accents contextuels de l'icône */
+.scr-hero.is-expense .scr-hero-ico { color: var(--red-l); background: color-mix(in srgb, var(--red-l) 12%, var(--s1)); border-color: color-mix(in srgb, var(--red-l) 22%, var(--b1)); }
+.scr-hero.is-income  .scr-hero-ico { color: var(--green);  background: color-mix(in srgb, var(--green) 13%, var(--s1)); border-color: color-mix(in srgb, var(--green) 22%, var(--b1)); }
+.scr-hero.is-goal    .scr-hero-ico,
+.scr-hero.is-poste   .scr-hero-ico { color: var(--pr);     background: color-mix(in srgb, var(--pr) 12%, var(--s1)); border-color: color-mix(in srgb, var(--pr) 22%, var(--b1)); }
