@@ -623,7 +623,7 @@ nav::-webkit-scrollbar { display:none; }
 .ai-hd {
   display:flex; align-items:center; gap:11px;
   padding:12px 16px; margin-bottom:0;
-  background:linear-gradient(135deg, var(--pr), var(--violet));
+  background:var(--ai-grad);
 }
 .ai-av {
   width:40px; height:40px; border-radius:50%;
@@ -657,9 +657,9 @@ nav::-webkit-scrollbar { display:none; }
 /* Bot mini avatar */
 .ai-bot-av {
   width:28px; height:28px; border-radius:50%; flex-shrink:0;
-  background:linear-gradient(135deg, var(--pr), var(--violet));
+  background:var(--ai-grad);
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 2px 8px rgba(77,120,212,.35);
+  box-shadow:0 2px 8px rgba(124,92,252,.35);
   align-self:flex-end; margin-bottom:2px;
 }
 
@@ -716,13 +716,13 @@ nav::-webkit-scrollbar { display:none; }
 .ai-ir input:focus { border-color:var(--pr); box-shadow:0 0 0 3px rgba(77,120,212,.1); }
 .ai-send {
   width:40px; height:40px; border-radius:50%; flex-shrink:0;
-  background:var(--pr); color:#fff; border:none;
+  background:var(--ai); color:#fff; border:none;
   cursor:pointer; transition:.15s;
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 2px 8px rgba(77,120,212,.4);
+  box-shadow:0 2px 8px rgba(124,92,252,.4);
 }
 .ai-send svg { stroke:#fff; }
-.ai-send:hover { background:var(--pr-d); transform:scale(1.06); }
+.ai-send:hover { background:var(--ai-d); transform:scale(1.06); }
 .ai-send:active { transform:scale(0.94); }
 .ai-send:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 
@@ -1352,9 +1352,9 @@ nav::-webkit-scrollbar { display:none; }
 .ai-budget-btn {
   display:flex; align-items:center; justify-content:center; gap:8px; width:100%;
   margin:0 0 12px; padding:11px; border:none; border-radius:var(--r2); cursor:pointer;
-  background:linear-gradient(135deg, var(--pr), #7a5af0); color:#fff;
+  background:var(--ai-grad); color:#fff;
   font-family:var(--fh); font-weight:700; font-size:.85rem;
-  box-shadow:0 2px 10px rgba(77,120,212,.32); transition:filter .15s, opacity .15s;
+  box-shadow:0 2px 10px rgba(124,92,252,.32); transition:filter .15s, opacity .15s;
 }
 .ai-budget-btn:hover { filter:brightness(1.06); }
 .ai-budget-btn:disabled, .ai-budget-btn.loading { opacity:.6; pointer-events:none; }
@@ -1703,14 +1703,15 @@ body:has(#page-overview.active) .fab { display: none; }
 }
 .add-btn:hover { border-color: var(--pr); color: var(--pr-l); }
 
-/* Bouton IA discret */
+/* Bouton IA — couleur d'accent IA qui s'impose */
 .bud-ai {
   display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-  margin: 8px 0 4px; padding: 11px; border: 1px solid var(--b1); border-radius: var(--r2);
-  cursor: pointer; background: var(--s1); color: var(--pr-l);
-  font-family: var(--fb); font-weight: 700; font-size: .84rem; transition: border-color .15s, background .15s;
+  margin: 8px 0 12px; padding: 12px; border: none; border-radius: var(--r2);
+  cursor: pointer; background: var(--ai-grad); color: #fff;
+  font-family: var(--fb); font-weight: 700; font-size: .85rem; transition: filter .15s, transform .12s;
 }
-.bud-ai:hover { border-color: var(--pr); background: var(--s2); }
+.bud-ai:hover { filter: brightness(1.07); }
+.bud-ai:active { transform: scale(.99); }
 .bud-ai svg { stroke: currentColor; }
 .bud-ai:disabled, .bud-ai.loading { opacity: .6; pointer-events: none; }
 

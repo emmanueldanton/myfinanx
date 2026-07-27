@@ -56,6 +56,11 @@
   --bubble-bot:  #FFFFFF;
   --page-bg:     #F7F9FC;
   --glass-hi:    transparent;
+
+  /* Accent IA — couleur qui s'impose pour tout ce qui concerne l'IA (fixe, tous thèmes) */
+  --ai:      #5B34D6;
+  --ai-d:    #45259E;
+  --ai-grad: linear-gradient(135deg, #5B34D6 0%, #8B2CD0 100%);
 }
 
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
