@@ -1464,7 +1464,7 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 }
 .tx-search-wrap input {
   flex:1; background:none; border:none; outline:none;
-  color:var(--text); font-size:.84rem; padding:10px 0;
+  color:var(--text); font-family:var(--fb); font-size:.84rem; padding:10px 0;
 }
 .tx-search-wrap input::placeholder { color:var(--muted); }
 .tx-search-clear {
@@ -1476,7 +1476,7 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .tx-cat-pills { display:flex; flex-wrap:wrap; gap:6px; }
 .tx-cat-pill {
   background:var(--s2); border:1px solid var(--b1); border-radius:20px;
-  padding:4px 12px; font-size:.75rem; font-weight:600; cursor:pointer;
+  padding:4px 12px; font-family:var(--fh); font-size:.75rem; font-weight:600; cursor:pointer;
   color:var(--muted); transition:.15s; white-space:nowrap;
 }
 .tx-cat-pill:hover { border-color:var(--pr); color:var(--pr-l); }
