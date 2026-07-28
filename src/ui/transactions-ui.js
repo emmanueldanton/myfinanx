@@ -106,7 +106,7 @@ export function renderExpenses(state) {
   _renderCatPills(allTxs);
 
   if (!allTxs.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction.<br>Ajoute ta première ci-dessus.</div>`;
+    list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction.<br>Ajoute ta première avec le bouton +.</div>`;
     renderCatBk([]);
     return;
   }
@@ -154,10 +154,14 @@ export function renderCatBk(expenses) {
   div.innerHTML = Object.entries(bycat).sort((a, b) => b[1] - a[1]).map(([c, a]) => {
     const pct = tot > 0 ? Math.round((a / tot) * 100) : 0;
     const cc  = CAT_COLORS[c] || 'var(--pr)';
-    return `<div class="catrow">
-      <div class="catrow-l">${c}</div>
-      <div class="catrow-b"><div class="pt"><div class="pf" style="width:${pct}%;background:${cc}"></div></div></div>
-      <div class="catrow-a" style="color:var(--red-l)">−${fmt(a)}</div>
+    const ico = catIco(c, 16);
+    return `<div class="depcat">
+      <div class="depcat-ico" style="color:${cc};background:color-mix(in srgb, ${cc} 15%, transparent)">${ico}</div>
+      <div class="depcat-main">
+        <div class="depcat-top"><span class="depcat-name">${esc(c)}</span><span class="depcat-amt">−${fmt(a)}</span></div>
+        <div class="depcat-track"><div class="depcat-fill" style="width:${pct}%;background:${cc}"></div></div>
+      </div>
+      <div class="depcat-pct">${pct}%</div>
     </div>`;
   }).join('');
 }
@@ -173,7 +177,12 @@ export function updateTracker(state) {
   _setText('tr-b', fmt(totalIncome));
   _setText('tr-t', fmt(totalE));
   const el = document.getElementById('tr-r');
-  if (el) { el.textContent = fmt(Math.abs(reste)); el.style.color = reste >= 0 ? 'var(--pr-l)' : 'var(--red-l)'; }
+  if (el) { el.textContent = fmt(Math.abs(reste)); el.style.color = reste >= 0 ? 'var(--green)' : 'var(--red-l)'; }
+  const bar = document.getElementById('dep-track-fill');
+  if (bar) {
+    const pct = totalIncome > 0 ? Math.min(100, Math.round((totalE / totalIncome) * 100)) : (totalE > 0 ? 100 : 0);
+    bar.style.width = pct + '%';
+  }
 }
 
 // ── Form helpers ──────────────────────────────────────────────────

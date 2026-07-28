@@ -442,68 +442,35 @@
 
 <!-- ─── TRACKER ─── -->
 <div id="page-tracker" class="page">
-  <div class="page-ttl">Mes transactions</div>
-  <div class="sl">Ajouter une transaction</div>
-  <div class="tx-panel">
-    <div class="tygt">
-      <button class="tyb exp on" id="ty-e" onclick="setTxType('expense')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-        Dépense
-      </button>
-      <button class="tyb inc" id="ty-i" onclick="setTxType('income')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        Revenu ponctuel
-      </button>
-    </div>
-    <div class="txg">
-      <div class="field"><label>Description</label><input type="text" id="tx-d" placeholder="Ex: Courses Lidl" onkeydown="if(event.key==='Enter')addTx()"></div>
-      <div class="field"><label>Catégorie</label><select id="tx-c"></select></div>
-      <div class="field">
-        <label>Montant (<span id="tx-cur-lbl">€</span>)</label>
-        <div class="fw"><span class="cur-sym" id="tx-cur-sym">€</span><input type="text" inputmode="decimal" id="tx-a" placeholder="0.00" onkeydown="if(event.key==='Enter')addTx()"></div>
-      </div>
-      <div class="field"><label>Date</label><input type="date" id="tx-dt"></div>
-      <button class="btn bp" onclick="addTx()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
-    </div>
-  </div>
+  <div class="page-hd"><h1 class="bud-title">Dépenses</h1></div>
 
-  <div class="sl">Récapitulatif</div>
-  <div class="g3" style="margin-bottom:15px;">
-    <div class="kpi">
-      <div class="kpi-bar" style="background:var(--red)"></div>
-      <div class="kpi-hd">
-        <div class="kpi-hd-ico" style="background:rgba(196,58,58,.2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div>
-        <div class="kpi-lbl">Total dépensé</div>
-      </div>
-      <div class="kpi-val" id="tr-t" style="color:var(--red-l)">0</div>
+  <!-- Résumé du mois -->
+  <section class="dep-sum">
+    <div class="dep-sum-head">
+      <span class="dep-sum-lbl">Dépensé ce mois</span>
+      <span class="dep-sum-val" id="tr-t">0</span>
     </div>
-    <div class="kpi">
-      <div class="kpi-bar" style="background:var(--green)"></div>
-      <div class="kpi-hd">
-        <div class="kpi-hd-ico" style="background:rgba(52,211,153,.15)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="var(--green)"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="kpi-lbl">Budget total</div>
+    <div class="dep-track"><div class="dep-track-fill" id="dep-track-fill"></div></div>
+    <div class="dep-sum-foot">
+      <div class="dep-stat">
+        <span class="dep-stat-lbl">Revenus</span>
+        <span class="dep-stat-val" id="tr-b">0</span>
       </div>
-      <div class="kpi-val" id="tr-b" style="color:var(--green)">0</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-bar" style="background:var(--pr)"></div>
-      <div class="kpi-hd">
-        <div class="kpi-hd-ico" style="background:rgba(77,120,212,.18)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="var(--pr-l)"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-        <div class="kpi-lbl">Reste disponible</div>
+      <div class="dep-stat dep-stat-end">
+        <span class="dep-stat-lbl">Reste disponible</span>
+        <span class="dep-stat-val" id="tr-r">0</span>
       </div>
-      <div class="kpi-val" id="tr-r" style="color:var(--pr-l)">0</div>
     </div>
-  </div>
+  </section>
 
-  <div class="sl">Répartition par catégorie</div>
-  <div id="cat-bk" style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:15px;">
+  <!-- Où part l'argent -->
+  <div class="dep-sec-lbl">Où part ton argent</div>
+  <div id="cat-bk" class="dep-cats">
     <div class="empty" style="padding:10px;"><div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>Aucune dépense ce mois-ci</div>
   </div>
 
-  <div class="sl">Transactions du mois</div>
+  <!-- Transactions -->
+  <div class="dep-sec-lbl">Transactions</div>
   <div class="tx-controls">
     <div class="tx-search-wrap">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
