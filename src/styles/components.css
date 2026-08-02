@@ -96,23 +96,6 @@ body::before {
 .greet-emoji { font-style: normal; }
 .greet-name {
   color: #fff;
-  cursor: pointer;
-  border-bottom: 1.5px solid rgba(255,255,255,.5);
-  padding-bottom: 1px;
-  transition: opacity .15s;
-}
-.greet-name:hover { opacity: .8; }
-.greet-name-input {
-  font-family: var(--fh);
-  font-size: inherit;
-  font-weight: 800;
-  color: #fff;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid rgba(255,255,255,.7);
-  outline: none;
-  width: 150px;
-  padding-bottom: 1px;
 }
 .greet-sub {
   position: relative; z-index: 2;
@@ -123,18 +106,6 @@ body::before {
   align-items: center;
   gap: 6px;
 }
-.greet-gender-pick {
-  position: relative; z-index: 2;
-  display: flex; gap: 6px; margin-top: 10px;
-}
-.greet-gender-btn {
-  font-size: .75rem; font-family: var(--fb); font-weight: 700;
-  padding: 4px 13px; border-radius: 99px;
-  border: 1px solid rgba(255,255,255,.45); background: rgba(255,255,255,.14);
-  color: #fff; cursor: pointer; transition: .15s;
-}
-.greet-gender-btn.on { background: #fff; border-color: #fff; color: var(--pr-d); }
-.greet-gender-btn:hover:not(.on) { background: rgba(255,255,255,.24); }
 
 /* ════ HEADER ════ */
 header {
@@ -1899,6 +1870,36 @@ body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab, body:has(
   outline: none; width: 100%; padding: 0 0 2px;
 }
 .set-chev { width: 18px; height: 18px; color: var(--faint); flex-shrink: 0; }
+
+/* Écran Profil (détails utilisateur : prénom + sexe) */
+.prof-hero { display: flex; justify-content: center; padding: 6px 0 24px; }
+.prof-avatar {
+  width: 84px; height: 84px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--pr), var(--pr-d));
+  color: #fff; font-family: var(--fh); font-weight: 800; font-size: 2rem;
+}
+.prof-field { margin-bottom: 20px; }
+.prof-lbl {
+  display: block; font-family: var(--fh); font-size: .78rem; font-weight: 700;
+  color: var(--muted); margin: 0 2px 8px;
+}
+.prof-input {
+  width: 100%; box-sizing: border-box;
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r2);
+  color: var(--text); font-family: var(--fb);
+  padding: 13px 15px; outline: none; transition: border-color .15s;
+}
+.prof-input:focus { border-color: var(--pr); }
+.prof-sex { display: flex; gap: 8px; }
+.prof-sex-btn {
+  flex: 1; padding: 12px 8px; border-radius: var(--r2);
+  background: var(--s1); border: 1px solid var(--b1); color: var(--muted);
+  font-family: var(--fh); font-weight: 600; font-size: .85rem; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.prof-sex-btn:hover { color: var(--text); }
+.prof-sex-btn.on { background: var(--pr); border-color: var(--pr); color: #fff; }
 
 /* Label de section */
 .set-sec-label {

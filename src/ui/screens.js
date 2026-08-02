@@ -4,7 +4,8 @@
 
 import { getActiveCurrency } from '../currency.js';
 
-const USER_KEY = 'monargent-username';
+const USER_KEY   = 'monargent-username';
+const GENDER_KEY = 'monargent-usergender';
 
 const THEME_LABELS = { light: 'Clair', blue: 'Bleu nuit', violet: 'Violet' };
 
@@ -88,34 +89,38 @@ export function syncSettings() {
   document.querySelectorAll('.set-cur-btn').forEach(b => b.classList.toggle('on', b.dataset.cur === cur.code));
 }
 
-// ── Renommage inline du profil ──
-export function editSettingsName() {
-  const disp = document.getElementById('set-name-display');
-  if (!disp || disp.querySelector('input')) return;
-  const cur = localStorage.getItem(USER_KEY) || '';
-  const input = document.createElement('input');
-  input.className = 'set-name-input';
-  input.value = cur;
-  input.maxLength = 30;
-  input.placeholder = 'Ton prénom';
-  const save = () => { saveAccountName(input.value); syncSettings(); };
-  input.addEventListener('blur', save);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') input.blur();
-    if (e.key === 'Escape') syncSettings();
-  });
-  input.addEventListener('click', e => e.stopPropagation());
-  disp.textContent = '';
-  disp.appendChild(input);
-  input.focus(); input.select();
+// ── Écran Profil (détails utilisateur : prénom + sexe) ──
+export function openProfile() {
+  syncProfile();
+  openScreen('screen-profile');
+  setTimeout(() => document.getElementById('prof-name')?.focus(), 60);
 }
 
-export function saveAccountName(v) {
+export function syncProfile() {
+  const name = localStorage.getItem(USER_KEY) || '';
+  const inp = document.getElementById('prof-name');
+  if (inp) inp.value = name;
+  const av = document.getElementById('prof-avatar');
+  if (av) av.textContent = (name || 'M').trim().charAt(0).toUpperCase();
+  const g = localStorage.getItem(GENDER_KEY) || '';
+  document.querySelectorAll('#prof-sex .prof-sex-btn').forEach(b => b.classList.toggle('on', b.dataset.g === g));
+}
+
+export function saveProfileName(v) {
   const name = (v || '').trim();
   try {
     if (name) localStorage.setItem(USER_KEY, name);
     else      localStorage.removeItem(USER_KEY);
   } catch (e) {}
+  const av = document.getElementById('prof-avatar');
+  if (av) av.textContent = (name || 'M').charAt(0).toUpperCase();
+  window.renderGreeting?.();
+  syncSettings();
+}
+
+export function setProfileGender(g) {
+  try { localStorage.setItem(GENDER_KEY, g); } catch (e) {}
+  document.querySelectorAll('#prof-sex .prof-sex-btn').forEach(b => b.classList.toggle('on', b.dataset.g === g));
   window.renderGreeting?.();
 }
 
@@ -126,8 +131,9 @@ export function initScreens() {
   window.closeScreenMenus = closeScreenMenus;
   window.syncSettings    = syncSettings;
   window.toggleSetRow    = toggleSetRow;
-  window.editSettingsName = editSettingsName;
-  window.saveAccountName = saveAccountName;
+  window.openProfile       = openProfile;
+  window.saveProfileName   = saveProfileName;
+  window.setProfileGender  = setProfileGender;
   // Échap ferme l'écran courant
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScreen(); });
 }

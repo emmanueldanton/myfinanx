@@ -16,7 +16,6 @@ let _getYM        = () => { const n = new Date(); return [n.getFullYear(), n.get
 export function initGreetingUI(getYM) {
   _getYM = getYM;
   window.renderGreeting = renderGreeting;
-  window.editGreetName  = editGreetName;
 }
 
 // ── Render ────────────────────────────────────────────────────────
@@ -41,55 +40,14 @@ export function renderGreeting() {
     if (cached && cached.hash === greetDataHash() && cached.msg) sub = cached.msg;
   } catch (e) {}
 
+  // Le prénom et le sexe se modifient désormais dans Réglages > Profil (plus d'édition sur l'accueil)
   wrap.innerHTML = `
     <div class="greet-title">
-      ${greet},&nbsp;<span class="greet-name" id="greet-name" onclick="editGreetName()" title="Clique pour modifier ton prénom">${esc(name)}</span>&nbsp;!&nbsp;<span class="greet-emoji">${emoji}</span>
+      ${greet},&nbsp;<span class="greet-name">${esc(name)}</span>&nbsp;!&nbsp;<span class="greet-emoji">${emoji}</span>
     </div>
     <div class="greet-sub">${esc(sub)}</div>`;
 
-  _showGenderPick();
   scheduleAiGreeting();
-}
-
-function _showGenderPick() {
-  const wrap = document.getElementById('greet-wrap');
-  if (!wrap) return;
-  const cur = localStorage.getItem(GENDER_KEY);
-  if (cur || !localStorage.getItem(USER_KEY)) return;
-  const pick = document.createElement('div');
-  pick.className = 'greet-gender-pick';
-  ['M', 'F'].forEach(g => {
-    const btn = document.createElement('button');
-    btn.className = 'greet-gender-btn' + (cur === g ? ' on' : '');
-    btn.textContent = g === 'M' ? 'Masculin' : 'Féminin';
-    btn.onclick = () => { localStorage.setItem(GENDER_KEY, g); renderGreeting(); };
-    pick.appendChild(btn);
-  });
-  const sub = wrap.querySelector('.greet-sub');
-  if (sub) sub.after(pick);
-}
-
-export function editGreetName() {
-  const span = document.getElementById('greet-name');
-  if (!span) return;
-  const cur   = localStorage.getItem(USER_KEY) || '';
-  const input = document.createElement('input');
-  input.className   = 'greet-name-input';
-  input.value       = cur;
-  input.maxLength   = 30;
-  input.placeholder = 'Ton prénom…';
-  const save = () => {
-    const v = input.value.trim();
-    if (v) localStorage.setItem(USER_KEY, v);
-    renderGreeting();
-  };
-  input.addEventListener('blur', save);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter')  input.blur();
-    if (e.key === 'Escape') renderGreeting();
-  });
-  span.replaceWith(input);
-  input.focus(); input.select();
 }
 
 // ── Hash + scheduling ─────────────────────────────────────────────
@@ -158,7 +116,7 @@ export async function fetchAiGreetingSub() {
   const userName   = localStorage.getItem(USER_KEY);
   const userGender = localStorage.getItem(GENDER_KEY);
   const identityLine = userName
-    ? `Prénom: ${userName}. Genre: ${userGender === 'F' ? 'féminin' : userGender === 'M' ? 'masculin' : 'non précisé'}.`
+    ? `Prénom: ${userName}. Genre: ${userGender === 'F' ? 'féminin' : userGender === 'M' ? 'masculin' : userGender === 'A' ? 'autre' : 'non précisé'}.`
     : '';
 
   const goalsStr = goals.length

@@ -795,7 +795,7 @@
   <div class="screen-body">
 
     <!-- Carte profil -->
-    <button class="set-profile" onclick="editSettingsName()">
+    <button class="set-profile" onclick="openProfile()">
       <span class="set-avatar" id="set-avatar">M</span>
       <span class="set-profile-txt">
         <span class="set-name-display" id="set-name-display">Ton prénom</span>
@@ -894,6 +894,37 @@
 
     <div class="set-appver">MyFinanx · version 1.0.0</div>
 
+  </div>
+</div>
+
+<!-- ════ ÉCRAN PROFIL (détails utilisateur) ════ -->
+<div class="screen" id="screen-profile" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title">Profil</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <div class="prof-hero">
+      <span class="prof-avatar" id="prof-avatar">M</span>
+    </div>
+
+    <div class="prof-field">
+      <label class="prof-lbl" for="prof-name">Prénom</label>
+      <input type="text" id="prof-name" class="prof-input" maxlength="30" placeholder="Ton prénom"
+             autocomplete="off" oninput="saveProfileName(this.value)">
+    </div>
+
+    <div class="prof-field">
+      <span class="prof-lbl">Sexe</span>
+      <div class="prof-sex" id="prof-sex">
+        <button type="button" class="prof-sex-btn" data-g="M" onclick="setProfileGender('M')">Masculin</button>
+        <button type="button" class="prof-sex-btn" data-g="F" onclick="setProfileGender('F')">Féminin</button>
+        <button type="button" class="prof-sex-btn" data-g="A" onclick="setProfileGender('A')">Autre</button>
+      </div>
+    </div>
   </div>
 </div>
 
