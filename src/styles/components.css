@@ -746,6 +746,59 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .depcat-fill { height: 100%; border-radius: 99px; transition: width .55s cubic-bezier(.22, 1, .36, 1); }
 .depcat-pct { font-family: var(--fh); font-size: .8rem; font-weight: 700; color: var(--muted); min-width: 32px; text-align: right; flex-shrink: 0; }
 
+/* ════ STATISTIQUES ════ */
+/* Filtre de période (segmenté) */
+.stt-period { display: flex; gap: 7px; margin: 2px 0 18px; }
+.stt-pill {
+  flex: 1; padding: 9px 8px; border-radius: 999px;
+  background: var(--s1); border: 1px solid var(--b1); color: var(--muted);
+  font-family: var(--fh); font-weight: 600; font-size: .82rem; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.stt-pill:hover { color: var(--text); }
+.stt-pill.active { background: var(--pr); border-color: var(--pr); color: #fff; }
+
+.stt-sec-lbl {
+  font-family: var(--fh); font-weight: 700; font-size: .98rem;
+  color: var(--text); letter-spacing: -0.01em; margin: 22px 2px 11px;
+}
+
+/* Chiffres clés (2x2) */
+.stt-kfig { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stt-kf {
+  display: flex; flex-direction: column; gap: 5px;
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r3);
+  padding: 14px 15px;
+}
+.stt-kf-lbl { font-size: .76rem; color: var(--muted); font-weight: 600; }
+.stt-kf-val { font-family: var(--fh); font-weight: 800; font-size: 1.24rem; letter-spacing: -0.02em; color: var(--text); white-space: nowrap; }
+.stt-kf-val.pos { color: var(--green); }
+.stt-kf-val.neg { color: var(--red-l); }
+
+/* Cartes graphiques */
+.stt-card { background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r3); padding: 14px 16px; }
+.stt-trend-legend { display: flex; gap: 16px; margin-bottom: 6px; }
+.stt-tl { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); font-weight: 600; }
+.stt-leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.stt-trend { width: 100%; }
+.stt-trend svg { display: block; }
+
+/* Donut + légende */
+.stt-donut-card { display: flex; align-items: center; gap: 12px; }
+.stt-donut { flex-shrink: 0; }
+.stt-donut svg { display: block; width: 116px; height: 116px; }
+.stt-donut-leg { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+.stt-leg-item { display: flex; align-items: center; gap: 7px; }
+.stt-leg-item .stt-leg-dot { width: 10px; height: 10px; border-radius: 3px; }
+.stt-leg-name { flex: 1; min-width: 0; font-size: .8rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stt-leg-pct { font-size: .74rem; color: var(--muted); font-weight: 600; min-width: 26px; text-align: right; }
+.stt-leg-val { font-family: var(--fh); font-size: .78rem; font-weight: 700; color: var(--text); min-width: 52px; text-align: right; }
+.stt-empty { font-size: .82rem; color: var(--muted); text-align: center; padding: 20px 8px; }
+@media (max-width: 380px) {
+  .stt-donut-card { flex-direction: column; align-items: stretch; }
+  .stt-donut { align-self: center; }
+}
+
 /* Mobile : en-tête et barre de saisie fixes, seuls les messages défilent */
 @media (max-width: 620px) {
   #page-ai.active {

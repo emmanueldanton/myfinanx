@@ -27,6 +27,7 @@ import { scheduleDailyPush } from './ui/push-notify.js';
 import { initToast } from './ui/toast.js';
 import { initAds } from './ui/ads.js';
 import { initScreens } from './ui/screens.js';
+import { initStatsUI } from './ui/stats-ui.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -175,6 +176,9 @@ function init() {
 
   // Wire sous-écrans plein écran (expose openScreen/closeScreen)
   initScreens();
+
+  // Wire page Statistiques (expose openStats/setStatsPeriod)
+  initStatsUI(() => [_Y, _M]);
 
   // Refresh currency DOM labels with saved currency (setActiveCurrency already set module state above)
   setCurrency(prefs.currency);
