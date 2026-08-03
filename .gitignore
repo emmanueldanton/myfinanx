@@ -8,3 +8,6 @@ dist/
 .DS_Store
 Thumbs.db
 .playwright-mcp/
+
+# Maquettes / fichiers de design (pas du code applicatif)
+design-*.html
