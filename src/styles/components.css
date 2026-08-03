@@ -774,7 +774,7 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 @media (max-width: 620px) {
   #page-ai.active {
     position: fixed; top: 0; left: 0; right: 0;
-    bottom: calc(12px + 78px + 18px + env(safe-area-inset-bottom));
+    bottom: calc(12px + 70px + 18px + env(safe-area-inset-bottom));
     max-width: 560px; margin: 0 auto; min-height: 0;
     padding: calc(env(safe-area-inset-top) + 14px) 16px 4px;
   }
@@ -1167,7 +1167,7 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
   overflow:hidden;
 }
 .bnav-inner {
-  display:flex; height:78px; align-items:center; padding:0 10px;
+  display:flex; height:70px; align-items:center; padding:0 10px;
   position:relative;
 }
 /* Indicateur "pilule" en verre qui glisse/morphe — position/largeur posées par moveBnavPill() */
@@ -1219,9 +1219,9 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 @media(max-width:620px){
   .hbg-btn { display:none !important; }
   .bottom-nav { display:block; }
-  .fab { display:flex; bottom:calc(12px + 78px + 18px + env(safe-area-inset-bottom)); }
+  .fab { display:flex; bottom:calc(12px + 70px + 18px + env(safe-area-inset-bottom)); }
   nav { display:none; }
-  .wrap { padding-bottom:calc(12px + 78px + 18px + env(safe-area-inset-bottom)); }
+  .wrap { padding-bottom:calc(12px + 70px + 18px + env(safe-area-inset-bottom)); }
 }
 
 /* ════ OVERVIEW DASHBOARD ════ */
