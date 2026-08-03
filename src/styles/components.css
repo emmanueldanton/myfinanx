@@ -1808,6 +1808,8 @@ body:has(#page-overview.active) .fab { display: none; }
 
 /* ═══ Objectifs « Mes Objectifs » — refonte fidele Sleek ═══ */
 #page-goals.active { max-width: 560px; margin: 0 auto; padding: 10px 16px 28px; }
+/* Dépenses : mêmes marges latérales que les autres onglets (référence Objectifs) */
+#page-tracker.active { max-width: 560px; margin: 0 auto; padding: 10px 16px 28px; }
 
 /* Carte vedette */
 .gc-featured {
