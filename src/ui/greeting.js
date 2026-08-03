@@ -16,7 +16,6 @@ let _getYM        = () => { const n = new Date(); return [n.getFullYear(), n.get
 export function initGreetingUI(getYM) {
   _getYM = getYM;
   window.renderGreeting = renderGreeting;
-  window.editGreetName  = editGreetName;
 }
 
 // ── Render ────────────────────────────────────────────────────────
@@ -26,11 +25,13 @@ export function renderGreeting() {
   if (!wrap) return;
 
   const hour = new Date().getHours();
-  let greet, emoji;
-  if      (hour >= 5  && hour < 12) { greet = 'Bon matin';      emoji = '🌅'; }
-  else if (hour >= 12 && hour < 18) { greet = 'Bon après-midi'; emoji = '⛅'; }
-  else if (hour >= 18 && hour < 22) { greet = 'Bonsoir';        emoji = '🌆'; }
-  else                               { greet = 'Bonne nuit';     emoji = '🌙'; }
+  let greet, emoji, daypart;
+  if      (hour >= 5  && hour < 12) { greet = 'Bon matin';      emoji = '🌅'; daypart = 'morning';   }
+  else if (hour >= 12 && hour < 18) { greet = 'Bon après-midi'; emoji = '⛅'; daypart = 'afternoon'; }
+  else if (hour >= 18)              { greet = 'Bonne soirée';   emoji = '🌆'; daypart = 'evening';   } // 18h–23h
+  else                               { greet = 'Bonne nuit';     emoji = '🌙'; daypart = 'night';     } // 0h–4h
+  // Le fond de la bannière suit l'état du ciel selon l'heure (voir .greet-wrap[data-daypart] en CSS)
+  wrap.dataset.daypart = daypart;
 
   const name = localStorage.getItem(USER_KEY) || 'toi';
   let sub = _greetFinancialSub();
@@ -39,55 +40,14 @@ export function renderGreeting() {
     if (cached && cached.hash === greetDataHash() && cached.msg) sub = cached.msg;
   } catch (e) {}
 
+  // Le prénom et le sexe se modifient désormais dans Réglages > Profil (plus d'édition sur l'accueil)
   wrap.innerHTML = `
     <div class="greet-title">
-      ${greet},&nbsp;<span class="greet-name" id="greet-name" onclick="editGreetName()" title="Clique pour modifier ton prénom">${esc(name)}</span>&nbsp;!&nbsp;<span class="greet-emoji">${emoji}</span>
+      ${greet},&nbsp;<span class="greet-name">${esc(name)}</span>&nbsp;!&nbsp;<span class="greet-emoji">${emoji}</span>
     </div>
     <div class="greet-sub">${esc(sub)}</div>`;
 
-  _showGenderPick();
   scheduleAiGreeting();
-}
-
-function _showGenderPick() {
-  const wrap = document.getElementById('greet-wrap');
-  if (!wrap) return;
-  const cur = localStorage.getItem(GENDER_KEY);
-  if (cur || !localStorage.getItem(USER_KEY)) return;
-  const pick = document.createElement('div');
-  pick.className = 'greet-gender-pick';
-  ['M', 'F'].forEach(g => {
-    const btn = document.createElement('button');
-    btn.className = 'greet-gender-btn' + (cur === g ? ' on' : '');
-    btn.textContent = g === 'M' ? 'Masculin' : 'Féminin';
-    btn.onclick = () => { localStorage.setItem(GENDER_KEY, g); renderGreeting(); };
-    pick.appendChild(btn);
-  });
-  const sub = wrap.querySelector('.greet-sub');
-  if (sub) sub.after(pick);
-}
-
-export function editGreetName() {
-  const span = document.getElementById('greet-name');
-  if (!span) return;
-  const cur   = localStorage.getItem(USER_KEY) || '';
-  const input = document.createElement('input');
-  input.className   = 'greet-name-input';
-  input.value       = cur;
-  input.maxLength   = 30;
-  input.placeholder = 'Ton prénom…';
-  const save = () => {
-    const v = input.value.trim();
-    if (v) localStorage.setItem(USER_KEY, v);
-    renderGreeting();
-  };
-  input.addEventListener('blur', save);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter')  input.blur();
-    if (e.key === 'Escape') renderGreeting();
-  });
-  span.replaceWith(input);
-  input.focus(); input.select();
 }
 
 // ── Hash + scheduling ─────────────────────────────────────────────
@@ -116,7 +76,7 @@ export function scheduleAiGreeting() {
     if (aiMsg) {
       sessionStorage.setItem('greetingDone', '1');
       const sub = document.querySelector('#greet-wrap .greet-sub');
-      if (sub && window.typeWriter) window.typeWriter(sub, aiMsg);
+      if (sub) sub.textContent = aiMsg;   // affichage direct, sans animation (app plus stable)
     }
   }, 3000);
 }
@@ -156,7 +116,7 @@ export async function fetchAiGreetingSub() {
   const userName   = localStorage.getItem(USER_KEY);
   const userGender = localStorage.getItem(GENDER_KEY);
   const identityLine = userName
-    ? `Prénom: ${userName}. Genre: ${userGender === 'F' ? 'féminin' : userGender === 'M' ? 'masculin' : 'non précisé'}.`
+    ? `Prénom: ${userName}. Genre: ${userGender === 'F' ? 'féminin' : userGender === 'M' ? 'masculin' : userGender === 'A' ? 'autre' : 'non précisé'}.`
     : '';
 
   const goalsStr = goals.length
@@ -167,16 +127,16 @@ export async function fetchAiGreetingSub() {
     : 'aucun objectif défini';
 
   const cur = getActiveCurrency();
-  const system = `Tu es le conseiller financier personnel de MyFinanx, bienveillant et direct. Réponds uniquement en français, sans humour.
+  const system = `Tu es le conseiller financier personnel de MyFinanx, bienveillant, direct et terre à terre. Réponds uniquement en français, sans humour, dans un langage simple et courant que tout le monde comprend, sans jargon. N'utilise jamais de tiret cadratin (—) ni de tiret demi-cadratin (–) : sépare tes idées avec une virgule ou un point.
 ${identityLine}
-Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ dans cette devise — raisonne et exprime-toi exclusivement dans cette devise, jamais en euros par défaut.
+Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ dans cette devise, raisonne et exprime-toi exclusivement dans cette devise, jamais en euros par défaut.
 Situation de ${MONTHS[M]} ${Y} :
 - Revenus: ${fmt(totalR)} (${incomes.length} source${incomes.length > 1 ? 's' : ''}: ${incomes.map(r => r.name).join(', ')})
 - Budget alloué: ${fmt(totalB)} | Dépensé: ${fmt(totalE)} | Reste: ${fmt(reste)}
 - Taux d'épargne: ${tauxEpargne}%${dépassés.length ? `\n- Postes dépassés: ${dépassés.join(', ')}` : ''}
 - Objectifs: ${goalsStr}
 N'invente jamais un chiffre absent de ces données.`;
-  const question = `Écris UNE seule phrase courte et percutante (max 18 mots) qui pointe le fait le plus important ou urgent de cette situation. Commence par UN seul émoji adapté à la situation, puis l'observation directement. Pas de salutation, pas d'introduction.`;
+  const question = `Écris UNE seule phrase courte (max 18 mots), simple et terre à terre, avec des mots de tous les jours. Pointe le fait le plus important ou urgent de la situation. Commence par UN seul émoji adapté, puis l'observation directement. Pas de salutation, pas d'introduction. Interdiction d'utiliser un tiret cadratin (—) ou demi-cadratin (–) : utilise une virgule ou un point.`;
 
   try {
     const res  = await fetch('/api/ai', {
@@ -185,7 +145,10 @@ N'invente jamais un chiffre absent de ces données.`;
       body:    JSON.stringify({ messages: [{ role: 'user', content: question }], context: system, temperature: 0.3, maxTokens: 60 }),
     });
     const data = await res.json();
-    const msg  = (data.reply || '').trim().replace(/^["'«»]|["'«»]$/g, '').trim();
+    const msg  = (data.reply || '').trim()
+      .replace(/^["'«»]|["'«»]$/g, '')
+      .replace(/\s*[—–]\s*/g, ', ')   // filet de sécurité : aucun tiret cadratin/demi-cadratin
+      .trim();
     if (msg) {
       try { localStorage.setItem(GREETING_CACHE_KEY, JSON.stringify({ hash, msg })); } catch (e) {}
       return msg;

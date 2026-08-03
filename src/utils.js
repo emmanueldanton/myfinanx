@@ -19,7 +19,9 @@ export function fmtDate(iso) {
 
 // Accept comma or dot as decimal separator
 export function parseAmt(str) {
-  return parseFloat(String(str).replace(',', '.')) || 0;
+  // Retire les espaces (normal, insécable, fin) utilisés comme séparateurs de milliers,
+  // puis convertit la virgule décimale. Robuste au round-trip fmtInput → parseAmt (édition).
+  return parseFloat(String(str).replace(/[\s  ]/g, '').replace(',', '.')) || 0;
 }
 
 export function catIco(cat, size = 14) {
@@ -78,3 +80,14 @@ export const CAT_COLORS = {
 export const CATS_E = ['Alimentation','Transport','Logement','Santé','Téléphone','Abonnements','Dette','Scolarité','Famille','Cérémonie','Matériel','Business','Marketing','Loisirs','Imprévu','Autre'];
 export const CATS_I = ['Salaire','Freelance','Commerce','Business','Loyers','Tontine','Aide famille','Agriculture','Dividendes','Bourse','Pension','Allocations','Stage','Autre'];
 export const COLS   = ['#7BA3F0','#4D78D4','#34d399','#a78bfa','#f59e0b','#e87a7a','#e879f9'];
+
+// Sous-titres descriptifs par catégorie (style Sleek « Planning Budgétaire »)
+export const CAT_SUBTITLES = {
+  'Alimentation':'Courses & resto', 'Transport':'Déplacements', 'Logement':'Loyer & charges',
+  'Santé':'Soins & mutuelle', 'Téléphone':'Forfait & internet', 'Abonnements':'Netflix, Mobile…',
+  'Dette':'Remboursements', 'Scolarité':'Frais & fournitures', 'Famille':'Enfants & proches',
+  'Cérémonie':'Événements', 'Matériel':'Équipement', 'Business':'Activité pro',
+  'Marketing':'Publicité', 'Loisirs':'Sorties & hobbies', 'Imprévu':'Réserve',
+  'Épargne':'Mise de côté', 'Autre':'Divers',
+};
+export function catSubtitle(cat) { return CAT_SUBTITLES[cat] || ''; }

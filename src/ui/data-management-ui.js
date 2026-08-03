@@ -109,7 +109,7 @@ export function showStorageError() {
   const toast = document.createElement('div');
   toast.id = 'storage-error-toast';
   toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:10px 18px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3)';
-  toast.textContent = '⚠️ Stockage local plein — libérez de l\'espace ou exportez vos données.';
+  toast.textContent = '⚠️ Stockage local plein, libérez de l\'espace ou exportez vos données.';
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 6000);
 }

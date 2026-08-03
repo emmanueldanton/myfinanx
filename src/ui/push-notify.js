@@ -74,7 +74,7 @@ function _buildNotification() {
   // ① Budget critique > 90 %
   if (pct > 90) return {
     title:   'MyFinanx ⚠️',
-    message: `${s}tu as dépensé ${pct}% de tes revenus ce mois. Il te reste ${fmt(reste)} — surveille tes sorties.`,
+    message: `${s}tu as dépensé ${pct}% de tes revenus ce mois. Il te reste ${fmt(reste)}, surveille tes sorties.`,
   };
 
   // ② Budget serré 75–90 %
@@ -106,7 +106,7 @@ function _buildNotification() {
   // ⑤ Situation positive (< 50 % du budget utilisé)
   if (pct >= 0 && pct < 50) return {
     title:   'MyFinanx ✅',
-    message: `${s}tu es en bonne forme ce mois — ${fmt(reste)} encore disponibles. Continue comme ça !`,
+    message: `${s}tu es en bonne forme ce mois, ${fmt(reste)} encore disponibles. Continue comme ça !`,
   };
 
   // ⑥ Défaut — rappel quotidien générique

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<!-- Apply saved theme before first paint — prevents flash of wrong colors -->
+<!-- Apply saved theme before first paint, prevents flash of wrong colors -->
 <script>(function(){var t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
@@ -18,8 +18,8 @@
 <meta name="apple-mobile-web-app-title" content="MyFinanx">
 
 <!-- ═══ SEO ═══ -->
-<title>MyFinanx — Gestion de budget personnel</title>
-<meta name="description" content="MyFinanx — Suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil. Dashboard financier personnel, gratuit et sans inscription.">
+<title>MyFinanx - Gestion de budget personnel</title>
+<meta name="description" content="MyFinanx : suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil. Dashboard financier personnel, gratuit et sans inscription.">
 <meta name="keywords" content="budget, finances personnelles, gestion argent, épargne, dépenses, revenus, dashboard financier">
 <meta name="author" content="Emmanuel Danton">
 <meta name="robots" content="index, follow">
@@ -49,7 +49,7 @@
   // L'init est mise en file d'attente, mais le SDK (lourd) n'est PAS chargé ici.
   // Il n'est injecté que lorsqu'il est réellement nécessaire (acceptation de
   // l'overlay push, ou programmation de notif si la permission est déjà accordée),
-  // via window.loadOneSignal() — ça allège le chargement initial de l'app.
+  // via window.loadOneSignal(), ça allège le chargement initial de l'app.
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
@@ -88,8 +88,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Polices non bloquantes : on charge en media=print puis on bascule en all une fois prêtes (le thème est déjà appliqué avant le paint, swap géré par display=swap) -->
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;800&display=swap"></noscript>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"></noscript>
 </head>
 <body>
 
@@ -108,11 +108,21 @@
   <!-- Month nav -->
   <div class="month-nav">
     <button class="mnb" onclick="changeMonth(-1)" title="Mois précédent">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
-    <div id="ml">–</div>
+    <div id="ml">…</div>
     <button class="mnb" onclick="changeMonth(1)" title="Mois suivant">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+    </button>
+  </div>
+
+  <!-- Actions rondes : statistiques + paramètres (mobile) -->
+  <div class="hdr-actions">
+    <button class="hdr-circle-btn" onclick="openStats()" aria-label="Statistiques" title="Statistiques">
+      <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" d="M7 18V9m5 9V6m5 12v-5"/></g></svg>
+    </button>
+    <button class="hdr-circle-btn" onclick="openScreen('screen-settings')" aria-label="Paramètres" title="Paramètres">
+      <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M13.765 2.152C13.398 2 12.932 2 12 2s-1.398 0-1.765.152a2 2 0 0 0-1.083 1.083c-.092.223-.129.484-.143.863a1.62 1.62 0 0 1-.79 1.353a1.62 1.62 0 0 1-1.567.008c-.336-.178-.579-.276-.82-.308a2 2 0 0 0-1.478.396C4.04 5.79 3.806 6.193 3.34 7s-.7 1.21-.751 1.605a2 2 0 0 0 .396 1.479c.148.192.355.353.676.555c.473.297.777.803.777 1.361s-.304 1.064-.777 1.36c-.321.203-.529.364-.676.556a2 2 0 0 0-.396 1.479c.052.394.285.798.75 1.605c.467.807.7 1.21 1.015 1.453a2 2 0 0 0 1.479.396c.24-.032.483-.13.819-.308a1.62 1.62 0 0 1 1.567.008c.483.28.77.795.79 1.353c.014.38.05.64.143.863a2 2 0 0 0 1.083 1.083C10.602 22 11.068 22 12 22s1.398 0 1.765-.152a2 2 0 0 0 1.083-1.083c.092-.223.129-.483.143-.863c.02-.558.307-1.074.79-1.353a1.62 1.62 0 0 1 1.567-.008c.336.178.579.276.819.308a2 2 0 0 0 1.479-.396c.315-.242.548-.646 1.014-1.453s.7-1.21.751-1.605a2 2 0 0 0-.396-1.479c-.148-.192-.355-.353-.676-.555A1.62 1.62 0 0 1 19.562 12c0-.558.304-1.064.777-1.36c.321-.203.529-.364.676-.556a2 2 0 0 0 .396-1.479c-.052-.394-.285-.798-.75-1.605c-.467-.807-.7-1.21-1.015-1.453a2 2 0 0 0-1.479-.396c-.24.032-.483.13-.82.308a1.62 1.62 0 0 1-1.566-.008a1.62 1.62 0 0 1-.79-1.353c-.014-.38-.05-.64-.143-.863a2 2 0 0 0-1.083-1.083Z"/></g></svg>
     </button>
   </div>
 
@@ -182,7 +192,7 @@
   <button class="hdr-help-btn" onclick="openTuto()" title="Aide / Tutoriel">?</button>
   <div class="chip" id="chip">✓ Sauvegardé</div>
 </header>
-<div style="height:56px;flex-shrink:0"></div>
+<div class="hdr-spacer" style="height:56px;flex-shrink:0"></div>
 
 <!-- ════ DRAWER (mobile) ════ -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer(false)"></div>
@@ -198,8 +208,8 @@
   </div>
   <div class="drawer-nav">
     <button class="drawer-item active" id="di-overview" onclick="goTab('overview',null);toggleDrawer(false)">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Vue globale
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Accueil
     </button>
     <button class="drawer-item" id="di-budget" onclick="goTab('budget',null);toggleDrawer(false)">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -287,7 +297,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </div>
       <div class="reset-title">Tout effacer ?</div>
-      <div class="reset-body">Revenus, dépenses, budget, objectifs et historique IA — tout sera supprimé définitivement. L'application repartira de zéro.</div>
+      <div class="reset-body">Revenus, dépenses, budget, objectifs et historique IA, tout sera supprimé définitivement. L'application repartira de zéro.</div>
       <div class="reset-actions">
         <button class="reset-btn-cancel" onclick="closeResetModal()">Annuler</button>
         <button class="reset-btn-confirm" onclick="confirmReset()">
@@ -302,8 +312,8 @@
 <!-- ════ TOP NAV ════ -->
 <nav id="top-nav">
   <button class="tab active" onclick="goTab('overview',this)">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-    <span class="tab-txt">Vue globale</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="tab-txt">Accueil</span>
   </button>
   <button class="tab" onclick="goTab('budget',this)">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -329,269 +339,138 @@
 <!-- ─── OVERVIEW ─── -->
 <div id="page-overview" class="page active">
 
-  <!-- GREETING -->
-  <div id="greet-wrap"></div>
+  <!-- SALUTATION -->
+  <div class="greet-wrap" id="greet-wrap"></div>
 
-  <!-- BIG STAT CARDS ROW -->
-  <div class="ov-hero">
-    <!-- Revenue card -->
-    <div class="ov-card ov-green">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        </div>
-        <span class="ov-card-lbl">Revenus du mois</span>
-      </div>
-      <div class="ov-card-val" id="ov-rev">0</div>
-      <div class="ov-card-sub" id="ov-rev-sub">–</div>
-    </div>
-    <!-- Spent card -->
-    <div class="ov-card ov-red">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-        </div>
-        <span class="ov-card-lbl">Dépenses réelles</span>
-      </div>
-      <div class="ov-card-val" id="ov-dep">0</div>
-      <div class="ov-card-sub" id="ov-dep-sub">–</div>
-    </div>
-    <!-- Remaining card -->
-    <div class="ov-card ov-blue">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </div>
-        <span class="ov-card-lbl">Reste disponible</span>
-      </div>
-      <div class="ov-card-val" id="ov-rest">0</div>
-      <div class="ov-card-sub" id="ov-rest-sub">–</div>
-    </div>
-    <!-- Savings card -->
-    <div class="ov-card ov-violet">
-      <div class="ov-card-bg"></div>
-      <div class="ov-card-top">
-        <div class="ov-card-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        </div>
-        <span class="ov-card-lbl">Budget non alloué</span>
-      </div>
-      <div class="ov-card-val" id="ov-na">0</div>
-      <div class="ov-card-sub" id="ov-na-sub">–</div>
-    </div>
-  </div>
+  <!-- HÉROS : RESTE DISPONIBLE -->
+  <section class="dash-hero">
+    <div class="dash-hero-lbl">Reste disponible</div>
+    <div class="dash-hero-val" id="dash-hero-val">0</div>
+    <div class="dash-hero-delta" id="dash-hero-delta"></div>
+  </section>
 
-  <!-- DONUT + BUDGET USAGE -->
-  <div class="ov-mid">
-    <!-- Donut chart -->
-    <div class="ov-panel ov-donut-wrap">
-      <div class="ov-panel-hd">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 12L16.24 7.76"/><path d="M12 12v-4"/></svg>
-        Répartition du mois
-      </div>
-      <div class="donut-center-wrap">
-        <svg id="donut-svg" viewBox="0 0 130 130" style="width:100%;max-width:180px;height:auto;display:block;"></svg>
-        <div class="donut-label">
-          <div class="donut-pct" id="donut-pct">0%</div>
-          <div class="donut-sub">utilisé</div>
-        </div>
-      </div>
-      <div class="donut-legend" id="donut-legend"></div>
+  <!-- ACTIONS RAPIDES -->
+  <section class="dash-actions">
+    <button class="dash-act dash-act-primary" onclick="openTxScreen('expense')">
+      <span class="dash-act-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+      <span class="dash-act-lbl">Ajouter</span>
+    </button>
+    <button class="dash-act" onclick="openTxScreen('income')">
+      <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+      <span class="dash-act-lbl">Revenu</span>
+    </button>
+    <button class="dash-act" onclick="openGoalScreen()">
+      <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+      <span class="dash-act-lbl">Objectif</span>
+    </button>
+  </section>
+
+  <!-- CARTES RÉSUMÉ (scroll horizontal) -->
+  <section class="dash-cards">
+    <button class="dash-card dash-card-budget" onclick="goTab('budget')">
+      <div class="dash-card-hd">Budget restant</div>
+      <div class="dash-card-val" id="dash-budget-rest">0</div>
+      <div class="pt dash-card-gauge"><div class="pf" id="dash-budget-gauge" style="width:0%"></div></div>
+      <div class="dash-card-sub" id="dash-budget-sub">…</div>
+    </button>
+    <button class="dash-card dash-card-goal" id="dash-goal-card" onclick="goTab('goals')"></button>
+  </section>
+
+  <!-- RÉCENTS -->
+  <section class="dash-recent-wrap">
+    <div class="dash-recent-hd">
+      <span>Récents</span>
+      <button class="dash-see-all" onclick="goTab('tracker')">Voir tout</button>
     </div>
-
-    <!-- Budget progress bars -->
-    <div class="ov-panel ov-budget-bars">
-      <div class="ov-panel-hd">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-        Budget mensuel
-      </div>
-      <!-- Global progress -->
-      <div class="ov-glob-prog" style="margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;">
-          <span style="font-size:.75rem;color:var(--muted)">Utilisation globale</span>
-          <span id="ov-pct-l" style="font-family:var(--fh);font-weight:800;font-size:.82rem;color:var(--pr-l)">0%</span>
-        </div>
-        <div class="pt" style="height:9px;"><div class="pf" id="ov-pct-b" style="width:0%;background:var(--pr)"></div></div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:.75rem;color:var(--muted);">
-          <span id="ov-all">0</span>
-          <span>/ <span id="ov-rev2">0</span></span>
-        </div>
-      </div>
-      <!-- Top budget lines breakdown -->
-      <div id="ov-budget-lines"></div>
-    </div>
-  </div>
-
-  <!-- REVENUES CARDS -->
-  <div class="sl">Sources de revenus</div>
-  <div class="g3" id="ov-cards"></div>
-
-  <!-- RECENT TRANSACTIONS -->
-  <div class="sl">Dernières transactions</div>
-  <div class="ov-panel" id="ov-recent-txs" style="padding:0;overflow:hidden;">
-    <div class="empty" style="padding:20px;">
-      <div class="empty-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      Aucune transaction ce mois-ci
-    </div>
-  </div>
-
-  <div id="ov-al" style="margin-top:10px;"></div>
-
-  <!-- GOALS -->
-  <div class="sl">Progression objectifs</div>
-  <div class="g2" id="ov-goals"></div>
+    <div id="dash-recent"></div>
+  </section>
 </div>
 
 <!-- ─── BUDGET ─── -->
 <div id="page-budget" class="page">
-  <div class="page-ttl">Mes budgets</div>
-  <div class="sl">Sources de revenus</div>
-  <div class="rev-tbl">
-    <div class="tbl-th">
-      <span style="flex:1">Source</span>
-      <span style="width:110px;text-align:right;flex-shrink:0" id="rev-th-cur">Montant</span>
-      <span style="width:22px;flex-shrink:0"></span>
-    </div>
-    <div id="rev-rows"></div>
-    <div class="arf">
-      <input class="an" type="text" id="nr-n" placeholder="Nouvelle source…">
-      <input class="aa" type="text" inputmode="decimal" id="nr-a" placeholder="0" onkeydown="if(event.key==='Enter')addRev()">
-      <button class="btn bp bsm" onclick="addRev()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
-    </div>
-    <div class="tbl-foot">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
-      <div class="tf-lbl">Total revenus</div>
-      <div class="tf-val" id="rev-tot" style="color:var(--green)">0</div>
-      <div style="width:22px;flex-shrink:0;"></div>
-    </div>
-    <div class="tbl-foot" id="bud-ponctuel-row" style="display:none;border-top:none;">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-      <div class="tf-lbl" style="color:var(--green)">
-        Total avec ponctuels
-        <div id="bud-ponctuel-sub" style="font-size:.75rem;color:var(--muted);font-weight:500;margin-top:2px;"></div>
-      </div>
-      <div class="tf-val" id="bud-ponctuel-tot" style="color:var(--green)">0</div>
-      <div style="width:22px;flex-shrink:0;"></div>
-    </div>
+  <div class="page-hd">
+    <h1 class="bud-title">Planning Budgétaire</h1>
   </div>
 
-  <div class="sl">Planification budgétaire</div>
-  <button class="ai-budget-btn" id="ai-budget-btn" onclick="suggestBudget()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14z"/></svg>
+  <!-- REVENUS ATTENDUS -->
+  <div class="sec-hd">
+    <span class="sec-lbl">Revenus attendus</span>
+    <span class="sec-tot" id="rev-tot" style="color:var(--green)">0</span>
+  </div>
+  <div class="bud-card">
+    <div id="rev-rows"></div>
+  </div>
+  <div class="add-reveal">
+    <button class="add-btn" onclick="openBudgetScreen('rev')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un revenu
+    </button>
+  </div>
+
+  <!-- POSTES DE DÉPENSES -->
+  <div class="sec-hd">
+    <span class="sec-lbl">Postes de dépenses</span>
+    <span class="sec-tot sec-tot-muted">Alloué : <span id="bud-tot">0</span></span>
+  </div>
+  <button class="bud-ai" id="ai-budget-btn" onclick="suggestBudget()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/></svg>
     <span>Répartir mon budget avec l'IA</span>
   </button>
-  <div class="bud-tbl">
-    <div class="tbl-th">
-      <span style="width:20px;flex-shrink:0"></span>
-      <span style="flex:1">Poste</span>
-      <span style="width:110px;text-align:right;flex-shrink:0" id="bud-th-cur">Montant</span>
-      <span class="tf-pct">%</span>
-      <span style="width:22px;flex-shrink:0"></span>
-    </div>
-    <div id="bud-rows"></div>
-    <div class="arf">
-      <input type="text" id="nb-n" placeholder="Nouveau poste…" class="an">
-      <input class="aa" type="text" inputmode="decimal" id="nb-a" placeholder="0" onkeydown="if(event.key==='Enter')addBud()">
-      <button class="btn bp bsm" onclick="addBud()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
-    </div>
-    <div class="tbl-foot">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg></div>
-      <div class="tf-lbl">Total alloué</div>
-      <div class="tf-val" id="bud-tot" style="color:var(--red-l)">0</div>
-      <div class="tf-pct" id="bud-tot-pct">–</div>
-      <div style="width:22px;flex-shrink:0;"></div>
-    </div>
-    <div class="tbl-foot" style="border-top:none;">
-      <div class="tbl-foot-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <div class="tf-lbl">Reste non alloué</div>
-      <div class="tf-val" id="bud-reste">0</div>
-      <div class="bp3" style="visibility:hidden;"></div>
-      <div style="width:22px;flex-shrink:0;"></div>
-    </div>
+  <div id="bud-rows"></div>
+  <div class="add-reveal">
+    <button class="add-btn" onclick="openBudgetScreen('bud')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter un poste
+    </button>
   </div>
+
+  <!-- Éléments conservés pour la logique du footer (masqués) -->
+  <div class="bud-hidden-foot" style="display:none;">
+    <span id="bud-tot-pct">…</span>
+    <span id="bud-reste">0</span>
+    <span id="bud-ponctuel-tot">0</span>
+    <span id="bud-ponctuel-sub"></span>
+  </div>
+  <div id="bud-ponctuel-row" style="display:none;"></div>
 
   <!-- Currency note -->
   <div class="cur-note" id="cur-conv-note" style="display:none;">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10z"/></svg>
     <span id="cur-conv-txt"></span>
   </div>
-
-  <div id="bud-al" style="margin-top:11px;"></div>
 </div>
 
 <!-- ─── TRACKER ─── -->
 <div id="page-tracker" class="page">
-  <div class="page-ttl">Mes transactions</div>
-  <div class="sl">Ajouter une transaction</div>
-  <div class="tx-panel">
-    <div class="tygt">
-      <button class="tyb exp on" id="ty-e" onclick="setTxType('expense')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-        Dépense
-      </button>
-      <button class="tyb inc" id="ty-i" onclick="setTxType('income')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        Revenu ponctuel
-      </button>
-    </div>
-    <div class="txg">
-      <div class="field"><label>Description</label><input type="text" id="tx-d" placeholder="Ex: Courses Lidl" onkeydown="if(event.key==='Enter')addTx()"></div>
-      <div class="field"><label>Catégorie</label><select id="tx-c"></select></div>
-      <div class="field">
-        <label>Montant (<span id="tx-cur-lbl">€</span>)</label>
-        <div class="fw"><span class="cur-sym" id="tx-cur-sym">€</span><input type="text" inputmode="decimal" id="tx-a" placeholder="0.00" onkeydown="if(event.key==='Enter')addTx()"></div>
-      </div>
-      <div class="field"><label>Date</label><input type="date" id="tx-dt"></div>
-      <button class="btn bp" onclick="addTx()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Ajouter
-      </button>
-    </div>
-  </div>
+  <div class="page-hd"><h1 class="bud-title">Dépenses</h1></div>
 
-  <div class="sl">Récapitulatif</div>
-  <div class="g3" style="margin-bottom:15px;">
-    <div class="kpi">
-      <div class="kpi-bar" style="background:var(--red)"></div>
-      <div class="kpi-hd">
-        <div class="kpi-hd-ico" style="background:rgba(196,58,58,.2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div>
-        <div class="kpi-lbl">Total dépensé</div>
-      </div>
-      <div class="kpi-val" id="tr-t" style="color:var(--red-l)">0</div>
+  <!-- Résumé du mois -->
+  <section class="dep-sum">
+    <div class="dep-sum-head">
+      <span class="dep-sum-lbl">Dépensé ce mois</span>
+      <span class="dep-sum-val" id="tr-t">0</span>
     </div>
-    <div class="kpi">
-      <div class="kpi-bar" style="background:var(--green)"></div>
-      <div class="kpi-hd">
-        <div class="kpi-hd-ico" style="background:rgba(52,211,153,.15)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="var(--green)"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="kpi-lbl">Budget total</div>
+    <div class="dep-track"><div class="dep-track-fill" id="dep-track-fill"></div></div>
+    <div class="dep-sum-foot">
+      <div class="dep-stat">
+        <span class="dep-stat-lbl">Revenus</span>
+        <span class="dep-stat-val" id="tr-b">0</span>
       </div>
-      <div class="kpi-val" id="tr-b" style="color:var(--green)">0</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-bar" style="background:var(--pr)"></div>
-      <div class="kpi-hd">
-        <div class="kpi-hd-ico" style="background:rgba(77,120,212,.18)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="var(--pr-l)"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-        <div class="kpi-lbl">Reste disponible</div>
+      <div class="dep-stat dep-stat-end">
+        <span class="dep-stat-lbl">Reste disponible</span>
+        <span class="dep-stat-val" id="tr-r">0</span>
       </div>
-      <div class="kpi-val" id="tr-r" style="color:var(--pr-l)">0</div>
     </div>
-  </div>
+  </section>
 
-  <div class="sl">Répartition par catégorie</div>
-  <div id="cat-bk" style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:15px;">
+  <!-- Où part l'argent -->
+  <div class="dep-sec-lbl">Où part ton argent</div>
+  <div id="cat-bk" class="dep-cats">
     <div class="empty" style="padding:10px;"><div class="empty-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>Aucune dépense ce mois-ci</div>
   </div>
 
-  <div class="sl">Transactions du mois</div>
+  <!-- Transactions -->
+  <div class="dep-sec-lbl">Transactions</div>
   <div class="tx-controls">
     <div class="tx-search-wrap">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -610,60 +489,50 @@
 
 <!-- ─── GOALS ─── -->
 <div id="page-goals" class="page">
-  <div class="page-ttl">Mes objectifs</div>
-  <div class="sl">Nouvel objectif</div>
-  <div class="ngform">
-    <div class="g2" style="margin-bottom:11px;">
-      <div class="field"><label>Nom de l'objectif</label><input type="text" id="ng-n" placeholder="Ex: Caution appartement"></div>
-      <div class="field"><label>Échéance</label><input type="date" id="ng-d"></div>
-      <div class="field"><label>Montant cible</label><input type="text" inputmode="decimal" id="ng-t" placeholder="1 800"></div>
-      <div class="field"><label>Déjà épargné</label><input type="text" inputmode="decimal" id="ng-c" placeholder="0"></div>
-    </div>
-    <div style="margin-bottom:11px;">
-      <div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--fh);margin-bottom:6px;">Couleur</div>
-      <div class="sws">
-        <div class="sw on" data-c="#4D78D4" style="background:#4D78D4" onclick="selC(this)"></div>
-        <div class="sw" data-c="#7BA3F0" style="background:#7BA3F0" onclick="selC(this)"></div>
-        <div class="sw" data-c="#C43A3A" style="background:#C43A3A" onclick="selC(this)"></div>
-        <div class="sw" data-c="#E87A7A" style="background:#E87A7A" onclick="selC(this)"></div>
-        <div class="sw" data-c="#f59e0b" style="background:#f59e0b" onclick="selC(this)"></div>
-        <div class="sw" data-c="#34d399" style="background:#34d399" onclick="selC(this)"></div>
-        <div class="sw" data-c="#a78bfa" style="background:#a78bfa" onclick="selC(this)"></div>
-        <div class="sw" data-c="#e879f9" style="background:#e879f9" onclick="selC(this)"></div>
-      </div>
-    </div>
-    <button class="btn bp" onclick="addGoal()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Créer l'objectif
+  <div class="page-hd">
+    <h1 class="bud-title">Mes Objectifs</h1>
+    <button class="page-hd-btn primary" onclick="openGoalScreen()" aria-label="Nouvel objectif" title="Nouvel objectif">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
-  <div class="sl">Mes objectifs</div>
-  <div class="g2" id="goals-grid"></div>
+
+  <div id="goals-grid"></div>
 </div>
 
 <!-- ─── AI ─── -->
 <div id="page-ai" class="page">
-  <div class="sl">Conseiller IA</div>
-  <div class="ai-box">
-    <div class="ai-hd">
-      <div class="ai-av">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 2v4"/><circle cx="12" cy="6" r="1.5" fill="white" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="white" stroke="none"/><path d="M9 19h6"/></svg>
-      </div>
-      <div><h3>Conseiller financier IA</h3><p>Analyse ta situation · Conseils personnalisés</p></div>
-      <div class="ai-hd-right">
-        <button class="btn bg2 bsm" onclick="clearAiHistory()" title="Effacer la conversation" style="opacity:.85;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Effacer
-        </button>
-      </div>
+  <!-- En-tête -->
+  <div class="ai-hero">
+    <div class="ai-hero-av">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2.6" x2="12" y2="5"/><circle cx="12" cy="2" r="0.95" fill="white" stroke="none"/><rect x="4" y="5" width="16" height="13" rx="4.5"/><line x1="4" y1="10.5" x2="2.4" y2="10.5"/><line x1="20" y1="10.5" x2="21.6" y2="10.5"/><circle cx="9" cy="11" r="1.4" fill="white" stroke="none"/><circle cx="15" cy="11" r="1.4" fill="white" stroke="none"/><path d="M9 14.5c.8.7 1.9 1 3 1s2.2-.3 3-1"/></svg>
+      <span class="ai-hero-online" aria-hidden="true"></span>
     </div>
-    <div class="ai-msgs" id="ai-msgs"></div>
-    <div class="ai-ir">
-      <input type="text" id="ai-q" placeholder="Ex: Comment rembourser ma dette plus vite ?" onkeydown="if(event.key==='Enter')sendAI()">
-      <button class="ai-send" id="ai-btn" onclick="sendAI()" title="Envoyer">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
+    <div class="ai-hero-txt">
+      <div class="ai-hero-title">Conseiller IA</div>
+      <div class="ai-hero-sub"><span class="ai-online-dot"></span>En ligne</div>
     </div>
+    <button class="ai-clear" onclick="clearAiHistory()" title="Effacer la conversation" aria-label="Effacer la conversation">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+  </div>
+
+  <!-- Fil de messages -->
+  <div class="ai-msgs" id="ai-msgs"></div>
+
+  <!-- Suggestions -->
+  <div class="ai-suggest" id="ai-suggest">
+    <button class="ai-chip" onclick="askAI('Comment épargner plus ce mois-ci ?')">Épargner plus</button>
+    <button class="ai-chip" onclick="askAI('Où part mon argent ce mois-ci ?')">Où part mon argent</button>
+    <button class="ai-chip" onclick="askAI('Comment atteindre mon objectif plus vite ?')">Atteindre mon objectif</button>
+    <button class="ai-chip" onclick="askAI('Comment réduire mes dépenses ?')">Réduire mes dépenses</button>
+  </div>
+
+  <!-- Saisie -->
+  <div class="ai-ir">
+    <input type="text" id="ai-q" placeholder="Pose ta question…" onkeydown="if(event.key==='Enter')sendAI()">
+    <button class="ai-send" id="ai-btn" onclick="sendAI()" title="Envoyer" aria-label="Envoyer">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
   </div>
 </div>
 
@@ -734,7 +603,7 @@
   </div>
 </div>
 
-<!-- ob-overlay removed — replaced by src/ui/tutorial.js -->
+<!-- ob-overlay removed, replaced by src/ui/tutorial.js -->
 <div class="pwa-overlay" id="ob-overlay" style="display:none!important">
   <div class="pwa-card">
     <div class="ob-progress" id="ob-progress-bar">
@@ -780,7 +649,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       </div>
       <div class="ob-title">Commence par tes revenus</div>
-      <div class="ob-txt">Salaire, freelance, commerce, tontine, agriculture, dividendes... 14 catégories couvrent toutes les situations. Saisis tes sources de revenus une fois — elles se reportent chaque mois automatiquement.</div>
+      <div class="ob-txt">Salaire, freelance, commerce, tontine, agriculture, dividendes... 14 catégories couvrent toutes les situations. Saisis tes sources de revenus une fois, elles se reportent chaque mois automatiquement.</div>
       <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--green);">
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Pourquoi c'est essentiel</div>
         <div style="font-size:.78rem;color:var(--text);">Sans revenus saisis, ton solde et ton budget restent à 0. C'est la première étape à faire dès maintenant.</div>
@@ -793,7 +662,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
       </div>
       <div class="ob-title">Planifie ton budget</div>
-      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport, épargne... L'app te prévient en temps réel si tu dépasses. Et chaque mois, ton budget du mois précédent se recopie automatiquement — tu ajustes seulement ce qui change.</div>
+      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport, épargne... L'app te prévient en temps réel si tu dépasses. Et chaque mois, ton budget du mois précédent se recopie automatiquement, tu ajustes seulement ce qui change.</div>
       <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Bonne habitude</div>
         <div style="font-size:.78rem;color:var(--text);">5 minutes en début de mois pour revoir ton plan. C'est la clé pour ne jamais être à court en fin de mois.</div>
@@ -809,7 +678,7 @@
       <div class="ob-txt">16 catégories couvrent toutes tes dépenses : alimentation, transport, famille, scolarité, cérémonie, business... Le bouton <strong>+</strong> en bas de l'écran est là en permanence. La Vue globale affiche ensuite un graphique de tes postes de dépenses.</div>
       <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--gold);">
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Discipline = liberté</div>
-        <div style="font-size:.78rem;color:var(--text);">30 secondes après chaque achat pour le noter. En 21 jours, c'est un réflexe automatique — et tu sais exactement où va ton argent.</div>
+        <div style="font-size:.78rem;color:var(--text);">30 secondes après chaque achat pour le noter. En 21 jours, c'est un réflexe automatique, et tu sais exactement où va ton argent.</div>
       </div>
     </div>
 
@@ -819,7 +688,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       </div>
       <div class="ob-title">Fixe tes objectifs</div>
-      <div class="ob-txt">Voyage, épargne de précaution, remboursement de dette, achat immobilier... Crée un objectif avec un montant cible et une date. Alimente-le depuis la Vue globale ou l'onglet Objectifs — la barre de progression avance en temps réel.</div>
+      <div class="ob-txt">Voyage, épargne de précaution, remboursement de dette, achat immobilier... Crée un objectif avec un montant cible et une date. Alimente-le depuis la Vue globale ou l'onglet Objectifs, la barre de progression avance en temps réel.</div>
       <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--violet);">
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Motivation</div>
         <div style="font-size:.78rem;color:var(--text);">Un objectif visible chaque jour avance 3 fois plus vite qu'un objectif vague dans ta tête. L'app te notifie quand tu approches du but.</div>
@@ -832,7 +701,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
       <div class="ob-title">Ton conseiller IA</div>
-      <div class="ob-txt">Il a accès à tes revenus, dépenses, budget et objectifs du moment. Il ne donne pas des conseils génériques — il raisonne avec tes vrais chiffres pour des réponses personnalisées.</div>
+      <div class="ob-txt">Il a accès à tes revenus, dépenses, budget et objectifs du moment. Il ne donne pas des conseils génériques, il raisonne avec tes vrais chiffres pour des réponses personnalisées.</div>
       <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
         <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Questions à lui poser</div>
         <div style="font-size:.78rem;color:var(--text);font-style:italic;">"Combien puis-je épargner ce mois ?" · "Où est-ce que je dépense trop ?" · "Mon objectif voyage est-il réaliste ?" · "Comment rembourser ma dette plus vite ?"</div>
@@ -845,7 +714,7 @@
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="ob-title">Tu es prêt. 🚀</div>
-      <div class="ob-txt">Ceux qui notent leurs finances progressent 40% plus vite vers leurs objectifs. L'app t'envoie des rappels intelligents basés sur ta situation réelle — pas besoin de tout retenir.</div>
+      <div class="ob-txt">Ceux qui notent leurs finances progressent 40% plus vite vers leurs objectifs. L'app t'envoie des rappels intelligents basés sur ta situation réelle, pas besoin de tout retenir.</div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
         <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -857,7 +726,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">Bilan chaque lundi — l'app te le rappelle automatiquement</span>
+          <span style="font-size:.77rem;color:var(--text);">Bilan chaque lundi, l'app te le rappelle automatiquement</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -887,85 +756,430 @@
   <div class="bnav-inner">
     <div class="bnav-pill" id="bnav-pill"></div>
     <button class="bnav-btn active" id="bn-overview" onclick="goTabMobile('overview')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      <span class="bnav-lbl">Vue globale</span>
+      <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12.204c0-2.289 0-3.433.52-4.381c.518-.949 1.467-1.537 3.364-2.715l2-1.241C9.889 2.622 10.892 2 12 2s2.11.622 4.116 1.867l2 1.241c1.897 1.178 2.846 1.766 3.365 2.715S22 9.915 22 12.203v1.522c0 3.9 0 5.851-1.172 7.063S17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.212S2 17.626 2 13.725z"/><path stroke-linecap="round" d="M9 16c.85.63 1.885 1 3 1s2.15-.37 3-1"/></g></svg></span>
+      <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M2.52 7.823C2 8.77 2 9.915 2 12.203v1.522c0 3.9 0 5.851 1.172 7.063S6.229 22 10 22h4c3.771 0 5.657 0 6.828-1.212S22 17.626 22 13.725v-1.521c0-2.289 0-3.433-.52-4.381c-.518-.949-1.467-1.537-3.364-2.715l-2-1.241C14.111 2.622 13.108 2 12 2s-2.11.622-4.116 1.867l-2 1.241C3.987 6.286 3.038 6.874 2.519 7.823m6.927 7.575a.75.75 0 1 0-.894 1.204A5.77 5.77 0 0 0 12 17.75a5.77 5.77 0 0 0 3.447-1.148a.75.75 0 1 0-.894-1.204A4.27 4.27 0 0 1 12 16.25a4.27 4.27 0 0 1-2.553-.852" clip-rule="evenodd"/></svg></span>
+      <span class="bnav-lbl">Accueil</span>
     </button>
     <button class="bnav-btn" id="bn-budget" onclick="goTabMobile('budget')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601Z"/><path d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931Z"/></g></svg></span>
+      <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601"/><path fill="currentColor" d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931"/></svg></span>
       <span class="bnav-lbl">Budget</span>
     </button>
     <button class="bnav-btn" id="bn-tracker" onclick="goTabMobile('tracker')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 8h4"/><path d="M20.833 9h-2.602C16.446 9 15 10.343 15 12s1.447 3 3.23 3h2.603c.084 0 .125 0 .16-.002c.54-.033.97-.432 1.005-.933c.002-.032.002-.071.002-.148v-3.834c0-.077 0-.116-.002-.148c-.036-.501-.465-.9-1.005-.933C20.959 9 20.918 9 20.834 9Z"/><path d="M20.965 9c-.078-1.872-.328-3.02-1.137-3.828C18.657 4 16.771 4 13 4h-3C6.229 4 4.343 4 3.172 5.172S2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h3c3.771 0 5.657 0 6.828-1.172c.809-.808 1.06-1.956 1.137-3.828"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.991 12h.01"/></g></svg></span>
+      <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M21.1 8.004q-.085-.005-.181-.004h-2.525c-2.068 0-3.837 1.628-3.837 3.75s1.77 3.75 3.837 3.75h2.525q.096.001.182-.004a1.755 1.755 0 0 0 1.645-1.628c.004-.06.004-.125.004-.185V9.817c0-.06 0-.125-.004-.185a1.755 1.755 0 0 0-1.645-1.628m-2.928 4.746c.532 0 .963-.448.963-1s-.431-1-.963-1c-.533 0-.964.448-.964 1s.431 1 .964 1"/><path d="M20.918 17a.22.22 0 0 1 .221.278c-.2.712-.519 1.32-1.03 1.83c-.749.75-1.698 1.081-2.87 1.239c-1.14.153-2.595.153-4.433.153h-2.112c-1.838 0-3.294 0-4.433-.153c-1.172-.158-2.121-.49-2.87-1.238c-.748-.749-1.08-1.698-1.238-2.87C2 15.099 2 13.644 2 11.806v-.112C2 9.856 2 8.4 2.153 7.26c.158-1.172.49-2.121 1.238-2.87c.749-.748 1.698-1.08 2.87-1.238C7.401 3 8.856 3 10.694 3h2.112c1.838 0 3.294 0 4.433.153c1.172.158 2.121.49 2.87 1.238c.511.512.83 1.119 1.03 1.831a.22.22 0 0 1-.221.278h-2.524c-2.837 0-5.337 2.24-5.337 5.25s2.5 5.25 5.337 5.25zM5.75 7a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5z"/></g></svg></span>
       <span class="bnav-lbl">Dépenses</span>
     </button>
     <button class="bnav-btn" id="bn-goals" onclick="goTabMobile('goals')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10Z"/><path stroke-linecap="round" d="M2 12h3m14 0h3M12 22v-3m0-14V2"/><path stroke-linecap="round" stroke-linejoin="round" d="M10 12h4m-2 2v-4"/></g></svg></span>
+      <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M11.248 2A10.03 10.03 0 0 0 2 11.248h2.98a.752.752 0 1 1 0 1.504H2A10.03 10.03 0 0 0 11.248 22v-2.98a.752.752 0 0 1 1.504 0V22A10.03 10.03 0 0 0 22 12.752h-2.98a.752.752 0 0 1 0-1.504H22A10.03 10.03 0 0 0 12.752 2v2.98a.752.752 0 1 1-1.504 0zM9.242 12c0-.415.337-.752.752-.752h1.254V9.994a.752.752 0 1 1 1.504 0v1.254h1.254a.752.752 0 0 1 0 1.504h-1.254v1.254a.752.752 0 0 1-1.504 0v-1.254H9.994A.75.75 0 0 1 9.242 12" clip-rule="evenodd"/></svg></span>
       <span class="bnav-lbl">Objectifs</span>
     </button>
-    <button class="bnav-btn" id="bn-plus" onclick="openPlusPanel()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
-      <span class="bnav-lbl">Plus</span>
+    <button class="bnav-btn" id="bn-ai" onclick="goTabMobile('ai')">
+      <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.845 7.922a2.883 2.883 0 1 1 4.077-4.077l12.234 12.233a2.884 2.884 0 0 1-4.078 4.078z"/><path stroke-linecap="round" d="m6 10l4-4"/><path d="M16.1 2.307a.483.483 0 0 1 .9 0l.43 1.095a.48.48 0 0 0 .272.274l1.091.432a.486.486 0 0 1 0 .903l-1.09.432a.5.5 0 0 0-.273.273L17 6.81a.483.483 0 0 1-.9 0l-.43-1.095a.5.5 0 0 0-.273-.273l-1.09-.432a.486.486 0 0 1 0-.903l1.09-.432a.5.5 0 0 0 .273-.274zm3.867 6.823a.483.483 0 0 1 .9 0l.156.399c.05.125.148.224.273.273l.398.158a.486.486 0 0 1 0 .902l-.398.158a.5.5 0 0 0-.273.273l-.156.4a.483.483 0 0 1-.9 0l-.157-.4a.5.5 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.902l.398-.158a.5.5 0 0 0 .272-.273zM5.133 15.307a.483.483 0 0 1 .9 0l.157.4a.48.48 0 0 0 .272.273l.398.157a.486.486 0 0 1 0 .903l-.398.158a.48.48 0 0 0-.272.273l-.157.4a.483.483 0 0 1-.9 0l-.157-.4a.48.48 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.903l.398-.157a.48.48 0 0 0 .272-.274z"/></g></svg></span>
+      <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M3.845 7.922a2.883 2.883 0 1 1 4.077-4.077l12.234 12.233a2.884 2.884 0 0 1-4.078 4.078z"/><path d="M16.1 2.307a.483.483 0 0 1 .9 0l.43 1.095a.48.48 0 0 0 .272.274l1.091.432a.486.486 0 0 1 0 .903l-1.09.432a.5.5 0 0 0-.273.273L17 6.81a.483.483 0 0 1-.9 0l-.43-1.095a.5.5 0 0 0-.273-.273l-1.09-.432a.486.486 0 0 1 0-.903l1.09-.432a.5.5 0 0 0 .273-.274zm3.867 6.823a.483.483 0 0 1 .9 0l.156.399c.05.125.148.224.273.273l.398.158a.486.486 0 0 1 0 .902l-.398.158a.5.5 0 0 0-.273.273l-.156.4a.483.483 0 0 1-.9 0l-.157-.4a.5.5 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.902l.398-.158a.5.5 0 0 0 .272-.273zM5.133 15.307a.483.483 0 0 1 .9 0l.157.4a.48.48 0 0 0 .272.273l.398.157a.486.486 0 0 1 0 .903l-.398.158a.48.48 0 0 0-.272.273l-.157.4a.483.483 0 0 1-.9 0l-.157-.4a.48.48 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.903l.398-.157a.48.48 0 0 0 .272-.274z"/></g></svg></span>
+      <span class="bnav-lbl">Conseils IA</span>
     </button>
   </div>
 </div>
 
-<!-- ════ PLUS PANEL ════ -->
-<div class="plus-overlay" id="plus-overlay" onclick="closePlusPanel()"></div>
-<div class="plus-panel" id="plus-panel">
-  <div style="width:36px;height:4px;border-radius:99px;background:var(--b2);margin:12px auto 4px;"></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 0;">
-    <div style="font-family:var(--fh);font-size:1rem;font-weight:800;color:var(--text);">Plus</div>
-    <button onclick="closePlusPanel()" style="width:30px;height:30px;border-radius:50%;border:none;background:var(--s2);color:var(--muted);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">✕</button>
-  </div>
-  <div style="padding:14px 16px;display:flex;flex-direction:column;gap:16px;">
-    <!-- Conseils IA -->
-    <button class="plus-nav-btn" onclick="goTab('ai',null);closePlusPanel();">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Conseils IA
+<!-- ════ ÉCRAN RÉGLAGES ════ -->
+<div class="screen" id="screen-settings" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
-    <!-- Thème -->
-    <div>
-      <div class="plus-lbl">Thème</div>
-      <div class="drawer-themes">
-        <div class="dtdot" data-theme="blue"   style="background:linear-gradient(135deg,#4D78D4,#0d1628)" onclick="setTheme('blue')"   title="Midnight Blue"></div>
-        <div class="dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)" onclick="setTheme('violet')" title="Violet"></div>
-        <div class="dtdot" data-theme="light"  style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)" onclick="setTheme('light')"  title="Thème clair"></div>
+    <div class="screen-title">Réglages</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+
+    <!-- Carte profil -->
+    <button class="set-profile" onclick="openProfile()">
+      <span class="set-avatar" id="set-avatar">M</span>
+      <span class="set-profile-txt">
+        <span class="set-name-display" id="set-name-display">Ton prénom</span>
+        <span class="set-profile-sub">Compte personnel</span>
+      </span>
+      <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+    </button>
+
+    <!-- Apparence -->
+    <div class="set-sec-label">Apparence</div>
+    <div class="set-group">
+      <button class="set-row" onclick="toggleSetRow(this)">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"/></g></svg></span>
+        <span class="set-row-label">Thème</span>
+        <span class="set-row-value" id="set-theme-val">Clair</span>
+        <svg class="set-chev set-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-panel">
+        <div class="set-theme-row">
+          <button class="set-theme" onclick="setTheme('light');syncSettings();">
+            <span class="set-swatch dtdot" data-theme="light" style="background:linear-gradient(135deg,#c8d8f8,#f0f4ff)"></span>Clair
+          </button>
+          <button class="set-theme" onclick="setTheme('blue');syncSettings();">
+            <span class="set-swatch dtdot" data-theme="blue" style="background:linear-gradient(135deg,#4D78D4,#0d1628)"></span>Bleu nuit
+          </button>
+          <button class="set-theme" onclick="setTheme('violet');syncSettings();">
+            <span class="set-swatch dtdot" data-theme="violet" style="background:linear-gradient(135deg,#7A6BC4,#0c0a10)"></span>Violet
+          </button>
+        </div>
+      </div>
+      <div class="set-divider"></div>
+      <button class="set-row" onclick="toggleSetRow(this)">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.6c0-1 1.1-1.6 2.5-1.6s2.5.5 2.5 1.6-1.1 1.6-2.5 1.6-2.5.6-2.5 1.6 1.1 1.6 2.5 1.6 2.5-.6 2.5-1.6"/></g></svg></span>
+        <span class="set-row-label">Devise</span>
+        <span class="set-row-value" id="set-cur-val">EUR €</span>
+        <svg class="set-chev set-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-panel">
+        <div class="set-cur-grid">
+          <button class="set-cur-btn" data-cur="EUR" onclick="setCurrency('EUR');syncSettings();"><span>🇪🇺</span> EUR</button>
+          <button class="set-cur-btn" data-cur="USD" onclick="setCurrency('USD');syncSettings();"><span>🇺🇸</span> USD</button>
+          <button class="set-cur-btn" data-cur="GBP" onclick="setCurrency('GBP');syncSettings();"><span>🇬🇧</span> GBP</button>
+          <button class="set-cur-btn" data-cur="CAD" onclick="setCurrency('CAD');syncSettings();"><span>🇨🇦</span> CAD</button>
+          <button class="set-cur-btn" data-cur="XOF" onclick="setCurrency('XOF');syncSettings();"><span>🌍</span> XOF</button>
+          <button class="set-cur-btn" data-cur="MAD" onclick="setCurrency('MAD');syncSettings();"><span>🇲🇦</span> MAD</button>
+        </div>
       </div>
     </div>
+
     <!-- Données -->
-    <div>
-      <div class="plus-lbl">Données</div>
-      <div class="drawer-data" style="margin-top:0;">
-        <button class="drawer-data-btn" onclick="exportData()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Exporter
+    <div class="set-sec-label">Données</div>
+    <div class="set-group">
+      <button class="set-row" onclick="exportData()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+        <span class="set-row-label">Exporter une sauvegarde</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-divider"></div>
+      <button class="set-row" onclick="document.getElementById('import-input').click()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+        <span class="set-row-label">Importer une sauvegarde</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Zone de danger -->
+    <div class="set-sec-label">Zone de danger</div>
+    <div class="set-group">
+      <button class="set-row danger" onclick="openResetModal()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span>
+        <span class="set-row-label">Réinitialiser les données</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+    </div>
+
+    <!-- À propos -->
+    <div class="set-sec-label">À propos</div>
+    <div class="set-group">
+      <button class="set-row" onclick="openTuto()">
+        <span class="set-row-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="set-row-label">Revoir le tutoriel</span>
+        <svg class="set-chev" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
+      </button>
+      <div class="set-divider"></div>
+      <div class="set-about">
+        <img src="pp.png" alt="Emmanuel Danton" class="set-about-pp" onerror="this.style.display='none'">
+        <div class="set-about-txt">
+          Hey les curieux 👋 je suis <strong>Emmanuel</strong>, le concepteur de MyFinanx.
+          <a href="https://www.linkedin.com/in/emmanueldanton/" target="_blank" rel="noopener" class="set-about-li">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            Suivez-moi sur LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="set-appver">MyFinanx · version 1.0.0</div>
+
+  </div>
+</div>
+
+<!-- ════ ÉCRAN PROFIL (détails utilisateur) ════ -->
+<div class="screen" id="screen-profile" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title">Profil</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <div class="prof-hero">
+      <span class="prof-avatar" id="prof-avatar">M</span>
+    </div>
+
+    <div class="prof-field">
+      <label class="prof-lbl" for="prof-name">Prénom</label>
+      <input type="text" id="prof-name" class="prof-input" maxlength="30" placeholder="Ton prénom"
+             autocomplete="off" oninput="saveProfileName(this.value)">
+    </div>
+
+    <div class="prof-field">
+      <span class="prof-lbl">Sexe</span>
+      <div class="prof-sex" id="prof-sex">
+        <button type="button" class="prof-sex-btn" data-g="M" onclick="setProfileGender('M')">Masculin</button>
+        <button type="button" class="prof-sex-btn" data-g="F" onclick="setProfileGender('F')">Féminin</button>
+        <button type="button" class="prof-sex-btn" data-g="A" onclick="setProfileGender('A')">Autre</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ÉCRAN STATISTIQUES ════ -->
+<div class="screen" id="screen-stats" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title">Statistiques</div>
+  </div>
+  <div class="screen-body">
+    <!-- Filtre de période -->
+    <div class="stt-period" id="stats-period">
+      <button class="stt-pill" data-p="3" onclick="setStatsPeriod(3)">3 mois</button>
+      <button class="stt-pill active" data-p="6" onclick="setStatsPeriod(6)">6 mois</button>
+      <button class="stt-pill" data-p="12" onclick="setStatsPeriod(12)">12 mois</button>
+    </div>
+
+    <!-- Chiffres clés -->
+    <div class="stt-kfig" id="stats-kfig"></div>
+
+    <!-- Revenus vs dépenses -->
+    <div class="stt-sec-lbl">Revenus vs dépenses</div>
+    <div class="stt-card">
+      <div class="stt-trend-legend">
+        <span class="stt-tl"><span class="stt-leg-dot" style="background:var(--green)"></span>Revenus</span>
+        <span class="stt-tl"><span class="stt-leg-dot" style="background:var(--red-l)"></span>Dépenses</span>
+      </div>
+      <div class="stt-trend" id="stats-trend"></div>
+    </div>
+
+    <!-- Répartition par catégorie -->
+    <div class="stt-sec-lbl">Répartition des dépenses</div>
+    <div class="stt-card stt-donut-card">
+      <div class="stt-donut" id="stats-donut"></div>
+      <div class="stt-donut-leg" id="stats-donut-leg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ÉCRAN DÉTAIL (visualisation revenu / poste) ════ -->
+<div class="screen" id="screen-item" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="isc-title">Détail</div>
+    <div class="screen-menu-wrap">
+      <button class="screen-menu-btn" onclick="toggleScreenMenu(this)" aria-label="Options">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <div class="screen-menu">
+        <button class="screen-menu-item" onclick="closeScreenMenus();editCurrentItem()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifier
         </button>
-        <button class="drawer-data-btn imp" onclick="document.getElementById('import-input').click()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Importer
-        </button>
-        <button class="drawer-data-btn rst" onclick="openResetModal()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-          Réinitialiser
-        </button>
-        <button class="drawer-data-btn" onclick="closePlusPanel();openTuto();">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Tutoriel
+        <button class="screen-menu-item danger" onclick="closeScreenMenus();deleteCurrentItem()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Supprimer
         </button>
       </div>
     </div>
-    <!-- Made by -->
-    <div class="drawer-made" style="border-top:1px solid var(--b1);padding-top:14px;margin-top:4px;">
-      <img src="pp.png" alt="Emmanuel Danton" class="drawer-made-pp">
-      <div class="drawer-made-txt">
-        Hey les curieux 👋 je suis <strong>Emmanuel</strong>, le concepteur de MyFinanx.
-        <br>
-        <a href="https://www.linkedin.com/in/emmanueldanton/" target="_blank" rel="noopener" class="drawer-made-li">
-          <svg width="11" height="11" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          Suivez-moi sur LinkedIn
-        </a>
+  </div>
+  <div class="screen-body" id="isc-content"></div>
+</div>
+
+<!-- ════ ÉCRAN DÉTAIL OBJECTIF ════ -->
+<div class="screen" id="screen-goal-detail" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title">Objectif</div>
+    <div class="screen-menu-wrap">
+      <button class="screen-menu-btn" onclick="toggleScreenMenu(this)" aria-label="Options">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></svg>
+      </button>
+      <div class="screen-menu">
+        <button class="screen-menu-item" onclick="closeScreenMenus();editCurrentGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Modifier
+        </button>
+        <button class="screen-menu-item" onclick="closeScreenMenus();pinCurrentGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6"/><path d="M10 4v6l-3 3v2h10v-2l-3-3V4"/><line x1="12" y1="18" x2="12" y2="22"/></svg>
+          Épingler en haut
+        </button>
+        <button class="screen-menu-item danger" onclick="closeScreenMenus();deleteCurrentGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Supprimer
+        </button>
       </div>
     </div>
+  </div>
+  <div class="screen-body" id="gdc-content"></div>
+  <div class="screen-foot">
+    <div class="gd-add">
+      <input type="text" inputmode="decimal" id="gdc-add" placeholder="Ajouter un montant…" onkeydown="if(event.key==='Enter')addFundsCurrentGoal()">
+      <button class="gd-add-btn" onclick="addFundsCurrentGoal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ÉCRAN REVENU / POSTE ════ -->
+<div class="screen" id="screen-budget" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="bsc-title">Nouveau revenu</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <!-- Hero : montant en grand -->
+    <div class="scr-hero is-income" id="bsc-hero">
+      <div class="scr-hero-ico" id="bsc-hero-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div class="scr-amount-input">
+        <span class="scr-cur">€</span>
+        <input type="text" inputmode="decimal" id="bsc-amount" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')saveBudgetScreen()">
+      </div>
+      <div class="scr-hero-lbl" id="bsc-amount-lbl">Montant</div>
+    </div>
+
+    <div class="scr-field">
+      <label id="bsc-name-lbl" for="bsc-name">Source de revenu</label>
+      <input type="text" id="bsc-name" placeholder="Ex : Salaire">
+    </div>
+  </div>
+  <div class="screen-foot">
+    <button class="scr-save" onclick="saveBudgetScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="bsc-save-lbl">Ajouter</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════ ÉCRAN OBJECTIF ════ -->
+<div class="screen" id="screen-goal" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="gsc-title">Nouvel objectif</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <!-- Hero : montant cible en grand -->
+    <div class="scr-hero is-goal" id="gsc-hero">
+      <div class="scr-hero-ico" id="gsc-hero-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </div>
+      <div class="scr-amount-input">
+        <span class="scr-cur">€</span>
+        <input type="text" inputmode="decimal" id="gsc-target" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')document.getElementById('gsc-name').focus()">
+      </div>
+      <div class="scr-hero-lbl">Montant cible</div>
+    </div>
+
+    <div class="scr-field">
+      <label for="gsc-name">Nom de l'objectif</label>
+      <input type="text" id="gsc-name" placeholder="Ex : Caution appartement">
+    </div>
+    <div class="scr-field">
+      <label for="gsc-deadline">Échéance</label>
+      <input type="date" id="gsc-deadline">
+    </div>
+    <div class="scr-field">
+      <label for="gsc-saved">Déjà épargné</label>
+      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-saved" placeholder="0"></div>
+    </div>
+    <div class="scr-field">
+      <label>Couleur</label>
+      <div class="gsw-row">
+        <button class="gsw on" data-c="#4D78D4" style="background:#4D78D4" onclick="selGoalColor(this)" aria-label="Bleu"></button>
+        <button class="gsw" data-c="#7BA3F0" style="background:#7BA3F0" onclick="selGoalColor(this)" aria-label="Bleu clair"></button>
+        <button class="gsw" data-c="#C43A3A" style="background:#C43A3A" onclick="selGoalColor(this)" aria-label="Rouge"></button>
+        <button class="gsw" data-c="#E87A7A" style="background:#E87A7A" onclick="selGoalColor(this)" aria-label="Rose"></button>
+        <button class="gsw" data-c="#f59e0b" style="background:#f59e0b" onclick="selGoalColor(this)" aria-label="Orange"></button>
+        <button class="gsw" data-c="#34d399" style="background:#34d399" onclick="selGoalColor(this)" aria-label="Vert"></button>
+        <button class="gsw" data-c="#a78bfa" style="background:#a78bfa" onclick="selGoalColor(this)" aria-label="Violet"></button>
+        <button class="gsw" data-c="#e879f9" style="background:#e879f9" onclick="selGoalColor(this)" aria-label="Magenta"></button>
+      </div>
+    </div>
+  </div>
+  <div class="screen-foot">
+    <button class="scr-save" onclick="saveGoalScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="gsc-save-lbl">Créer l'objectif</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════ ÉCRAN DÉPENSE / REVENU ════ -->
+<div class="screen" id="screen-tx" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title" id="txs-title">Nouvelle dépense</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <!-- Hero : montant en grand -->
+    <div class="scr-hero is-expense" id="txs-hero">
+      <div class="scr-hero-ico" id="txs-hero-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+      </div>
+      <div class="scr-amount-input">
+        <span class="scr-cur" id="txs-cur-sym">€</span>
+        <input type="text" inputmode="decimal" id="txs-amt" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')saveTxScreen()">
+      </div>
+      <div class="scr-hero-lbl" id="txs-hero-lbl">Montant de la dépense</div>
+    </div>
+
+    <!-- Type -->
+    <div class="txs-type">
+      <button class="txs-ty on" id="txs-ty-e" onclick="setTxScreenType('expense')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        Dépense
+      </button>
+      <button class="txs-ty" id="txs-ty-i" onclick="setTxScreenType('income')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Revenu
+      </button>
+    </div>
+
+    <!-- Raccourcis : dépenses fréquentes (rempli par JS, masqué si pas d'historique) -->
+    <div class="txs-freq" id="txs-freq" style="display:none"></div>
+
+    <div class="scr-field">
+      <label for="txs-desc">Description</label>
+      <div class="txs-desc-wrap">
+        <input type="text" id="txs-desc" placeholder="Ex : Courses Lidl" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
+        <div class="txs-ac" id="txs-ac"></div>
+      </div>
+    </div>
+    <div class="scr-field">
+      <label for="txs-cat">Catégorie</label>
+      <select id="txs-cat"></select>
+    </div>
+    <div class="scr-field">
+      <label for="txs-date">Date</label>
+      <input type="date" id="txs-date">
+    </div>
+  </div>
+  <div class="screen-foot">
+    <button class="scr-save" onclick="saveTxScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span id="txs-save-lbl">Ajouter</span>
+    </button>
   </div>
 </div>
 
@@ -984,12 +1198,12 @@
 </div>
 
 <!-- FAB -->
-<button class="fab" onclick="goTabMobile('tracker');setTimeout(()=>document.getElementById('tx-d').focus(),100)" title="Ajouter une dépense">
+<button class="fab" onclick="openTxScreen('expense')" title="Ajouter une dépense">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 
 
-<!-- ════ PUSH PERMISSION — bottom sheet, même design que le tutoriel ════ -->
+<!-- ════ PUSH PERMISSION, bottom sheet, même design que le tutoriel ════ -->
 <div class="tuto-overlay" id="push-overlay" onclick="pushOverlayBackdrop(event)">
   <div class="tuto-card">
     <button class="tuto-close" onclick="closePushOverlay()" aria-label="Fermer">
@@ -1013,23 +1227,20 @@
   </div>
 </div>
 
-<!-- ════ TUTORIAL — bottom sheet, rendered dynamically by src/ui/tutorial.js ════ -->
-<div class="tuto-overlay" id="tuto-overlay" onclick="tutoBackdrop(event)">
-  <div class="tuto-card">
-    <div class="tuto-prog" id="tuto-prog"></div>
-    <button class="tuto-close" onclick="closeTuto()" aria-label="Fermer">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="tuto-slide">
-      <div class="tuto-ico" id="tuto-ico"></div>
-      <div class="tuto-title" id="tuto-title"></div>
-      <div class="tuto-body" id="tuto-body"></div>
-    </div>
-    <div class="tuto-dots" id="tuto-dots"></div>
-    <div class="tuto-nav">
-      <button class="tuto-skip" id="tuto-skip" onclick="closeTuto()">Passer</button>
-      <button class="tuto-next" id="tuto-next" onclick="tutoNext()">Suivant →</button>
-    </div>
+<!-- ════ TUTORIAL, bottom sheet, rendered dynamically by src/ui/tutorial.js ════ -->
+<div class="tut-screen" id="tuto-overlay">
+  <div class="tut-prog-track"><div class="tut-prog" id="tuto-prog"></div></div>
+  <div class="tut-topbar">
+    <button class="tut-skip" id="tuto-skip" onclick="closeTuto()">Passer</button>
+  </div>
+  <div class="tut-stage">
+    <div class="tut-mock" id="tuto-ico"></div>
+    <div class="tut-title" id="tuto-title"></div>
+    <div class="tut-body" id="tuto-body"></div>
+  </div>
+  <div class="tut-foot">
+    <div class="tut-dots" id="tuto-dots"></div>
+    <button class="tut-next" id="tuto-next" onclick="tutoNext()">Suivant</button>
   </div>
 </div>
 

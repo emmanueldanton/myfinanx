@@ -8,7 +8,6 @@ const GENDER_KEY  = 'monargent-usergender';
 const MONTHS      = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 const AI_WELCOME  = '👋 Bonjour ! Je connais ta situation complète (revenus, budget, objectifs). Pose-moi n\'importe quelle question sur ta gestion financière !';
-const BOT_AV_SVG  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="13" rx="2"/><path d="M12 2v4"/><circle cx="12" cy="6" r="1.5" fill="white" stroke="none"/><circle cx="9" cy="15" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="15" r="1.5" fill="white" stroke="none"/><path d="M9 19h6"/></svg>';
 
 let _aiHistory = [];
 let _twTimer   = null;
@@ -19,9 +18,18 @@ let _getYM     = () => { const n = new Date(); return [n.getFullYear(), n.getMon
 export function initAiChatUI(getYM) {
   _getYM = getYM;
   window.sendAI        = sendAI;
+  window.askAI         = askAI;
   window.clearAiHistory = clearAiHistory;
   window.typeWriter    = typeWriter;
   window.renderAiMsg   = renderAiMsg;
+}
+
+// Envoie une question prédéfinie (suggestions)
+export function askAI(text) {
+  const inp = document.getElementById('ai-q');
+  if (!inp || inp.disabled) return;
+  inp.value = text;
+  sendAI();
 }
 
 // ── Typewriter effect ─────────────────────────────────────────────
@@ -66,12 +74,6 @@ export function renderAiMsg(role, text) {
   if (!msgs) return;
   const row = document.createElement('div');
   row.className = 'ai-row' + (role === 'user' ? ' usr' : '');
-  if (role !== 'user') {
-    const av = document.createElement('div');
-    av.className = 'ai-bot-av';
-    av.innerHTML = BOT_AV_SVG;
-    row.appendChild(av);
-  }
   const bubble = document.createElement('div');
   bubble.className = 'ai-bubble ' + (role === 'user' ? 'usr' : 'bot');
   bubble.innerHTML = renderMarkdown(text);   // texte BRUT → échappé + formaté ici
@@ -86,7 +88,7 @@ export function saveAiHistory() {
   try {
     localStorage.setItem(AI_KEY, JSON.stringify(_aiHistory));
   } catch (e) {
-    if (e.name === 'QuotaExceededError') console.warn('localStorage plein — historique IA non sauvegardé');
+    if (e.name === 'QuotaExceededError') console.warn('localStorage plein, historique IA non sauvegardé');
   }
 }
 
@@ -130,12 +132,10 @@ export async function sendAI() {
   const tid    = 'ty' + Date.now();
   const typRow = document.createElement('div');
   typRow.className = 'ai-row'; typRow.id = tid;
-  const typAv  = document.createElement('div');
-  typAv.className = 'ai-bot-av'; typAv.innerHTML = BOT_AV_SVG;
   const typBub = document.createElement('div');
   typBub.className = 'ai-bubble bot ai-typ';
   typBub.innerHTML = '<div class="ai-typ-dots"><div class="ai-typ-dot"></div><div class="ai-typ-dot"></div><div class="ai-typ-dot"></div></div>';
-  typRow.appendChild(typAv); typRow.appendChild(typBub);
+  typRow.appendChild(typBub);
   msgs.appendChild(typRow);
   msgs.scrollTop = msgs.scrollHeight;
 
@@ -157,18 +157,19 @@ export async function sendAI() {
     document.getElementById(tid)?.remove();
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      const errMsg  = errData.message || `Erreur ${res.status} — réessayez dans quelques instants.`;
+      const errMsg  = errData.message || `Erreur ${res.status}, réessayez dans quelques instants.`;
       renderAiMsg('ai', '⚠️ ' + errMsg);
     } else {
       const data  = await res.json();
-      const reply = data.reply || 'Pas de réponse.';
+      // Filet de sécurité : aucun tiret cadratin/demi-cadratin dans les réponses
+      const reply = (data.reply || 'Pas de réponse.').replace(/\s*[—–]\s*/g, ', ');
       _aiHistory.push({ role: 'ai', text: reply });
       saveAiHistory();
       renderAiMsg('ai', reply);
     }
   } catch (e) {
     document.getElementById(tid)?.remove();
-    renderAiMsg('ai', '⚠️ Connexion impossible — vérifiez votre réseau et réessayez.');
+    renderAiMsg('ai', '⚠️ Connexion impossible, vérifiez votre réseau et réessayez.');
   }
 
   btn.disabled = false; inp.disabled = false; inp.focus();
@@ -214,7 +215,7 @@ function _buildSystemPrompt() {
   const goalsStr = goals.length
     ? goals.map(g => {
         const pct = g.targetEUR > 0 ? Math.round((g.savedEUR / g.targetEUR) * 100) : 0;
-        const dl  = g.deadline ? ` — échéance: ${g.deadline}` : '';
+        const dl  = g.deadline ? `, échéance: ${g.deadline}` : '';
         return `  • ${g.name}: ${fmt(g.savedEUR)} / ${fmt(g.targetEUR)} (${pct}%${dl})`;
       }).join('\n')
     : '  • Aucun objectif défini';
@@ -227,11 +228,11 @@ Utilise son prénom pour t'adresser à lui/elle directement et accorde correctem
     : '';
 
   return `Tu es un conseiller financier personnel expert et bienveillant.
-Ton style : direct, chaleureux et terre à terre — comme un ami de confiance qui s'y connaît en finances. Tu parles simplement, sans jargon inutile, sans blague ni humour. Tu vas droit au but avec des conseils concrets basés sur les vrais chiffres de l'utilisateur.
+Ton style : direct, chaleureux et terre à terre, comme un ami de confiance qui s'y connaît en finances. Tu parles simplement, sans jargon inutile, sans blague ni humour. Tu vas droit au but avec des conseils concrets basés sur les vrais chiffres de l'utilisateur.
 Ton objectif à chaque réponse : que l'utilisateur se sente à l'aise et bien accompagné (jamais jugé, jamais culpabilisé), et qu'il reparte motivé à passer à l'action concrètement.
 ${identityLine}
 Tu connais TOUTE la situation financière de l'utilisateur pour ${MONTHS[M]} ${Y}.
-Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ convertis dans cette devise — exprime TOUS les montants de tes réponses dans cette devise (avec le symbole ${cur.symbol}), jamais en euros par défaut.
+Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Tous les montants ci-dessous sont DÉJÀ convertis dans cette devise, exprime TOUS les montants de tes réponses dans cette devise (avec le symbole ${cur.symbol}), jamais en euros par défaut.
 
 ━━ REVENUS ━━
 ${revStr}
@@ -250,10 +251,11 @@ Taux d'épargne implicite: ${tauxEpargne}%
 ${goalsStr}
 
 INSTRUCTIONS: Réponds en français. Sois précis, chiffré et actionnable. Maximum 180 mots.
-Base-toi UNIQUEMENT sur les données réelles ci-dessus — ne suppose rien qui n'y figure pas.
-Si une donnée nécessaire est absente, dis-le clairement et propose à l'utilisateur de la renseigner — n'invente aucun montant.
+Base-toi UNIQUEMENT sur les données réelles ci-dessus, ne suppose rien qui n'y figure pas.
+Si une donnée nécessaire est absente, dis-le clairement et propose à l'utilisateur de la renseigner, n'invente aucun montant.
 Exprime tous les montants dans la devise de l'utilisateur (${cur.symbol}), jamais en euros par défaut.
 Utilise le prénom et le genre de l'utilisateur pour personnaliser chaque réponse.
 Si l'utilisateur a des objectifs d'épargne, intègre-les dans tes recommandations.
-Zéro humour, zéro blague, zéro analogie amusante — reste professionnel et humain.`;
+Zéro humour, zéro blague, zéro analogie amusante, reste professionnel et humain.
+N'utilise jamais de tiret cadratin (—) ni de tiret demi-cadratin (–) : sépare tes idées avec une virgule ou un point.`;
 }

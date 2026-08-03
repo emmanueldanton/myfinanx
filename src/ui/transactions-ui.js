@@ -4,12 +4,14 @@ import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
+import { buildCorpus, frequentExpenses, matchDescriptions, guessCategory } from './expense-intel.js';
 
 let _txType      = 'expense';
 let _getYM       = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()]; };
 let _searchQuery = '';
 let _filterCat   = '';
 let _lastState   = null;
+let _catTouched  = false;   // l'utilisateur a choisi la catégorie à la main → ne plus la deviner
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -17,17 +19,29 @@ export function initTransactionsUI(getYM) {
   _getYM = getYM;
   window.addTx        = addTx;
   window.delTx        = delTx;
-  window.openEditTx   = openEditTx;
-  window.closeEditTx  = closeEditTx;
-  window.saveEditTx   = saveEditTx;
   window.setTxType    = setTxType;
   window.updateCatSel = updateCatSel;
   window.searchTx     = searchTx;
   window.filterTxCat  = filterTxCat;
+  // Écran dédié Dépense / Revenu (ajout + édition)
+  window.openTxScreen     = openTxScreen;
+  window.openTxScreenEdit = openTxScreenEdit;
+  window.setTxScreenType  = setTxScreenType;
+  window.saveTxScreen     = saveTxScreen;
 
   const txDt = document.getElementById('tx-dt');
   if (txDt && !txDt.value) txDt.value = todayISO();
   updateCatSel();
+
+  // Aide à la saisie (auto-complétion + catégorie devinée) sur l'écran d'ajout
+  const descEl = document.getElementById('txs-desc');
+  if (descEl) {
+    descEl.addEventListener('input', _onDescInput);
+    descEl.addEventListener('focus', _onDescInput);
+    descEl.addEventListener('blur', () => setTimeout(_hideAutocomplete, 120));
+  }
+  const catEl = document.getElementById('txs-cat');
+  if (catEl) catEl.addEventListener('change', () => { _catTouched = true; });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -104,7 +118,7 @@ export function renderExpenses(state) {
   _renderCatPills(allTxs);
 
   if (!allTxs.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction.<br>Ajoute ta première ci-dessus.</div>`;
+    list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Aucune transaction.<br>Ajoute ta première avec le bouton +.</div>`;
     renderCatBk([]);
     return;
   }
@@ -118,9 +132,6 @@ export function renderExpenses(state) {
     const ibg  = isE ? 'rgba(196,58,58,.14)' : 'rgba(52,211,153,.12)';
     const sign = isE ? '−' : '+';
     const ico  = catIco(t.category, 14);
-    const cats = (isE ? CATS_E : CATS_I).map(c =>
-      `<option value="${c}"${c === t.category ? ' selected' : ''}>${c}</option>`
-    ).join('');
     return `<div class="txi" id="txi-${t.id}">
       <div class="txii" style="background:${ibg};color:${col}">${ico}</div>
       <div class="txif">
@@ -131,34 +142,12 @@ export function renderExpenses(state) {
         </div>
       </div>
       <div class="txam" style="color:${col}">${sign} ${fmt(t.amountEUR ?? 0)}</div>
-      <button class="txed" onclick="openEditTx('${t.id}')" title="Modifier">
+      <button class="txed" onclick="openTxScreenEdit('${t.id}')" title="Modifier">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
       <button class="txdl" onclick="delTx('${t.id}')" title="Supprimer">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
-      <div class="tx-edit-form" id="txef-${t.id}" style="display:none;">
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Description</div>
-          <input type="text" class="tx-edit-desc" value="${esc(t.description || '')}" placeholder="Description">
-        </div>
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Catégorie</div>
-          <select class="tx-edit-cat">${cats}</select>
-        </div>
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Montant</div>
-          <input type="text" inputmode="decimal" class="tx-edit-amt" value="${fmtInput(t.amountEUR ?? 0)}" placeholder="Montant">
-        </div>
-        <div class="tx-edit-field">
-          <div class="tx-edit-lbl">Date</div>
-          <input type="date" class="tx-edit-date" value="${t.date || ''}">
-        </div>
-        <div class="tx-edit-actions">
-          <button class="btn bp bsm" onclick="saveEditTx('${t.id}')">Enregistrer</button>
-          <button class="btn bsm" onclick="closeEditTx('${t.id}')">Annuler</button>
-        </div>
-      </div>
     </div>`;
   }).join('');
   renderCatBk(allTxs.filter(t => t.type !== 'income'));
@@ -177,10 +166,14 @@ export function renderCatBk(expenses) {
   div.innerHTML = Object.entries(bycat).sort((a, b) => b[1] - a[1]).map(([c, a]) => {
     const pct = tot > 0 ? Math.round((a / tot) * 100) : 0;
     const cc  = CAT_COLORS[c] || 'var(--pr)';
-    return `<div class="catrow">
-      <div class="catrow-l">${c}</div>
-      <div class="catrow-b"><div class="pt"><div class="pf" style="width:${pct}%;background:${cc}"></div></div></div>
-      <div class="catrow-a" style="color:var(--red-l)">−${fmt(a)}</div>
+    const ico = catIco(c, 16);
+    return `<div class="depcat">
+      <div class="depcat-ico" style="color:${cc};background:color-mix(in srgb, ${cc} 15%, transparent)">${ico}</div>
+      <div class="depcat-main">
+        <div class="depcat-top"><span class="depcat-name">${esc(c)}</span><span class="depcat-amt">−${fmt(a)}</span></div>
+        <div class="depcat-track"><div class="depcat-fill" style="width:${pct}%;background:${cc}"></div></div>
+      </div>
+      <div class="depcat-pct">${pct}%</div>
     </div>`;
   }).join('');
 }
@@ -196,7 +189,12 @@ export function updateTracker(state) {
   _setText('tr-b', fmt(totalIncome));
   _setText('tr-t', fmt(totalE));
   const el = document.getElementById('tr-r');
-  if (el) { el.textContent = fmt(Math.abs(reste)); el.style.color = reste >= 0 ? 'var(--pr-l)' : 'var(--red-l)'; }
+  if (el) { el.textContent = fmt(Math.abs(reste)); el.style.color = reste >= 0 ? 'var(--green)' : 'var(--red-l)'; }
+  const bar = document.getElementById('dep-track-fill');
+  if (bar) {
+    const pct = totalIncome > 0 ? Math.min(100, Math.round((totalE / totalIncome) * 100)) : (totalE > 0 ? 100 : 0);
+    bar.style.width = pct + '%';
+  }
 }
 
 // ── Form helpers ──────────────────────────────────────────────────
@@ -253,31 +251,171 @@ export function delTx(id) {
   showUndoToast(`"${tx.description}" supprimée`, () => _mutate(snapshot));
 }
 
-export function openEditTx(id) {
-  document.querySelectorAll('.tx-edit-form').forEach(f => { f.style.display = 'none'; });
-  const form = document.getElementById('txef-' + id);
-  if (form) form.style.display = 'block';
+// ── Écran dédié Dépense / Revenu (ajout + édition) ────────────────
+let _txScrType = 'expense';
+let _txEditId  = null;
+
+export function openTxScreen(type) {
+  _txEditId  = null;
+  _catTouched = false;
+  _txScrType = type === 'income' ? 'income' : 'expense';
+  buildCorpus();               // rafraîchit le corpus d'aide à la saisie
+  setTxScreenType(_txScrType);
+  _setVal('txs-desc', '');
+  _setVal('txs-amt', '');
+  _setVal('txs-date', todayISO());
+  _setText('txs-title', _txScrType === 'income' ? 'Nouveau revenu' : 'Nouvelle dépense');
+  _setText('txs-save-lbl', 'Ajouter');
+  const sym = document.getElementById('txs-cur-sym');
+  if (sym) sym.textContent = getActiveCurrency().symbol;
+  _hideAutocomplete();
+  _renderFreqChips();
+  window.openScreen?.('screen-tx');
+  setTimeout(() => document.getElementById('txs-desc')?.focus(), 60);
 }
 
-export function closeEditTx(id) {
-  const form = document.getElementById('txef-' + id);
-  if (form) form.style.display = 'none';
-}
-
-export function saveEditTx(id) {
-  const txs = _txs();
-  const tx  = txs.find(t => t.id === id);
+export function openTxScreenEdit(id) {
+  const tx = _txs().find(t => t.id === id);
   if (!tx) return;
-  const form = document.getElementById('txef-' + id);
-  if (!form) return;
-  const desc = form.querySelector('.tx-edit-desc').value.trim();
-  const cat  = form.querySelector('.tx-edit-cat').value;
-  const amt  = fromDisplay(parseAmt(form.querySelector('.tx-edit-amt').value));
-  const date = form.querySelector('.tx-edit-date').value;
-  if (!desc || amt <= 0) return;
-  tx.description = desc;
-  tx.category    = cat;
-  tx.amountEUR   = amt;
-  if (date) tx.date = date;
-  _mutate(txs);
+  _txEditId  = id;
+  _catTouched = true;          // en édition on ne devine pas la catégorie
+  _txScrType = tx.type === 'income' ? 'income' : 'expense';
+  setTxScreenType(_txScrType, tx.category);
+  _setVal('txs-desc', tx.description || '');
+  _setVal('txs-amt', tx.amountEUR != null ? fmtInput(tx.amountEUR) : '');
+  _setVal('txs-date', tx.date || todayISO());
+  _setText('txs-title', 'Modifier la transaction');
+  _setText('txs-save-lbl', 'Enregistrer');
+  const sym = document.getElementById('txs-cur-sym');
+  if (sym) sym.textContent = getActiveCurrency().symbol;
+  _hideAutocomplete();
+  _renderFreqChips();          // masquées en édition
+  window.openScreen?.('screen-tx');
 }
+
+// ── Aide à la saisie : puces fréquentes, auto-complétion, catégorie devinée ──
+function _applyItem(it, setAmount) {
+  const desc = document.getElementById('txs-desc');
+  const cat  = document.getElementById('txs-cat');
+  const amt  = document.getElementById('txs-amt');
+  if (desc) desc.value = it.desc;
+  if (cat && it.cat && [...cat.options].some(o => o.value === it.cat)) {
+    cat.value = it.cat;
+    _catTouched = true;
+  }
+  if (amt && setAmount && it.amount != null) amt.value = fmtInput(it.amount);
+  _hideAutocomplete();
+  amt?.focus();
+}
+
+function _renderFreqChips() {
+  const wrap = document.getElementById('txs-freq');
+  if (!wrap) return;
+  const items = (_txScrType === 'expense' && !_txEditId) ? frequentExpenses(6) : [];
+  if (!items.length) { wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  wrap.innerHTML = '<div class="txs-freq-lbl">Fréquents</div><div class="txs-freq-row"></div>';
+  const row = wrap.querySelector('.txs-freq-row');
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'txs-chip';
+    b.innerHTML = `<span class="txs-chip-d">${esc(it.desc)}</span><span class="txs-chip-a">${fmt(it.amount)}</span>`;
+    b.addEventListener('click', () => _applyItem(it, true));
+    row.appendChild(b);
+  });
+}
+
+function _onDescInput() {
+  const desc = document.getElementById('txs-desc');
+  if (!desc) return;
+  const v = desc.value;
+  // Catégorie devinée (tant que l'utilisateur n'y a pas touché)
+  if (!_catTouched && _txScrType === 'expense') {
+    const g = guessCategory(v);
+    const cat = document.getElementById('txs-cat');
+    if (g && cat && [...cat.options].some(o => o.value === g)) cat.value = g;
+  }
+  // Auto-complétion du libellé (dépenses uniquement)
+  const ac = document.getElementById('txs-ac');
+  if (!ac) return;
+  const matches = _txScrType === 'expense' ? matchDescriptions(v, 5) : [];
+  if (!matches.length) { _hideAutocomplete(); return; }
+  ac.innerHTML = '';
+  matches.forEach(m => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'txs-ac-item';
+    b.innerHTML = `<span class="txs-ac-d">${esc(m.desc)}</span><span class="txs-ac-c">${esc(m.cat)}</span>`;
+    // mousedown : agit avant le blur du champ
+    b.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const amt = document.getElementById('txs-amt');
+      _applyItem(m, !amt || !amt.value);
+    });
+    ac.appendChild(b);
+  });
+  ac.classList.add('open');
+}
+
+function _hideAutocomplete() {
+  const ac = document.getElementById('txs-ac');
+  if (ac) { ac.classList.remove('open'); ac.innerHTML = ''; }
+}
+
+const _TX_ICO = {
+  expense: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>',
+  income:  '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+};
+
+export function setTxScreenType(t, keepCat) {
+  _txScrType = t === 'income' ? 'income' : 'expense';
+  document.getElementById('txs-ty-e')?.classList.toggle('on', _txScrType === 'expense');
+  document.getElementById('txs-ty-i')?.classList.toggle('on', _txScrType === 'income');
+  // Hero : couleur, icône et libellé selon le type
+  const hero = document.getElementById('txs-hero');
+  if (hero) {
+    hero.classList.toggle('is-expense', _txScrType === 'expense');
+    hero.classList.toggle('is-income',  _txScrType === 'income');
+  }
+  const heroIco = document.getElementById('txs-hero-ico');
+  if (heroIco) heroIco.innerHTML = _TX_ICO[_txScrType];
+  _setText('txs-hero-lbl', _txScrType === 'income' ? 'Montant du revenu' : 'Montant de la dépense');
+  const sel = document.getElementById('txs-cat');
+  if (sel) {
+    const cats = _txScrType === 'expense' ? CATS_E : CATS_I;
+    const prev = keepCat || sel.value;
+    sel.innerHTML = cats.map(c => `<option value="${c}"${c === prev ? ' selected' : ''}>${c}</option>`).join('');
+  }
+  // Les raccourcis et l'auto-complétion ne concernent que les dépenses
+  _renderFreqChips();
+  _hideAutocomplete();
+}
+
+export function saveTxScreen() {
+  const desc = (document.getElementById('txs-desc')?.value || '').trim();
+  const cat  = document.getElementById('txs-cat')?.value || '';
+  const amt  = fromDisplay(parseAmt(document.getElementById('txs-amt')?.value || ''));
+  const date = document.getElementById('txs-date')?.value || todayISO();
+  if (!desc || !amt || amt <= 0) {
+    const a = document.getElementById('txs-amt');
+    if (a) { a.classList.add('invalid'); setTimeout(() => a.classList.remove('invalid'), 1400); }
+    return;
+  }
+  const txs = _txs();
+  if (_txEditId) {
+    const tx = txs.find(t => t.id === _txEditId);
+    if (tx) { tx.description = desc; tx.category = cat; tx.amountEUR = amt; tx.date = date; tx.type = _txScrType; }
+  } else {
+    txs.unshift({
+      id: uid(), description: desc, category: cat, amountEUR: amt,
+      date, type: _txScrType, curCode: getActiveCurrency().code,
+    });
+  }
+  _mutate(txs);
+  window.closeScreen?.();
+  showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
+  _txEditId = null;
+}
+
+function _setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }

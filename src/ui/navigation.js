@@ -17,16 +17,13 @@ export function goTab(id) {
 }
 
 export function goTabMobile(id) {
-  document.getElementById('plus-panel')?.classList.remove('open');
-  document.getElementById('plus-overlay')?.classList.remove('open');
   document.body.style.overflow = '';
   goTab(id);
 }
 
 export function syncBnavActive(id) {
   document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  const navId = id === 'ai' ? 'plus' : id;
-  document.getElementById('bn-' + navId)?.classList.add('active');
+  document.getElementById('bn-' + id)?.classList.add('active');
   moveBnavPill();
 }
 
@@ -40,30 +37,11 @@ export function moveBnavPill() {
   pill.style.transform = 'translateX(' + active.offsetLeft + 'px)';
 }
 
-export function openPlusPanel() {
-  document.getElementById('plus-overlay')?.classList.add('open');
-  document.getElementById('plus-panel')?.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('bn-plus')?.classList.add('active');
-  moveBnavPill();
-}
-
-export function closePlusPanel() {
-  document.getElementById('plus-overlay')?.classList.remove('open');
-  document.getElementById('plus-panel')?.classList.remove('open');
-  document.body.style.overflow = '';
-  const activePage = document.querySelector('.page.active');
-  if (activePage) syncBnavActive(activePage.id.replace('page-', ''));
-}
-
 export function initNavigation() {
   // Expose on window so existing onclick="goTab(...)" handlers continue to work
   window.goTab       = goTab;
   window.goTabMobile = goTabMobile;
   window.syncBnavActive = syncBnavActive;
-  window.openPlusPanel  = openPlusPanel;
-  window.closePlusPanel = closePlusPanel;
 
   // Place la pilule au chargement SANS animation, puis réactive la transition
   const pill = document.getElementById('bnav-pill');

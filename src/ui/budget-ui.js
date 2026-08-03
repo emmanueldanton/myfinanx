@@ -1,7 +1,8 @@
 // ═══ Budget UI — revenue sources + budget items (onglet Budget) ═══
 import { store }      from '../store.js';
 import { bridgeSave, getRecentMonthsExpenseAverages } from '../data-bridge.js';
-import { uid, esc, parseAmt, catIco, COLS } from '../utils.js';
+import { uid, esc, parseAmt, catIco, catSubtitle } from '../utils.js';
+import { calcByCategory } from '../transactions.js';
 import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast }  from './toast.js';
 import { openOverlay, closeOverlay }        from './overlay.js';
@@ -14,17 +15,17 @@ let _getYM = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()
 
 export function initBudgetUI(getYM) {
   _getYM = getYM;
-  window.addRev    = addRev;
   window.delRev    = delRev;
-  window.editRev   = editRev;
-  window.saveRev   = saveRev;
-  window.cancelRev = cancelRev;
-  window.addBud    = addBud;
   window.delBud    = delBud;
-  window.editBud   = editBud;
-  window.saveBud   = saveBud;
-  window.cancelBud = cancelBud;
   window.suggestBudget = suggestBudget;
+  // Écran dédié Revenu / Poste de budget (ajout + édition)
+  window.openBudgetScreen     = openBudgetScreen;
+  window.openBudgetScreenEdit = openBudgetScreenEdit;
+  window.saveBudgetScreen     = saveBudgetScreen;
+  // Écran de détail (visualisation) + actions
+  window.openItemDetail    = openItemDetail;
+  window.editCurrentItem   = editCurrentItem;
+  window.deleteCurrentItem = deleteCurrentItem;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -46,43 +47,27 @@ function _setText(id, v) {
   if (el) el.textContent = v;
 }
 
-// ── Row action buttons (édition / valider / annuler / supprimer) ──
-const ICO = {
-  edit:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
-  save:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  cancel: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-  del:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
-};
-
-function _rowActions(prefix, id) {
-  return `<div class="row-acts">
-      <button class="r-edit"   onclick="edit${prefix}('${id}')"   title="Modifier">${ICO.edit}</button>
-      <button class="r-save"   onclick="save${prefix}('${id}')"   title="Valider">${ICO.save}</button>
-      <button class="r-cancel" onclick="cancel${prefix}('${id}')" title="Annuler">${ICO.cancel}</button>
-      <button class="r-del"    onclick="del${prefix}('${id}')"    title="Supprimer">${ICO.del}</button>
-    </div>`;
-}
-
 // ── Render ────────────────────────────────────────────────────────
+
+const REV_ICO = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+const CHEV    = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5l6 7l-6 7"/></svg>';
 
 export function renderRevRows(state) {
   const el = document.getElementById('rev-rows');
   if (!el) return;
   const incomes = state?.budget?.incomes ?? [];
-  el.innerHTML = incomes.map((r, i) => {
-    const col = COLS[i % COLS.length];
-    return `<div class="rev-row" data-rev-id="${r.id}">
+  el.innerHTML = incomes.map((r) =>
+    `<div class="rev-row" data-rev-id="${r.id}" role="button" tabindex="0" onclick="openItemDetail('rev','${r.id}')">
+      <div class="rev-ico">${REV_ICO}</div>
       <div class="rn">
         <span class="row-view-txt">${esc(r.name)}</span>
-        <input type="text" value="${esc(r.name)}" placeholder="Source">
       </div>
       <div class="ra">
-        <span class="row-view-txt amt" style="color:${col}">${fmt(r.amountEUR ?? 0)}</span>
-        <input type="text" inputmode="decimal" value="${fmtInput(r.amountEUR)}" style="color:${col}">
+        <span class="row-view-txt amt">${fmt(r.amountEUR ?? 0)}</span>
       </div>
-      ${_rowActions('Rev', r.id)}
-    </div>`;
-  }).join('');
+      <span class="card-chev">${CHEV}</span>
+    </div>`
+  ).join('');
 }
 
 export function renderBudRows(state) {
@@ -91,20 +76,29 @@ export function renderBudRows(state) {
   const budget = state?.budget ?? { incomes: [], budgetItems: [] };
   const items  = budget.budgetItems ?? [];
   const totalR = (budget.incomes ?? []).reduce((s, r) => s + r.amountEUR, 0);
+  const spentByCat = calcByCategory(state?.transactions ?? []);
   el.innerHTML = items.map(b => {
     const pct = totalR > 0 ? Math.round((b.allocatedEUR / totalR) * 100) : 0;
-    return `<div class="bud-row" data-bud-id="${b.id}">
+    const spent = spentByCat[b.name] || 0;
+    let status;
+    if (!(b.allocatedEUR > 0)) status = '<span class="bud-status is-none">Pas de budget</span>';
+    else if (spent > 0)        status = '<span class="bud-status is-ok">OK</span>';
+    else                       status = '<span class="bud-status is-plan">Prévu</span>';
+    const sub = catSubtitle(b.name);
+    return `<div class="poste-card bud-row" data-bud-id="${b.id}" role="button" tabindex="0" onclick="openItemDetail('bud','${b.id}')">
       <div class="b-ico-wrap" title="Catégorie">${catIco(b.name, 13)}</div>
       <div class="bn">
         <span class="row-view-txt">${esc(b.name)}</span>
-        <input type="text" value="${esc(b.name)}" placeholder="Nom du poste">
+        ${sub ? `<span class="poste-sub">${esc(sub)}</span>` : ''}
       </div>
-      <div class="ba">
-        <span class="row-view-txt amt" style="color:var(--red-l)">${fmt(b.allocatedEUR)}</span>
-        <input type="text" inputmode="decimal" value="${fmtInput(b.allocatedEUR)}">
+      <div class="ba-wrap">
+        <div class="ba">
+          <span class="row-view-txt amt" style="color:var(--red-l)">${fmt(b.allocatedEUR)}</span>
+        </div>
+        ${status}
       </div>
-      <div class="bp3">${pct}%</div>
-      ${_rowActions('Bud', b.id)}
+      <div class="bp3" style="display:none">${pct}%</div>
+      <span class="card-chev">${CHEV}</span>
     </div>`;
   }).join('');
 }
@@ -141,47 +135,11 @@ export function renderBudgetFooter(state) {
 
   // Per-row percentages — update in-place to avoid resetting focused inputs
   document.querySelectorAll('.bp3').forEach((el, i) => {
-    if (items[i]) el.textContent = totalIncome > 0 ? Math.round((items[i].allocatedEUR / totalIncome) * 100) + '%' : '–';
+    if (items[i]) el.textContent = totalIncome > 0 ? Math.round((items[i].allocatedEUR / totalIncome) * 100) + '%' : '…';
   });
 }
 
 // ── Revenue mutations ─────────────────────────────────────────────
-
-export function editRev(id) {
-  const row = document.querySelector(`.rev-row[data-rev-id="${id}"]`);
-  if (!row) return;
-  row.classList.add('editing');
-  const inp = row.querySelector('.rn input');
-  if (inp) { inp.focus(); inp.select(); }
-}
-
-export function saveRev(id) {
-  const row = document.querySelector(`.rev-row[data-rev-id="${id}"]`);
-  if (!row) return;
-  const b = _budget();
-  const r = b.incomes.find(x => x.id === id);
-  if (r) {
-    r.name      = row.querySelector('.rn input').value.trim() || 'Revenu';
-    r.amountEUR = fromDisplay(parseAmt(row.querySelector('.ra input').value));
-  }
-  _mutate(b);   // commit + re-render → la ligne repasse en mode lecture
-}
-
-export function cancelRev() {
-  // Aucun commit pendant l'édition → on re-rend l'état stocké (annule les saisies)
-  renderRevRows({ budget: store.get('mfx_budget') });
-}
-
-export function addRev() {
-  const n = document.getElementById('nr-n').value.trim() || 'Revenu';
-  const a = fromDisplay(parseAmt(document.getElementById('nr-a').value));
-  const b = _budget();
-  b.incomes.push({ id: uid(), name: n, amountEUR: a });
-  document.getElementById('nr-n').value = '';
-  document.getElementById('nr-a').value = '';
-  _mutate(b);
-  showSuccessToast('Revenu ajouté');
-}
 
 export function delRev(id) {
   const b        = _budget();
@@ -195,41 +153,6 @@ export function delRev(id) {
 
 // ── Budget item mutations ─────────────────────────────────────────
 
-export function editBud(id) {
-  const row = document.querySelector(`.bud-row[data-bud-id="${id}"]`);
-  if (!row) return;
-  row.classList.add('editing');
-  const inp = row.querySelector('.bn input');
-  if (inp) { inp.focus(); inp.select(); }
-}
-
-export function saveBud(id) {
-  const row = document.querySelector(`.bud-row[data-bud-id="${id}"]`);
-  if (!row) return;
-  const b = _budget();
-  const item = b.budgetItems.find(x => x.id === id);
-  if (item) {
-    item.name         = row.querySelector('.bn input').value.trim() || 'Nouveau poste';
-    item.allocatedEUR = fromDisplay(parseAmt(row.querySelector('.ba input').value));
-  }
-  _mutate(b);   // commit + re-render (met aussi à jour l'icône de catégorie)
-}
-
-export function cancelBud() {
-  renderBudRows({ budget: store.get('mfx_budget') });
-}
-
-export function addBud() {
-  const n = document.getElementById('nb-n').value.trim() || 'Nouveau poste';
-  const a = fromDisplay(parseAmt(document.getElementById('nb-a').value));
-  const b = _budget();
-  b.budgetItems.push({ id: uid(), name: n, allocatedEUR: a });
-  document.getElementById('nb-n').value = '';
-  document.getElementById('nb-a').value = '';
-  _mutate(b);
-  showSuccessToast('Poste budgétaire ajouté');
-}
-
 export function delBud(id) {
   const b        = _budget();
   const item     = b.budgetItems.find(x => x.id === id);
@@ -239,6 +162,177 @@ export function delBud(id) {
   _mutate(b);
   showUndoToast(`"${item.name}" supprimé`, () => _mutate(snapshot));
 }
+
+// ── Écran de détail (visualisation) d'un revenu ou d'un poste ─────
+let _detailKind = 'rev';
+let _detailId   = null;
+
+export function openItemDetail(kind, id) {
+  _detailKind = kind === 'bud' ? 'bud' : 'rev';
+  _detailId   = id;
+  const cont = document.getElementById('isc-content');
+  if (!cont) return;
+  const b   = _budget();
+  const tx  = store.get('mfx_transactions') || [];
+  const incomes = b.incomes ?? [];
+  const items   = b.budgetItems ?? [];
+  const totalIncome = incomes.reduce((s, r) => s + r.amountEUR, 0)
+    + tx.filter(t => t.type === 'income').reduce((s, t) => s + t.amountEUR, 0);
+
+  if (_detailKind === 'rev') {
+    const r = incomes.find(x => x.id === id);
+    if (!r) return;
+    const part = totalIncome > 0 ? Math.round((r.amountEUR / totalIncome) * 100) : 0;
+    _setText('isc-title', 'Revenu attendu');
+    cont.innerHTML = `
+      <div class="isc-hero isc-rev">
+        <div class="isc-ico">${REV_ICO}</div>
+        <div class="isc-name">${esc(r.name)}</div>
+        <div class="isc-amt">${fmt(r.amountEUR ?? 0)}</div>
+        <div class="isc-amt-lbl">par mois</div>
+      </div>
+      <div class="isc-stats">
+        <div class="isc-stat"><span>Part des revenus attendus</span><strong>${part}%</strong></div>
+        <div class="isc-stat"><span>Total des revenus</span><strong>${fmt(totalIncome)}</strong></div>
+      </div>`;
+  } else {
+    const it = items.find(x => x.id === id);
+    if (!it) return;
+    const spent   = calcByCategory(tx)[it.name] || 0;
+    const reste   = it.allocatedEUR - spent;
+    const usePct  = it.allocatedEUR > 0 ? Math.min(100, Math.round((spent / it.allocatedEUR) * 100)) : 0;
+    const overPct = it.allocatedEUR > 0 ? Math.round((spent / it.allocatedEUR) * 100) : 0;
+    const part    = totalIncome > 0 ? Math.round((it.allocatedEUR / totalIncome) * 100) : 0;
+    const sub     = catSubtitle(it.name);
+    const over    = spent > it.allocatedEUR;
+    _setText('isc-title', 'Poste de dépense');
+    cont.innerHTML = `
+      <div class="isc-hero isc-bud">
+        <div class="isc-ico">${catIco(it.name, 22)}</div>
+        <div class="isc-name">${esc(it.name)}</div>
+        ${sub ? `<div class="isc-sub">${esc(sub)}</div>` : ''}
+        <div class="isc-amt">${fmt(it.allocatedEUR ?? 0)}</div>
+        <div class="isc-amt-lbl">budget alloué</div>
+      </div>
+      <div class="isc-usage">
+        <div class="isc-usage-top">
+          <span>${fmt(spent)} dépensé</span>
+          <span class="${over ? 'is-over' : ''}">${overPct}%</span>
+        </div>
+        <div class="isc-bar"><div class="isc-bar-fill ${over ? 'is-over' : ''}" style="width:${usePct}%"></div></div>
+      </div>
+      <div class="isc-stats">
+        <div class="isc-stat"><span>${over ? 'Dépassement' : 'Reste à dépenser'}</span><strong class="${over ? 'v-red' : 'v-green'}">${fmt(Math.abs(reste))}</strong></div>
+        <div class="isc-stat"><span>Part des revenus attendus</span><strong>${part}%</strong></div>
+      </div>`;
+  }
+  window.openScreen?.('screen-item');
+}
+
+export function editCurrentItem() {
+  if (_detailId) openBudgetScreenEdit(_detailKind, _detailId);
+}
+
+export function deleteCurrentItem() {
+  if (!_detailId) return;
+  const id = _detailId, kind = _detailKind;
+  window.closeScreen?.();
+  if (kind === 'bud') delBud(id); else delRev(id);
+}
+
+// ── Écran dédié Revenu / Poste de budget (ajout + édition) ────────
+let _budScrKind = 'rev';   // 'rev' (source de revenu) | 'bud' (poste de dépense)
+let _budEditId  = null;
+
+export function openBudgetScreen(kind) {
+  _budScrKind = kind === 'bud' ? 'bud' : 'rev';
+  _budEditId  = null;
+  _bsSetVal('bsc-name', '');
+  _bsSetVal('bsc-amount', '');
+  _applyBudScreenLabels();
+  _bsText('bsc-save-lbl', 'Ajouter');
+  _setBudCurSym();
+  window.openScreen?.('screen-budget');
+  setTimeout(() => document.getElementById('bsc-name')?.focus(), 60);
+}
+
+export function openBudgetScreenEdit(kind, id) {
+  _budScrKind = kind === 'bud' ? 'bud' : 'rev';
+  _budEditId  = id;
+  const b    = _budget();
+  const item = _budScrKind === 'bud'
+    ? (b.budgetItems ?? []).find(x => x.id === id)
+    : (b.incomes ?? []).find(x => x.id === id);
+  if (!item) return;
+  _bsSetVal('bsc-name', item.name || '');
+  const amt = _budScrKind === 'bud' ? item.allocatedEUR : item.amountEUR;
+  _bsSetVal('bsc-amount', amt != null ? fmtInput(amt) : '');
+  _applyBudScreenLabels();
+  _bsText('bsc-save-lbl', 'Enregistrer');
+  _setBudCurSym();
+  window.openScreen?.('screen-budget');
+}
+
+export function saveBudgetScreen() {
+  const name = (document.getElementById('bsc-name')?.value || '').trim();
+  const amt  = fromDisplay(parseAmt(document.getElementById('bsc-amount')?.value || ''));
+  if (!name) {
+    const el = document.getElementById('bsc-name');
+    if (el) { el.classList.add('invalid'); setTimeout(() => el.classList.remove('invalid'), 1400); }
+    return;
+  }
+  const b = _budget();
+  if (_budScrKind === 'bud') {
+    if (_budEditId) {
+      const it = (b.budgetItems ?? []).find(x => x.id === _budEditId);
+      if (it) { it.name = name; it.allocatedEUR = amt; }
+    } else {
+      (b.budgetItems ?? (b.budgetItems = [])).push({ id: uid(), name, allocatedEUR: amt });
+    }
+  } else {
+    if (_budEditId) {
+      const r = (b.incomes ?? []).find(x => x.id === _budEditId);
+      if (r) { r.name = name; r.amountEUR = amt; }
+    } else {
+      (b.incomes ?? (b.incomes = [])).push({ id: uid(), name, amountEUR: amt });
+    }
+  }
+  _mutate(b);
+  window.closeScreen?.();
+  showSuccessToast(_budEditId ? 'Modifié' : (_budScrKind === 'bud' ? 'Poste ajouté' : 'Revenu ajouté'));
+  _budEditId = null;
+}
+
+const _BUD_HERO_ICO = {
+  rev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  bud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601Z"/><path d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931Z"/></svg>',
+};
+
+function _applyBudScreenLabels() {
+  const isBud = _budScrKind === 'bud';
+  _bsText('bsc-title', _budEditId
+    ? (isBud ? 'Modifier le poste' : 'Modifier le revenu')
+    : (isBud ? 'Nouveau poste'    : 'Nouveau revenu'));
+  _bsText('bsc-name-lbl',   isBud ? 'Nom du poste'   : 'Source de revenu');
+  _bsText('bsc-amount-lbl', isBud ? 'Budget alloué'  : 'Montant');
+  const nameInp = document.getElementById('bsc-name');
+  if (nameInp) nameInp.placeholder = isBud ? 'Ex : Alimentation' : 'Ex : Salaire';
+  // Hero : couleur + icône (revenu = vert / poste = accent)
+  const hero = document.getElementById('bsc-hero');
+  if (hero) {
+    hero.classList.toggle('is-income', !isBud);
+    hero.classList.toggle('is-poste',  isBud);
+  }
+  const ico = document.getElementById('bsc-hero-ico');
+  if (ico) ico.innerHTML = isBud ? _BUD_HERO_ICO.bud : _BUD_HERO_ICO.rev;
+}
+
+function _setBudCurSym() {
+  const s = getActiveCurrency().symbol;
+  document.querySelectorAll('#screen-budget .scr-cur').forEach(el => { el.textContent = s; });
+}
+function _bsSetVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+function _bsText(id, v)   { const el = document.getElementById(id); if (el) el.textContent = v; }
 
 // ── Répartition de budget assistée par l'IA ───────────────────────
 
@@ -252,9 +346,9 @@ export async function suggestBudget() {
   try {
     const suggestion = await _fetchBudgetSuggestion(b, totalR);
     if (suggestion) _openBudgetPreview(suggestion, totalR);
-    else showSuccessToast('L\'IA n\'a pas pu proposer de répartition — réessaie');
+    else showSuccessToast('L\'IA n\'a pas pu proposer de répartition, réessaie');
   } catch (e) {
-    showSuccessToast('Connexion à l\'IA impossible — réessaie');
+    showSuccessToast('Connexion à l\'IA impossible, réessaie');
   } finally {
     if (btn) { btn.disabled = false; btn.classList.remove('loading'); }
   }
@@ -343,7 +437,7 @@ function _openBudgetPreview({ allocations, note }, totalR) {
         </div>`).join('')}
       </div>
       <div class="aib-total"><span>Total réparti</span><span><strong id="aib-sum">0</strong> / ${revStr}</span></div>
-      <div class="aib-warn" id="aib-warn" style="display:none;">⚠️ La répartition dépasse ton revenu — ajuste les montants.</div>
+      <div class="aib-warn" id="aib-warn" style="display:none;">⚠️ La répartition dépasse ton revenu, ajuste les montants.</div>
       <div class="aib-foot">
         <button class="btn bsm aib-cancel">Annuler</button>
         <button class="btn bp bsm aib-apply">Appliquer au budget</button>
