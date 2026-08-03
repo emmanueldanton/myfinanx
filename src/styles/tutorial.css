@@ -1,4 +1,4 @@
-/* ════ TUTORIAL — bottom sheet ════ */
+/* ════ Bottom sheet — pop-up notifications (classes .tuto-* historiques, réutilisées) ════ */
 
 .tuto-overlay {
   position: fixed;
@@ -48,17 +48,6 @@
   border-radius: 2px;
   background: var(--b2);
   margin: 0 auto 24px;
-}
-
-/* CSS progress bar — width updated via JS */
-.tuto-prog {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 3px;
-  background: var(--pr);
-  transition: width .35s cubic-bezier(.4, 0, .2, 1);
 }
 
 /* Close button (top-right) */
@@ -137,42 +126,6 @@
   max-width: 340px;
 }
 
-/* Dot navigation */
-.tuto-dots {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-/* Touch target ≥ 44px via padding; visual via ::after */
-.tuto-dot {
-  background: none;
-  border: none;
-  padding: 14px 7px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tuto-dot::after {
-  content: '';
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--b2);
-  transition: background .2s, width .2s, border-radius .2s;
-}
-
-.tuto-dot.active::after {
-  background: var(--pr);
-  width: 18px;
-  border-radius: 3px;
-}
-
 /* Action buttons */
 .tuto-nav {
   display: flex;
@@ -212,7 +165,6 @@
 }
 
 .tuto-next:hover { opacity: .88; }
-.tuto-next.final { background: var(--green); }
 
 /* ════ TUTORIAL — parcours plein écran (refonte, aperçus maquettés) ════ */
 .tut-screen {

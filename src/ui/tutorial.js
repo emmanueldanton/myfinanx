@@ -2,7 +2,9 @@
 import iconSrc from '../../icon.png';
 import { openOverlay, closeOverlay } from './overlay.js';
 
-const TUTO_KEY   = 'myfinanx-tuto-done';
+// v2 : le tutoriel a été refondu (plein écran). Nouvelle clé pour que tous les
+// utilisateurs, même ceux qui avaient vu l'ancien, revoient le nouveau une fois.
+const TUTO_KEY   = 'myfinanx-tuto-done-v2';
 
 // Chaque écran : couleur d'accent, aperçu maquetté (mini rendu de l'écran réel), titre, texte.
 const SLIDES = [
@@ -104,8 +106,9 @@ export function tutoGo(idx) {
 }
 
 export function maybeShowTuto() {
-  // Vérifie aussi la clé monolithe héritée pour ne pas remontrer le tuto aux anciens utilisateurs
-  if (localStorage.getItem(TUTO_KEY) || localStorage.getItem('monargent-onboarded')) return;
+  // On ne teste QUE la clé v2 : les anciens (clé v1 ou monargent-onboarded) revoient
+  // ainsi le nouveau tutoriel une fois, puis la clé v2 est posée à la fermeture.
+  if (localStorage.getItem(TUTO_KEY)) return;
   setTimeout(openTuto, 600);
 }
 
