@@ -1228,22 +1228,19 @@
 </div>
 
 <!-- ════ TUTORIAL, bottom sheet, rendered dynamically by src/ui/tutorial.js ════ -->
-<div class="tuto-overlay" id="tuto-overlay" onclick="tutoBackdrop(event)">
-  <div class="tuto-card">
-    <div class="tuto-prog" id="tuto-prog"></div>
-    <button class="tuto-close" onclick="closeTuto()" aria-label="Fermer">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="tuto-slide">
-      <div class="tuto-ico" id="tuto-ico"></div>
-      <div class="tuto-title" id="tuto-title"></div>
-      <div class="tuto-body" id="tuto-body"></div>
-    </div>
-    <div class="tuto-dots" id="tuto-dots"></div>
-    <div class="tuto-nav">
-      <button class="tuto-skip" id="tuto-skip" onclick="closeTuto()">Passer</button>
-      <button class="tuto-next" id="tuto-next" onclick="tutoNext()">Suivant →</button>
-    </div>
+<div class="tut-screen" id="tuto-overlay">
+  <div class="tut-prog-track"><div class="tut-prog" id="tuto-prog"></div></div>
+  <div class="tut-topbar">
+    <button class="tut-skip" id="tuto-skip" onclick="closeTuto()">Passer</button>
+  </div>
+  <div class="tut-stage">
+    <div class="tut-mock" id="tuto-ico"></div>
+    <div class="tut-title" id="tuto-title"></div>
+    <div class="tut-body" id="tuto-body"></div>
+  </div>
+  <div class="tut-foot">
+    <div class="tut-dots" id="tuto-dots"></div>
+    <button class="tut-next" id="tuto-next" onclick="tutoNext()">Suivant</button>
   </div>
 </div>
 
