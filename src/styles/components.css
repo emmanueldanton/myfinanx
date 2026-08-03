@@ -770,6 +770,44 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
   .stt-donut { align-self: center; }
 }
 
+/* ════ Aide à la saisie des dépenses (écran d'ajout) ════ */
+/* Raccourcis : dépenses fréquentes */
+.txs-freq { margin-bottom: 16px; }
+.txs-freq-lbl { font-family: var(--fh); font-size: .74rem; font-weight: 700; color: var(--muted); margin: 0 2px 8px; }
+.txs-freq-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.txs-freq-row::-webkit-scrollbar { display: none; }
+.txs-chip {
+  flex-shrink: 0; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 999px;
+  background: var(--s1); border: 1px solid var(--b1); color: var(--text);
+  font-family: var(--fh); cursor: pointer; transition: border-color .15s, background .15s;
+}
+.txs-chip:hover { border-color: var(--pr); }
+.txs-chip:active { background: var(--s2); }
+.txs-chip-d { font-size: .8rem; font-weight: 600; }
+.txs-chip-a { font-size: .76rem; font-weight: 700; color: var(--muted); }
+
+/* Auto-complétion du libellé */
+.txs-desc-wrap { position: relative; }
+.txs-ac {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20;
+  display: none; max-height: 232px; overflow-y: auto;
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r2);
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+}
+.txs-ac.open { display: block; }
+.txs-ac-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; padding: 10px 13px; text-align: left; cursor: pointer;
+  background: none; border: none; border-bottom: 1px solid var(--b1);
+  color: var(--text); font-family: var(--fb); transition: background .12s;
+}
+.txs-ac-item:last-child { border-bottom: none; }
+.txs-ac-item:hover { background: var(--s2); }
+.txs-ac-d { font-size: .85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.txs-ac-c { flex-shrink: 0; font-size: .72rem; color: var(--muted); padding: 2px 8px; background: var(--s2); border-radius: 999px; }
+
 /* Mobile : en-tête et barre de saisie fixes, seuls les messages défilent */
 @media (max-width: 620px) {
   #page-ai.active {

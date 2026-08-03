@@ -1156,9 +1156,15 @@
       </button>
     </div>
 
+    <!-- Raccourcis : dépenses fréquentes (rempli par JS, masqué si pas d'historique) -->
+    <div class="txs-freq" id="txs-freq" style="display:none"></div>
+
     <div class="scr-field">
       <label for="txs-desc">Description</label>
-      <input type="text" id="txs-desc" placeholder="Ex : Courses Lidl" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
+      <div class="txs-desc-wrap">
+        <input type="text" id="txs-desc" placeholder="Ex : Courses Lidl" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
+        <div class="txs-ac" id="txs-ac"></div>
+      </div>
     </div>
     <div class="scr-field">
       <label for="txs-cat">Catégorie</label>

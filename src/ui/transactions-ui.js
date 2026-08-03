@@ -4,12 +4,14 @@ import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
+import { buildCorpus, frequentExpenses, matchDescriptions, guessCategory } from './expense-intel.js';
 
 let _txType      = 'expense';
 let _getYM       = () => { const n = new Date(); return [n.getFullYear(), n.getMonth()]; };
 let _searchQuery = '';
 let _filterCat   = '';
 let _lastState   = null;
+let _catTouched  = false;   // l'utilisateur a choisi la catégorie à la main → ne plus la deviner
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -30,6 +32,16 @@ export function initTransactionsUI(getYM) {
   const txDt = document.getElementById('tx-dt');
   if (txDt && !txDt.value) txDt.value = todayISO();
   updateCatSel();
+
+  // Aide à la saisie (auto-complétion + catégorie devinée) sur l'écran d'ajout
+  const descEl = document.getElementById('txs-desc');
+  if (descEl) {
+    descEl.addEventListener('input', _onDescInput);
+    descEl.addEventListener('focus', _onDescInput);
+    descEl.addEventListener('blur', () => setTimeout(_hideAutocomplete, 120));
+  }
+  const catEl = document.getElementById('txs-cat');
+  if (catEl) catEl.addEventListener('change', () => { _catTouched = true; });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -245,7 +257,9 @@ let _txEditId  = null;
 
 export function openTxScreen(type) {
   _txEditId  = null;
+  _catTouched = false;
   _txScrType = type === 'income' ? 'income' : 'expense';
+  buildCorpus();               // rafraîchit le corpus d'aide à la saisie
   setTxScreenType(_txScrType);
   _setVal('txs-desc', '');
   _setVal('txs-amt', '');
@@ -254,6 +268,8 @@ export function openTxScreen(type) {
   _setText('txs-save-lbl', 'Ajouter');
   const sym = document.getElementById('txs-cur-sym');
   if (sym) sym.textContent = getActiveCurrency().symbol;
+  _hideAutocomplete();
+  _renderFreqChips();
   window.openScreen?.('screen-tx');
   setTimeout(() => document.getElementById('txs-desc')?.focus(), 60);
 }
@@ -262,6 +278,7 @@ export function openTxScreenEdit(id) {
   const tx = _txs().find(t => t.id === id);
   if (!tx) return;
   _txEditId  = id;
+  _catTouched = true;          // en édition on ne devine pas la catégorie
   _txScrType = tx.type === 'income' ? 'income' : 'expense';
   setTxScreenType(_txScrType, tx.category);
   _setVal('txs-desc', tx.description || '');
@@ -271,7 +288,79 @@ export function openTxScreenEdit(id) {
   _setText('txs-save-lbl', 'Enregistrer');
   const sym = document.getElementById('txs-cur-sym');
   if (sym) sym.textContent = getActiveCurrency().symbol;
+  _hideAutocomplete();
+  _renderFreqChips();          // masquées en édition
   window.openScreen?.('screen-tx');
+}
+
+// ── Aide à la saisie : puces fréquentes, auto-complétion, catégorie devinée ──
+function _applyItem(it, setAmount) {
+  const desc = document.getElementById('txs-desc');
+  const cat  = document.getElementById('txs-cat');
+  const amt  = document.getElementById('txs-amt');
+  if (desc) desc.value = it.desc;
+  if (cat && it.cat && [...cat.options].some(o => o.value === it.cat)) {
+    cat.value = it.cat;
+    _catTouched = true;
+  }
+  if (amt && setAmount && it.amount != null) amt.value = fmtInput(it.amount);
+  _hideAutocomplete();
+  amt?.focus();
+}
+
+function _renderFreqChips() {
+  const wrap = document.getElementById('txs-freq');
+  if (!wrap) return;
+  const items = (_txScrType === 'expense' && !_txEditId) ? frequentExpenses(6) : [];
+  if (!items.length) { wrap.innerHTML = ''; wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  wrap.innerHTML = '<div class="txs-freq-lbl">Fréquents</div><div class="txs-freq-row"></div>';
+  const row = wrap.querySelector('.txs-freq-row');
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'txs-chip';
+    b.innerHTML = `<span class="txs-chip-d">${esc(it.desc)}</span><span class="txs-chip-a">${fmt(it.amount)}</span>`;
+    b.addEventListener('click', () => _applyItem(it, true));
+    row.appendChild(b);
+  });
+}
+
+function _onDescInput() {
+  const desc = document.getElementById('txs-desc');
+  if (!desc) return;
+  const v = desc.value;
+  // Catégorie devinée (tant que l'utilisateur n'y a pas touché)
+  if (!_catTouched && _txScrType === 'expense') {
+    const g = guessCategory(v);
+    const cat = document.getElementById('txs-cat');
+    if (g && cat && [...cat.options].some(o => o.value === g)) cat.value = g;
+  }
+  // Auto-complétion du libellé (dépenses uniquement)
+  const ac = document.getElementById('txs-ac');
+  if (!ac) return;
+  const matches = _txScrType === 'expense' ? matchDescriptions(v, 5) : [];
+  if (!matches.length) { _hideAutocomplete(); return; }
+  ac.innerHTML = '';
+  matches.forEach(m => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'txs-ac-item';
+    b.innerHTML = `<span class="txs-ac-d">${esc(m.desc)}</span><span class="txs-ac-c">${esc(m.cat)}</span>`;
+    // mousedown : agit avant le blur du champ
+    b.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const amt = document.getElementById('txs-amt');
+      _applyItem(m, !amt || !amt.value);
+    });
+    ac.appendChild(b);
+  });
+  ac.classList.add('open');
+}
+
+function _hideAutocomplete() {
+  const ac = document.getElementById('txs-ac');
+  if (ac) { ac.classList.remove('open'); ac.innerHTML = ''; }
 }
 
 const _TX_ICO = {
@@ -298,6 +387,9 @@ export function setTxScreenType(t, keepCat) {
     const prev = keepCat || sel.value;
     sel.innerHTML = cats.map(c => `<option value="${c}"${c === prev ? ' selected' : ''}>${c}</option>`).join('');
   }
+  // Les raccourcis et l'auto-complétion ne concernent que les dépenses
+  _renderFreqChips();
+  _hideAutocomplete();
 }
 
 export function saveTxScreen() {
