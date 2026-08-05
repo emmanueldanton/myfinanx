@@ -374,26 +374,38 @@ async function _fetchBudgetSuggestion(budget, totalR) {
 
   const userName = localStorage.getItem('monargent-username');
   const identity = userName ? `Prénom : ${userName}.` : '';
+  // Revenu exprimé comme un nombre propre (dans la devise d'affichage) pour un calcul fiable
+  const revNum = Math.floor(toDisplay(totalR));
 
-  const system = `Tu es le conseiller financier de MyFinanx. Tu proposes une répartition de budget mensuel réaliste et personnalisée, au format JSON.
+  const system = `Tu es le conseiller financier de MyFinanx. Tu établis une répartition de budget mensuel réaliste, prudente et personnalisée, au format JSON.
 ${identity}
-Devise de l'utilisateur : ${cur.name} (${cur.symbol}). Exprime tous les montants comme des nombres simples dans cette devise (sans symbole, sans séparateur de milliers).
-Revenu mensuel total à répartir : ${fmt(totalR)}.
-Moyenne des dépenses réelles par catégorie sur les ${monthsWithData} mois précédents :
+Devise : ${cur.name} (${cur.symbol}). Donne des montants comme des nombres simples dans cette devise (sans symbole, sans séparateur de milliers).
+
+Revenu mensuel à répartir : ${revNum}. Tu dois répartir EXACTEMENT ce montant.
+
+Dépenses réelles moyennes par catégorie (${monthsWithData} derniers mois) :
 ${histStr}
+
 Objectifs d'épargne :
 ${goalsStr}
-Catégories déjà présentes : ${items.map(i => i.name).join(', ') || '(aucune)'}.
 
-Règles STRICTES :
-- La somme de tous les montants ne doit PAS dépasser le revenu total.
-- Base-toi sur les moyennes historiques quand elles existent ; sinon propose des montants raisonnables.
-- Prévois une part d'épargne cohérente avec les objectifs (ex. un poste "Épargne").
-- Réutilise en priorité les catégories existantes ; ajoute-en seulement si pertinent.
-- N'invente aucun chiffre non justifié par les données.`;
+Catégories déjà utilisées (à réutiliser en priorité) : ${items.map(i => i.name).join(', ') || '(aucune)'}.
+
+MÉTHODE, dans cet ordre :
+1. Couvre d'abord les besoins essentiels (logement, alimentation, transport, santé, factures, téléphone) en te basant sur les moyennes réelles ci-dessus. Ne mets jamais un poste essentiel sous sa moyenne observée.
+2. Ajoute ensuite les dépenses de confort (loisirs, etc.) avec des montants raisonnables.
+3. Place le reste dans un poste "Épargne", plus élevé si un objectif a une échéance proche.
+4. La somme de TOUS les postes doit être EXACTEMENT égale à ${revNum}. Ajuste le poste "Épargne" pour tomber juste.
+5. Utilise des montants ronds (multiples de 5 ou 10).
+
+Règles :
+- Reste sur des postes clairs et utiles, n'invente aucune catégorie farfelue.
+- Sans historique, pars d'une base 50% besoins / 30% confort / 20% épargne, ajustée au bon sens.
+- Vérifie ton addition avant de répondre : le total doit valoir ${revNum}.`;
 
   const question = `Propose ma répartition de budget mensuel. Réponds UNIQUEMENT en JSON valide selon ce schéma exact :
-{"repartition": {"<categorie>": <montant_nombre>, ...}, "note": "<une phrase d'explication, max 25 mots>"}`;
+{"repartition": {"<categorie>": <montant_nombre>, ...}, "note": "<une phrase d'explication, max 25 mots>"}
+Le total de "repartition" doit valoir exactement ${revNum}.`;
 
   const res = await fetch('/api/ai', {
     method:  'POST',
@@ -414,7 +426,56 @@ Règles STRICTES :
     if (cat && isFinite(amt) && amt > 0) allocations.push({ cat: String(cat).trim(), amount: amt });
   }
   if (!allocations.length) return null;
-  return { allocations, note: (parsed.note || '').toString().trim() };
+
+  // Garantit une répartition cohérente : la somme colle EXACTEMENT au revenu.
+  const normalized = _normalizeAllocations(allocations, Math.floor(toDisplay(totalR)));
+  if (!normalized || !normalized.length) return null;
+  return { allocations: normalized, note: (parsed.note || '').toString().trim() };
+}
+
+// Force les montants à totaliser exactement `target` (devise d'affichage) :
+// fusionne les doublons, réduit proportionnellement si ça dépasse, arrondit,
+// puis loge le reste dans "Épargne" pour que le total tombe juste.
+function _normalizeAllocations(allocations, target) {
+  if (!(target > 0)) return null;
+  const merged = new Map();
+  for (const a of allocations) {
+    const key = a.cat.trim();
+    if (!key) continue;
+    merged.set(key, (merged.get(key) || 0) + a.amount);
+  }
+  let list = [...merged.entries()].map(([cat, amount]) => ({ cat, amount }));
+  let sum  = list.reduce((s, a) => s + a.amount, 0);
+  if (sum <= 0) return null;
+
+  // Trop réparti -> on réduit tout proportionnellement
+  if (sum > target) {
+    const k = target / sum;
+    list.forEach(a => { a.amount *= k; });
+  }
+  // Montants ronds (multiples de 5)
+  list.forEach(a => { a.amount = Math.max(0, Math.round(a.amount / 5) * 5); });
+  list = list.filter(a => a.amount > 0);
+  if (!list.length) return null;
+
+  // Reste (ou dépassement résiduel) -> poste "Épargne"
+  const isSavings = c => /^(é|e)pargne$/i.test(c.trim());
+  let diff = Math.round(target - list.reduce((s, a) => s + a.amount, 0));
+  if (diff !== 0) {
+    let sav = list.find(a => isSavings(a.cat));
+    if (!sav) {
+      if (diff > 0) { sav = { cat: 'Épargne', amount: 0 }; list.push(sav); }
+      else { sav = list.reduce((m, a) => (a.amount > m.amount ? a : m), list[0]); }
+    }
+    sav.amount = Math.max(0, sav.amount + diff);
+  }
+  // Ajustement final sur le plus gros poste pour un total exact
+  const resid = Math.round(target - list.reduce((s, a) => s + a.amount, 0));
+  if (resid !== 0) {
+    const big = list.reduce((m, a) => (a.amount > m.amount ? a : m), list[0]);
+    big.amount = Math.max(0, big.amount + resid);
+  }
+  return list.filter(a => a.amount > 0);
 }
 
 function _openBudgetPreview({ allocations, note }, totalR) {
