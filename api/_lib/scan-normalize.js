@@ -4,6 +4,9 @@
 
 const MAX_ITEMS = 100;
 
+// Lignes de relevé qui ne sont pas des opérations (soldes, totaux) : jamais proposées.
+const NOT_AN_OPERATION = /^((ancien|nouveau) )?solde\b|^total(aux)?\b|^totaux\b|^report\b/i;
+
 const CURRENCY_ALIASES = {
   'FCFA': 'XOF', 'F CFA': 'XOF', 'CFA': 'XOF', 'XOF': 'XOF', 'F': 'XOF',
   '€': 'EUR', 'EUR': 'EUR', 'EURO': 'EUR', 'EUROS': 'EUR',
@@ -89,6 +92,7 @@ export function normalizeScan(raw, { expenseCategories, incomeCategories, today 
     const type = ['income', 'revenu', 'credit', 'entree'].includes(t) ? 'income' : 'expense';
     const description = String(it.description ?? it.libelle ?? merchant ?? '').replace(/\s+/g, ' ').trim().slice(0, 80)
       || (type === 'income' ? 'Revenu' : 'Dépense');
+    if (NOT_AN_OPERATION.test(description)) continue;
     items.push({
       date: normalizeDate(it.date, today),
       description,

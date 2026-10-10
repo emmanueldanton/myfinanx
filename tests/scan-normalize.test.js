@@ -62,6 +62,17 @@ describe('normalizeScan', () => {
     expect(normalizeScan(null, opts).items).toEqual([]);
     expect(normalizeScan({ operations: 'nope' }, opts).items).toEqual([]);
   });
+  it("écarte les lignes de solde et de total d'un relevé, pas TotalEnergies", () => {
+    const r = normalizeScan({ operations: [
+      { description: 'Solde precedent', amount: 412300, type: 'income' },
+      { description: 'Salaire Orange CI', amount: 650000, type: 'income' },
+      { description: 'Solde au 30/09/2026', amount: 756050, type: 'income' },
+      { description: 'Nouveau solde', amount: 1, type: 'income' },
+      { description: 'Total des mouvements', amount: 2, type: 'expense' },
+      { description: 'TotalEnergies Riviera 3', amount: 15000, type: 'expense' },
+    ] }, opts);
+    expect(r.items.map(i => i.description)).toEqual(['Salaire Orange CI', 'TotalEnergies Riviera 3']);
+  });
   it('catégorie inconnue -> Autre', () => {
     const r = normalizeScan({ operations: [{ amount: 10, category: 'Jardinage' }] }, opts);
     expect(r.items[0].category).toBe('Autre');

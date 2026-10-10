@@ -21,7 +21,7 @@ Date du jour : ${today}. Devise habituelle de l'utilisateur : ${displayCurrency 
 
 Règles :
 - Ticket de caisse ou facture : UNE seule opération, le TOTAL payé (jamais article par article). Description courte : nom du commerçant puis nature, par exemple "Carrefour, courses".
-- Relevé bancaire ou historique de paiements : une opération par ligne. Débit = "expense", crédit = "income". Ignore les soldes et les totaux.
+- Relevé bancaire ou historique de paiements : une opération par ligne. Débit = "expense", crédit = "income". Ignore les lignes de solde (solde précédent, nouveau solde, solde au...) et les totaux : ce ne sont pas des opérations, même si elles sont en colonne crédit.
 - description lisible par un humain : nom du commerçant ou de l'organisme en casse normale, sans les préfixes techniques (CB, PRLV, VIR, CARTE, PAIEMENT). Exemple : "CB PROSUMA PLATEAU" devient "Prosuma Plateau".
 - amount : nombre positif, point comme séparateur décimal, sans symbole ni espace.
 - date : format YYYY-MM-DD. Si l'année manque, prends celle de la date du jour. Si aucune date, null.
