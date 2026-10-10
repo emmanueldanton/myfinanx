@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <!-- Apply saved theme before first paint, prevents flash of wrong colors -->
 <script>(function(){var t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- ═══ FAVICON ═══ -->
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
+<link rel="shortcut icon" href="/icon.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,7 +29,7 @@
 <meta property="og:url" content="https://myfinanx.vercel.app">
 <meta property="og:title" content="MyFinanx · Gestion de budget personnel">
 <meta property="og:description" content="Suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil. Dashboard financier personnel, gratuit et sans inscription.">
-<meta property="og:image" content="https://myfinanx.vercel.app/icons/icon-512.png">
+<meta property="og:image" content="https://myfinanx.vercel.app/icon.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:locale" content="fr_FR">
@@ -38,7 +39,7 @@
 <meta name="twitter:site" content="@myfinanx">
 <meta name="twitter:title" content="MyFinanx · Gestion de budget personnel">
 <meta name="twitter:description" content="Suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil.">
-<meta name="twitter:image" content="https://myfinanx.vercel.app/icons/icon-512.png">
+<meta name="twitter:image" content="https://myfinanx.vercel.app/icon.png">
 
 <script defer src="/_vercel/insights/script.js"></script>
 
@@ -74,7 +75,7 @@
 (function(){
   const t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';
   const THEMES_MINI={
-    light:{'--bg':'#EEF3FB','--s0':'#F6F9FE','--s1':'#FFFFFF','--s2':'#F2F6FC','--b1':'#E7EDF7','--b2':'#DBE3F1','--text':'#0F1B33','--muted':'#5F6B85','--faint':'#9AA6BD','--header-bg':'rgba(246,249,254,.82)','--logo-bg':'#EAF1FF','--chat-bg':'#F6F9FE','--bubble-bot':'#FFFFFF','--ai-bg1':'#F6F9FE','--ai-bg2':'#EEF3FB','--ai-bdr':'#E7EDF7'},
+    light:{'--bg':'#EEF3FB','--s0':'#F6F9FE','--s1':'#FFFFFF','--s2':'#F2F6FC','--b1':'#E7EDF7','--b2':'#DBE3F1','--text':'#0F1B33','--muted':'#6B7896','--faint':'#9AA6BD','--header-bg':'rgba(246,249,254,.82)','--logo-bg':'#EAF1FF','--chat-bg':'#F6F9FE','--bubble-bot':'#FFFFFF','--ai-bg1':'#F6F9FE','--ai-bg2':'#EEF3FB','--ai-bdr':'#E7EDF7'},
     blue:{'--bg':'#0A0E17','--s0':'#0E1320','--s1':'#141B2B','--s2':'#1B2436','--b1':'#232E45','--b2':'#303D5A','--text':'#EAEFF8','--muted':'#8190AE','--faint':'#79839A','--header-bg':'rgba(10,14,23,.82)','--logo-bg':'#1B2436','--chat-bg':'#0E1320','--bubble-bot':'#1B2436','--ai-bg1':'#0E1320','--ai-bg2':'#120E22','--ai-bdr':'#232E45'},
     violet:{'--bg':'#0B0814','--s0':'#110C1E','--s1':'#181227','--s2':'#211934','--b1':'#2C2348','--b2':'#3A2F5C','--text':'#ECE8FB','--muted':'#897FB0','--faint':'#79839A','--header-bg':'rgba(11,8,20,.84)','--logo-bg':'#181227','--chat-bg':'#110C1E','--bubble-bot':'#181227','--ai-bg1':'#110C1E','--ai-bg2':'#150E24','--ai-bdr':'#2C2348'},
   };
@@ -93,7 +94,7 @@
   </button>
   <div class="brand" onclick="goTab('overview',null)" style="cursor:pointer">
     <div class="brand-ico">
-      <img src="/icons/icon-96.png" width="30" height="30" alt="MyFinanx">
+      <img src="icon.png" width="30" height="30" alt="MyFinanx">
     </div>
     <span class="brand-name">MyFinanx</span>
   </div>
@@ -192,7 +193,7 @@
 <div class="drawer" id="drawer">
   <div class="drawer-hd">
     <div class="drawer-brand">
-      <img src="/icons/icon-96.png" width="26" height="26" alt="MyFinanx">
+      <img src="icon.png" width="26" height="26" alt="MyFinanx">
       MyFinanx
     </div>
     <button class="drawer-close" onclick="toggleDrawer(false)" aria-label="Fermer">
@@ -491,7 +492,7 @@
   <div class="txl" id="txl">
     <div class="empty">
       <div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      Aucune transaction ce mois-ci.<br>Touche « Ajouter une dépense » ou scanne un ticket.
+      Aucune transaction ce mois-ci.
     </div>
   </div>
 </div>
@@ -557,7 +558,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div class="pwa-icon">
-      <img src="/icons/icon-96.png" width="34" height="34" style="border-radius:8px;" alt="MyFinanx">
+      <img src="icon.png" width="34" height="34" style="border-radius:8px;" alt="MyFinanx">
     </div>
     <div class="pwa-title">Installe MyFinanx</div>
     <div class="pwa-sub">Pour ne jamais perdre tes données, installe l'app sur ton écran d'accueil. Gratuit, rapide, sans inscription.</div>
@@ -1010,9 +1011,9 @@
   </div>
   <div class="screen-body">
     <!-- Raccourci vers le scan (nouvelle dépense uniquement) -->
-    <button type="button" class="txs-scan" id="txs-scan" onclick="openScanScreen()">
+    <button type="button" class="txs-scan" id="txs-scan" onclick="openScanScreen('tx')">
       <span class="txs-scan-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
-      <span class="txs-scan-txt"><strong>Tu as un ticket ou une facture ?</strong><small>Scanne-le, l'IA remplit tout pour toi</small></span>
+      <span class="txs-scan-txt"><strong>Scanner un ticket</strong><small>L'IA remplit tout</small></span>
       <svg class="txs-scan-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <!-- Hero : montant en grand -->
@@ -1073,7 +1074,7 @@
 <!-- ════ SCAN : ticket, facture ou relevé (photo / PDF) ════ -->
 <div class="screen" id="screen-scan" aria-hidden="true">
   <div class="screen-head">
-    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+    <button class="screen-back" onclick="closeScan()" aria-label="Retour">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
     <div class="screen-title">Scanner un document</div>
@@ -1086,34 +1087,29 @@
         <div class="scan-intro-ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
         </div>
-        <h2 class="scan-intro-title">Ajoute tes dépenses en une photo</h2>
-        <p class="scan-intro-txt">Prends en photo un ticket de caisse ou une facture, ou importe un relevé bancaire en PDF. L'IA lit le document et te propose les opérations. Tu vérifies avant que quoi que ce soit soit ajouté.</p>
+        <p class="scan-intro-txt">Ticket, facture ou relevé : l'IA lit tout, tu valides.</p>
       </div>
 
       <label class="scan-btn primary" for="scan-in-camera">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span><strong>Prendre une photo</strong><small>Ticket de caisse, facture</small></span>
+        <span><strong>Prendre une photo</strong></span>
       </label>
       <input type="file" id="scan-in-camera" accept="image/*" capture="environment" class="sr-only">
 
       <label class="scan-btn" for="scan-in-image">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span><strong>Choisir dans la galerie</strong><small>Jusqu'à 3 photos pour un long ticket</small></span>
+        <span><strong>Choisir dans la galerie</strong></span>
       </label>
       <input type="file" id="scan-in-image" accept="image/*" multiple class="sr-only">
 
       <label class="scan-btn" for="scan-in-pdf">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-        <span><strong>Importer un PDF</strong><small>Relevé bancaire, facture numérique</small></span>
+        <span><strong>Importer un PDF</strong></span>
       </label>
       <input type="file" id="scan-in-pdf" accept="application/pdf,.pdf" class="sr-only">
 
-      <ul class="scan-tips">
-        <li>Pose le ticket à plat, bien éclairé, en entier dans le cadre.</li>
-        <li>Pour un ticket, seul le total payé est proposé.</li>
-        <li>Pour un relevé, chaque ligne devient une opération.</li>
-      </ul>
-      <p class="scan-privacy">Le document est envoyé à notre service d'IA uniquement pour être lu, puis oublié. Il n'est jamais conservé.</p>
+      <button class="scan-link" onclick="scanManual()">Pas de ticket ? Saisir à la main</button>
+      <p class="scan-privacy">Le document sert uniquement à la lecture, il n'est pas conservé.</p>
     </section>
 
     <!-- 2. Lecture en cours -->
@@ -1121,14 +1117,14 @@
       <div class="scan-busy-preview" id="scan-busy-preview"></div>
       <div class="scan-spinner" aria-hidden="true"></div>
       <p class="scan-busy-step" id="scan-busy-step">Lecture en cours…</p>
-      <p class="scan-busy-sub">Quelques secondes suffisent en général.</p>
+      <p class="scan-busy-sub">Quelques secondes…</p>
     </section>
 
     <!-- 3. Erreur -->
     <section id="scan-error" class="scan-error" hidden role="alert">
       <p id="scan-error-msg"></p>
-      <button class="scr-save" onclick="retryScan()">Réessayer avec un autre document</button>
-      <button class="scan-link" onclick="closeScreen();openTxScreen('expense')">Saisir la dépense à la main</button>
+      <button class="scr-save" onclick="retryScan()">Réessayer</button>
+      <button class="scan-link" onclick="scanManual()">Saisir à la main</button>
     </section>
 
     <!-- 4. Vérification -->

@@ -15,6 +15,7 @@ let _getYM = () => [new Date().getFullYear(), new Date().getMonth()];
 let _rows = [];
 let _meta = null;
 let _slowTimer = null;
+let _from = null;   // 'tx' si le scan a été ouvert depuis l'écran « Nouvelle dépense »
 
 const $ = id => document.getElementById(id);
 
@@ -27,7 +28,8 @@ function _state(name) {
   if (foot) foot.hidden = name !== 'review';
 }
 
-export function openScanScreen() {
+export function openScanScreen(from) {
+  _from = from === 'tx' ? 'tx' : null;
   _rows = []; _meta = null;
   ['scan-in-camera', 'scan-in-image', 'scan-in-pdf'].forEach(id => { const i = $(id); if (i) i.value = ''; });
   _state('pick');
@@ -60,7 +62,7 @@ async function _onFiles(files) {
     // Le service gratuit peut faire patienter quelques secondes aux heures chargées : on le dit.
     _slowTimer = setTimeout(() => {
       const sub = document.querySelector('.scan-busy-sub');
-      if (sub) sub.textContent = 'Le service est très demandé en ce moment, encore quelques secondes…';
+      if (sub) sub.textContent = 'Encore quelques secondes…';
     }, 6000);
 
     const res = await fetch('/api/scan', {
@@ -110,8 +112,8 @@ function _renderReview() {
   $('scan-sum').innerHTML = `
     <div class="scan-sum-title">${n} opération${n > 1 ? 's' : ''} trouvée${n > 1 ? 's' : ''}</div>
     <div class="scan-sum-sub">${esc(doc)}${_meta?.merchant ? ' · ' + esc(_meta.merchant) : ''}</div>
-    <p class="scan-sum-hint">Vérifie chaque ligne, corrige si besoin, puis valide. Décoche ce que tu ne veux pas ajouter.</p>
-    ${dups ? `<p class="scan-sum-warn">${dups} ligne${dups > 1 ? 's semblent' : ' semble'} déjà saisie${dups > 1 ? 's' : ''} : décochée${dups > 1 ? 's' : ''} par sécurité.</p>` : ''}`;
+    <p class="scan-sum-hint">Vérifie, corrige si besoin, puis valide.</p>
+    ${dups ? `<p class="scan-sum-warn">${dups > 1 ? `${dups} lignes déjà saisies, décochées.` : '1 ligne déjà saisie, décochée.'}</p>` : ''}`;
 
   const cur = getActiveCurrency();
   const list = $('scan-list');
@@ -225,6 +227,12 @@ export function saveScan() {
 export function initScanUI(getYM) {
   if (getYM) _getYM = getYM;
   window.openScanScreen = openScanScreen;
+  // Retour : revient à « Nouvelle dépense » si on en venait, sinon ferme l'écran
+  window.closeScan = () => {
+    if (_from === 'tx') window.openTxScreen?.('expense');
+    else window.closeScreen?.();
+  };
+  window.scanManual = () => window.openTxScreen?.('expense');
   window.saveScan = saveScan;
   window.retryScan = () => {
     // Vider les champs : sinon choisir à nouveau le même fichier ne déclenche rien
