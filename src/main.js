@@ -1,4 +1,7 @@
 // ═══ CSS — Vite extracts and injects these into the build output ═══
+// Polices auto-hébergées (hors ligne, sans aller-retour vers Google Fonts)
+import '@fontsource-variable/plus-jakarta-sans/wght.css';
+import '@fontsource/playfair-display/latin-800.css';
 import './styles/main.css';
 import './styles/themes.css';
 import './styles/components.css';
@@ -216,6 +219,10 @@ function init() {
 
   // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)
   scheduleDailyPush();
+
+  // Demande un stockage persistant : sans lui, le navigateur (Safari surtout) peut effacer
+  // les données locales d'une app peu utilisée. Silencieux si refusé ou non supporté.
+  try { navigator.storage?.persist?.().catch(() => {}); } catch (e) {}
 }
 
 // Modules are deferred — monolith's inline init() runs first, then this wires the modular layer

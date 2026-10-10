@@ -1,5 +1,5 @@
 // ═══ Tutorial — parcours plein écran (5 écrans, aperçus maquettés) ═══
-import iconSrc from '../../icon.png';
+const iconSrc = '/icons/icon-192.png';
 import { openOverlay, closeOverlay } from './overlay.js';
 
 // v2 : le tutoriel a été refondu (plein écran). Nouvelle clé pour que tous les

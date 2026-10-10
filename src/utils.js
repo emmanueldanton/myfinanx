@@ -1,7 +1,7 @@
 // ═══ Utilities — pure helpers extracted from the monolith ═══
 
 export function uid() { return Math.random().toString(36).slice(2, 10); }
-export function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+export function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 export function todayISO() {
   const n = new Date();

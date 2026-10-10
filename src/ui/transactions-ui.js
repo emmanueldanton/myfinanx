@@ -95,7 +95,7 @@ function _renderCatPills(txs) {
   wrap.innerHTML = [
     `<button class="tx-cat-pill${!_filterCat ? ' active' : ''}" onclick="filterTxCat('')">Tous</button>`,
     ...cats.map(c =>
-      `<button class="tx-cat-pill${_filterCat === c ? ' active' : ''}" onclick="filterTxCat('${esc(c)}')">${esc(c)}</button>`
+      `<button class="tx-cat-pill${_filterCat === c ? ' active' : ''}" data-cat="${esc(c)}" onclick="filterTxCat(this.dataset.cat)">${esc(c)}</button>`
     ),
   ].join('');
 }
@@ -132,20 +132,20 @@ export function renderExpenses(state) {
     const ibg  = isE ? 'rgba(196,58,58,.14)' : 'rgba(52,211,153,.12)';
     const sign = isE ? '−' : '+';
     const ico  = catIco(t.category, 14);
-    return `<div class="txi" id="txi-${t.id}">
+    return `<div class="txi" id="txi-${esc(t.id)}">
       <div class="txii" style="background:${ibg};color:${col}">${ico}</div>
       <div class="txif">
         <div class="txid">${esc(t.description || '')}</div>
         <div class="txim">
-          <span class="cpill">${t.category || ''}</span>
+          <span class="cpill">${esc(t.category || '')}</span>
           <span class="txdt">${fmtDate(t.date)}</span>
         </div>
       </div>
       <div class="txam" style="color:${col}">${sign} ${fmt(t.amountEUR ?? 0)}</div>
-      <button class="txed" onclick="openTxScreenEdit('${t.id}')" title="Modifier">
+      <button class="txed" data-id="${esc(t.id)}" onclick="openTxScreenEdit(this.dataset.id)" title="Modifier">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
-      <button class="txdl" onclick="delTx('${t.id}')" title="Supprimer">
+      <button class="txdl" data-id="${esc(t.id)}" onclick="delTx(this.dataset.id)" title="Supprimer">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
     </div>`;
@@ -210,7 +210,7 @@ export function updateCatSel() {
   const sel = document.getElementById('tx-c');
   if (!sel) return;
   const cats = _txType === 'expense' ? CATS_E : CATS_I;
-  sel.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  sel.innerHTML = cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
 }
 
 // ── Mutations ─────────────────────────────────────────────────────
@@ -385,7 +385,7 @@ export function setTxScreenType(t, keepCat) {
   if (sel) {
     const cats = _txScrType === 'expense' ? CATS_E : CATS_I;
     const prev = keepCat || sel.value;
-    sel.innerHTML = cats.map(c => `<option value="${c}"${c === prev ? ' selected' : ''}>${c}</option>`).join('');
+    sel.innerHTML = cats.map(c => `<option value="${esc(c)}"${c === prev ? ' selected' : ''}>${esc(c)}</option>`).join('');
   }
   // Les raccourcis et l'auto-complétion ne concernent que les dépenses
   _renderFreqChips();
