@@ -51,6 +51,49 @@ export async function imageToDataURL(file) {
   return canvasToJpeg(canvas);
 }
 
+// Reconstitue les lignes d'un PDF en gardant les colonnes : les fragments d'une même ligne
+// sont triés de gauche à droite, et un écart horizontal net sépare deux cellules par « | ».
+// Sans cela, « RIVIERA 3 » suivi de la colonne « 15 000 » était lu « 315 000 ».
+// Si l'en-tête contient « Débit » et « Crédit », chaque montant est étiqueté selon sa colonne.
+const AMOUNT_CELL = /^-?\d{1,3}([ .  ]?\d{3})*([.,]\d{1,2})?( ?(€|F|FCFA|XOF|EUR))?$/i;
+
+export function textItemsToLines(items) {
+  const rows = [];
+  for (const it of items) {
+    const str = (it.str || '').trim();
+    if (!str) continue;
+    const x = it.transform[4], y = it.transform[5];
+    const h = Math.abs(it.transform[3]) || it.height || 10;
+    let row = rows.find(r => Math.abs(r.y - y) <= h * 0.5);
+    if (!row) { row = { y, h, items: [] }; rows.push(row); }
+    row.items.push({ x, w: it.width || str.length * h * 0.5, str });
+  }
+  rows.sort((a, b) => b.y - a.y);
+
+  // Découpe chaque ligne en cellules { x0, x1, text }
+  for (const r of rows) {
+    r.items.sort((a, b) => a.x - b.x);
+    r.cells = [];
+    for (const it of r.items) {
+      const last = r.cells[r.cells.length - 1];
+      if (last && it.x - last.x1 <= r.h * 1.2) { last.text += ' ' + it.str; last.x1 = it.x + it.w; }
+      else r.cells.push({ x0: it.x, x1: it.x + it.w, text: it.str });
+    }
+  }
+
+  let debitX = null, creditX = null;
+  return rows.map(r => {
+    const deb = r.cells.find(c => /^d[ée]bits?$/i.test(c.text));
+    const cre = r.cells.find(c => /^cr[ée]dits?$/i.test(c.text));
+    if (deb && cre) { debitX = (deb.x0 + deb.x1) / 2; creditX = (cre.x0 + cre.x1) / 2; }
+    return r.cells.map(c => {
+      if (debitX === null || deb || !AMOUNT_CELL.test(c.text)) return c.text;
+      const cx = (c.x0 + c.x1) / 2;
+      return (Math.abs(cx - debitX) < Math.abs(cx - creditX) ? 'débit ' : 'crédit ') + c.text;
+    }).join(' | ');
+  }).join('\n');
+}
+
 let _pdfjs = null;
 async function loadPdfJs() {
   if (_pdfjs) return _pdfjs;
@@ -74,8 +117,7 @@ export async function pdfToPayload(file) {
     for (let p = 1; p <= pages; p++) {
       const page = await pdf.getPage(p);
       const tc = await page.getTextContent();
-      // Reconstitue les lignes : un retour à la ligne quand pdf.js le signale
-      chunks.push(tc.items.map(i => (i.str || '') + (i.hasEOL ? '\n' : ' ')).join(''));
+      chunks.push(textItemsToLines(tc.items));
     }
     const text = chunks.join('\n').replace(/[ \t]+/g, ' ').trim();
     if (text.replace(/\s/g, '').length >= MIN_TEXT_CHARS) return { text };

@@ -72,7 +72,7 @@ export default async function handler(req, res) {
 
   const userContent = imgs.length
     ? [{ type: 'text', text: 'Voici le document à lire.' }, ...imgs.map(url => ({ type: 'image_url', image_url: { url } }))]
-    : `Voici le texte extrait du document :\n"""\n${txt.slice(0, MAX_TEXT)}\n"""`;
+    : `Voici le texte extrait du document. Une ligne du document par ligne ; les colonnes sont séparées par " | ". Un montant est toujours dans sa propre colonne : ne colle jamais un chiffre du libellé au montant.\n"""\n${txt.slice(0, MAX_TEXT)}\n"""`;
 
   try {
     const { reply, model } = await groqChat(imgs.length ? VISION_MODELS : TEXT_MODELS, {
