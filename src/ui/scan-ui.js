@@ -9,10 +9,12 @@ import { uid, esc, parseAmt, CATS_E, CATS_I, todayISO, MONTHS } from '../utils.j
 import { showSuccessToast } from './toast.js';
 import { prepareFiles } from '../scan/prepare.js';
 import { buildReviewItems, groupByMonth } from '../scan/review.js';
+import { buildCorpus, guessCategory } from './expense-intel.js';
 
 let _getYM = () => [new Date().getFullYear(), new Date().getMonth()];
 let _rows = [];
 let _meta = null;
+let _slowTimer = null;
 
 const $ = id => document.getElementById(id);
 
@@ -50,10 +52,16 @@ function _showError(msg) {
 
 async function _onFiles(files) {
   if (!files || !files.length) return;
+  clearTimeout(_slowTimer);
   try {
     _setBusy('Préparation du document…', '');
     const payload = await prepareFiles(files);
     _setBusy(payload.text ? 'Lecture du relevé par l\'IA…' : 'Lecture du ticket par l\'IA…', payload.images?.[0] || '');
+    // Le service gratuit peut faire patienter quelques secondes aux heures chargées : on le dit.
+    _slowTimer = setTimeout(() => {
+      const sub = document.querySelector('.scan-busy-sub');
+      if (sub) sub.textContent = 'Le service est très demandé en ce moment, encore quelques secondes…';
+    }, 6000);
 
     const res = await fetch('/api/scan', {
       method: 'POST',
@@ -75,8 +83,17 @@ async function _onFiles(files) {
       currencies: CURRENCIES,
       existingFor: (Y, M) => (Y === cY && M === cM) ? (store.get('mfx_transactions') || []) : readMonthTransactions(Y, M),
     });
+    // Catégorie restée « Autre » : on s'appuie sur l'historique de l'utilisateur (libellés déjà classés)
+    buildCorpus();
+    _rows.forEach(r => {
+      if (r.type === 'expense' && r.category === 'Autre') {
+        const g = guessCategory(r.description);
+        if (g && CATS_E.includes(g)) r.category = g;
+      }
+    });
     _renderReview();
   } catch (e) {
+    clearTimeout(_slowTimer);
     const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
     _showError(offline ? 'Pas de connexion internet. Le scan a besoin du réseau, réessaie une fois connecté.' : (e.message || 'La lecture a échoué, réessaie.'));
   }
@@ -85,6 +102,7 @@ async function _onFiles(files) {
 const DOC_LABEL = { ticket: 'Ticket', facture: 'Facture', releve: 'Relevé', autre: 'Document' };
 
 function _renderReview() {
+  clearTimeout(_slowTimer);
   _state('review');
   const n = _rows.length;
   const dups = _rows.filter(r => r.duplicate).length;
@@ -115,10 +133,16 @@ function _renderReview() {
       </div>
       <label class="scan-fld"><span>Catégorie</span>
         <select data-f="category">${cats.map(c => `<option value="${esc(c)}"${c === r.category ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
-      ${converted ? `<div class="scan-conv">Lu sur le document : ${esc(String(r.sourceAmount))} ${esc(r.sourceCurrency)}, converti.</div>` : ''}
+      ${converted ? `<div class="scan-conv">Lu sur le document : ${_fmtSource(r)}, converti en ${esc(cur.name.toLowerCase())}.</div>` : ''}
     </div>`;
   }).join('');
   _updateFoot();
+}
+
+function _fmtSource(r) {
+  const c = CURRENCIES[r.sourceCurrency];
+  const n = Number(r.sourceAmount).toLocaleString('fr-FR', { maximumFractionDigits: c?.decimals ?? 2 });
+  return esc(`${n} ${r.sourceCurrency === 'XOF' ? 'FCFA' : (c?.symbol || r.sourceCurrency)}`);
 }
 
 function _updateFoot() {
@@ -189,8 +213,13 @@ export function saveScan() {
 
   window.closeScreen?.();
   window.goTab?.('tracker');
+  // Tout est dans un seul autre mois (ex. relevé du mois dernier) : on l'affiche directement.
+  const keys = Object.values(groups);
+  if (keys.length === 1 && (keys[0].Y !== cY || keys[0].M !== cM)) {
+    window.changeMonth?.((keys[0].Y - cY) * 12 + (keys[0].M - cM));
+  }
   const n = sel.length;
-  showSuccessToast(`${n} opération${n > 1 ? 's ajoutées' : ' ajoutée'}${otherMonths.length ? ` (rangée${n > 1 ? 's' : ''} aussi en ${otherMonths.join(', ')})` : ''}`);
+  showSuccessToast(`${n} opération${n > 1 ? 's ajoutées' : ' ajoutée'}${otherMonths.length && keys.length === 1 ? ` en ${otherMonths[0]}` : otherMonths.length ? `, dont certaines en ${otherMonths.join(', ')}` : ''}`);
 }
 
 export function initScanUI(getYM) {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { groqChat, buildBody, TEXT_MODELS } from '../api/_lib/groq.js';
+import { groqChat, buildBody, retryDelayMs, TEXT_MODELS, VISION_MODELS } from '../api/_lib/groq.js';
 import { buildSystem, SERVER_FRAME } from '../api/ai.js';
 
 const ok = (content) => ({ ok: true, status: 200, json: async () => ({ choices: [{ message: { content } }] }) });
@@ -24,6 +24,31 @@ describe('groqChat', () => {
   it('ajoute une marge de raisonnement pour gpt-oss et coupe le raisonnement de qwen', () => {
     expect(buildBody('openai/gpt-oss-120b', { messages: [], maxTokens: 60 }).max_completion_tokens).toBe(1084);
     expect(buildBody('qwen/qwen3.8-27b', { messages: [], maxTokens: 60 }).reasoning_effort).toBe('none');
+  });
+});
+
+describe('attente après un 429', () => {
+  const msg = 'Rate limit reached ... Please try again in 14.357142857s. Need more tokens?';
+  it('lit le délai annoncé par Groq', () => {
+    expect(retryDelayMs({ headers: { get: () => null } }, { error: { message: msg } })).toBeCloseTo(14357, 0);
+    expect(retryDelayMs({ headers: { get: () => null } }, { error: { message: 'try again in 1m2.5s' } })).toBe(62500);
+  });
+  it("patiente puis réessaie le même modèle quand l'attente est courte", async () => {
+    let n = 0; const waits = [];
+    const fetchImpl = async () => (++n === 1)
+      ? { ok: false, status: 429, headers: { get: () => null }, json: async () => ({ error: { message: msg } }) }
+      : ok('{"operations":[]}');
+    const r = await groqChat(VISION_MODELS, { messages: [], maxTokens: 10 }, { apiKey: 'k', fetchImpl, maxWaitMs: 20000, sleepImpl: async ms => waits.push(ms) });
+    expect(r.reply).toBe('{"operations":[]}');
+    expect(n).toBe(2);
+    expect(waits[0]).toBeGreaterThan(14000);
+  });
+  it("n'attend pas si le délai dépasse le maximum", async () => {
+    let n = 0;
+    const fetchImpl = async () => { n++; return { ok: false, status: 429, headers: { get: () => null }, json: async () => ({ error: { message: 'try again in 45s' } }) }; };
+    await expect(groqChat(VISION_MODELS, { messages: [], maxTokens: 10 }, { apiKey: 'k', fetchImpl, maxWaitMs: 20000, sleepImpl: async () => {} }))
+      .rejects.toMatchObject({ code: 'RATE_LIMITED' });
+    expect(n).toBe(1);
   });
 });
 

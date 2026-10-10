@@ -22,11 +22,13 @@ Date du jour : ${today}. Devise habituelle de l'utilisateur : ${displayCurrency 
 Règles :
 - Ticket de caisse ou facture : UNE seule opération, le TOTAL payé (jamais article par article). Description courte : nom du commerçant puis nature, par exemple "Carrefour, courses".
 - Relevé bancaire ou historique de paiements : une opération par ligne. Débit = "expense", crédit = "income". Ignore les soldes et les totaux.
+- description lisible par un humain : nom du commerçant ou de l'organisme en casse normale, sans les préfixes techniques (CB, PRLV, VIR, CARTE, PAIEMENT). Exemple : "CB PROSUMA PLATEAU" devient "Prosuma Plateau".
 - amount : nombre positif, point comme séparateur décimal, sans symbole ni espace.
 - date : format YYYY-MM-DD. Si l'année manque, prends celle de la date du jour. Si aucune date, null.
 - currency : code ISO 4217 lu sur le document (FCFA ou F CFA = XOF). null si rien n'est indiqué.
 - category, pour une dépense, exactement une de : ${EXPENSE_CATEGORIES.join(', ')}.
 - category, pour un revenu, exactement une de : ${INCOME_CATEGORIES.join(', ')}.
+- Déduis la catégorie de la nature du commerçant : supermarché, épicerie, restaurant rapide = Alimentation ; station-service, carburant, taxi, transport = Transport ; loyer, électricité, eau, gaz = Logement ; pharmacie, clinique = Santé ; opérateur mobile, crédit téléphonique = Téléphone ; télévision, streaming = Abonnements. Retrait d'espèces = Autre.
 - N'invente rien : ne retiens que ce qui est lisible. Si le document est illisible ou sans rapport avec de l'argent, renvoie operations vide et explique en une phrase dans "error".
 
 Réponds UNIQUEMENT avec ce JSON :
@@ -78,7 +80,7 @@ export default async function handler(req, res) {
       maxTokens: imgs.length ? 1500 : 4000,
       temperature: 0.1,
       json: true,
-    });
+    }, { maxWaitMs: 20000 });
     let parsed;
     try { parsed = JSON.parse(reply); } catch (e) {
       const m = String(reply).match(/\{[\s\S]*\}/);
