@@ -69,7 +69,7 @@ export function buildGoalCard(g, mode) {
 
   // ── Mode grille (compact) — carte cliquable vers le détail ──
   if (mode === 'grid') {
-    return `<div class="gc gc-grid" data-goal-id="${g.id}" role="button" tabindex="0" onclick="openGoalDetail('${g.id}')">
+    return `<div class="gc gc-grid" data-goal-id="${esc(g.id)}" role="button" tabindex="0" onclick="openGoalDetail(this.dataset.goalId)" onkeydown="if(event.key==='Enter')openGoalDetail(this.dataset.goalId)">
       <div class="gc-grid-top">
         <div class="g-ico" style="background:${g.color}22">${goalIco(g.color)}</div>
         <svg class="gc-grid-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5l6 7l-6 7"/></svg>
@@ -85,7 +85,7 @@ export function buildGoalCard(g, mode) {
   const badge = done
     ? `<span class="gbadge gb-d"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-1px"><polyline points="20 6 9 17 4 12"/></svg> Atteint</span>`
     : `<span class="gbadge gb-p">${pct}% · En cours</span>`;
-  return `<div class="gc gc-featured" data-goal-id="${g.id}" role="button" tabindex="0" onclick="openGoalDetail('${g.id}')">
+  return `<div class="gc gc-featured" data-goal-id="${esc(g.id)}" role="button" tabindex="0" onclick="openGoalDetail(this.dataset.goalId)" onkeydown="if(event.key==='Enter')openGoalDetail(this.dataset.goalId)">
     <div class="gt">
       <div class="gt-left">
         <div class="g-ico" style="background:rgba(255,255,255,.16)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
@@ -102,6 +102,7 @@ export function buildGoalCard(g, mode) {
       <span class="gf-pct">${pct}% complété</span>
       <span class="gf-tgt">Sur ${fmt(g.targetEUR)}</span>
     </div>
+    ${done ? '' : `<div class="gf-cta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter de l'épargne</div>`}
   </div>`;
 }
 

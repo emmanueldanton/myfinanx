@@ -1,0 +1,54 @@
+/* ═══ Passe UX : actions explicites, zones tactiles, lisibilité ═══ */
+
+/* Lignes de transaction : toute la ligne est touchable, le chevron l'annonce */
+.txi, .dash-recent-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.txi:active, .dash-recent-row:active { background: var(--s2); }
+.txi:focus-visible, .dash-recent-row:focus-visible { outline: 2px solid var(--pr); outline-offset: -2px; }
+.txi { flex-wrap: nowrap; min-height: 60px; }
+.txid { font-size: .88rem; font-weight: 600; }
+.txgo { color: var(--faint); flex-shrink: 0; margin-left: -2px; }
+
+/* Écran d'édition : Supprimer à gauche, Enregistrer à droite */
+#screen-tx .screen-foot { display: flex; gap: 10px; }
+#screen-tx .screen-foot .scr-save { flex: 1; margin: 0; }
+.scr-del {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 0 16px; border-radius: var(--r);
+  border: 1px solid color-mix(in srgb, var(--red) 35%, var(--b1));
+  background: var(--s1); color: var(--red-l);
+  font-family: var(--fh); font-weight: 700; font-size: .88rem; cursor: pointer;
+}
+.scr-del[hidden] { display: none; }
+.scr-del svg { width: 17px; height: 17px; }
+
+/* Actions de l'onglet Dépenses : une seule ligne, même sur petit écran */
+.dep-act { white-space: nowrap; font-size: .84rem; gap: 7px; padding: 12px 10px; }
+@media (max-width: 350px) { .dep-act { font-size: .78rem; } .dep-act svg { display: none; } }
+
+/* Objectifs : appel à l'action sur la carte vedette */
+.gf-cta {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.16); color: #fff;
+  font-family: var(--fh); font-weight: 700; font-size: .8rem;
+}
+
+/* Champ Description (enveloppé pour l'auto-complétion) : même style que les autres champs */
+.txs-desc-wrap > input {
+  width: 100%; padding: 13px 14px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fb); font-weight: 600; font-size: 1rem;
+}
+.txs-desc-wrap > input:focus { outline: none; border-color: var(--pr); }
+
+/* iOS zoome sur tout champ en dessous de 16 px. Le zoom manuel étant de nouveau autorisé
+   (accessibilité), on fixe les champs à 16 px sur mobile ; les grands montants gardent leur taille. */
+@media (max-width: 620px) {
+  input:not(.scr-big-amt):not([type=checkbox]):not([type=radio]), select, textarea { font-size: 16px !important; }
+}
+
+/* Thèmes sombres : --pr y est éclairci, le texte blanc des boutons pleins prend la teinte foncée */
+:root[data-theme="blue"] .dep-act.primary, :root[data-theme="violet"] .dep-act.primary,
+:root[data-theme="blue"] .scan-btn.primary, :root[data-theme="violet"] .scan-btn.primary {
+  background: var(--pr-d);
+}

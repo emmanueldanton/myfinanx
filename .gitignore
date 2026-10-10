@@ -11,3 +11,14 @@ Thumbs.db
 
 # Maquettes / fichiers de design (pas du code applicatif)
 design-*.html
+
+# Suivi de projet (hors depot)
+.planning/
+
+# Methodologie, specs et outillage agent (hors depot)
+docs/
+specs/
+.specify/
+.claude/
+.superpowers/
+CLAUDE.md

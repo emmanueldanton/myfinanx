@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <!-- Apply saved theme before first paint, prevents flash of wrong colors -->
 <script>(function(){var t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <!-- ═══ FAVICON ═══ -->
-<link rel="icon" type="image/png" sizes="192x192" href="/icon.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon.png">
-<link rel="shortcut icon" href="/icon.png">
-<link rel="apple-touch-icon" sizes="192x192" href="/icon.png">
-<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,7 +28,7 @@
 <meta property="og:url" content="https://myfinanx.vercel.app">
 <meta property="og:title" content="MyFinanx · Gestion de budget personnel">
 <meta property="og:description" content="Suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil. Dashboard financier personnel, gratuit et sans inscription.">
-<meta property="og:image" content="https://myfinanx.vercel.app/icon.png">
+<meta property="og:image" content="https://myfinanx.vercel.app/icons/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:locale" content="fr_FR">
@@ -40,7 +38,7 @@
 <meta name="twitter:site" content="@myfinanx">
 <meta name="twitter:title" content="MyFinanx · Gestion de budget personnel">
 <meta name="twitter:description" content="Suivez vos revenus, dépenses et objectifs d'épargne en un coup d'œil.">
-<meta name="twitter:image" content="https://myfinanx.vercel.app/icon.png">
+<meta name="twitter:image" content="https://myfinanx.vercel.app/icons/icon-512.png">
 
 <script defer src="/_vercel/insights/script.js"></script>
 
@@ -76,7 +74,7 @@
 (function(){
   const t=localStorage.getItem('monargent-theme')||localStorage.getItem('mfx_theme')||'light';
   const THEMES_MINI={
-    light:{'--bg':'#EEF3FB','--s0':'#F6F9FE','--s1':'#FFFFFF','--s2':'#F2F6FC','--b1':'#E7EDF7','--b2':'#DBE3F1','--text':'#0F1B33','--muted':'#6B7896','--faint':'#9AA6BD','--header-bg':'rgba(246,249,254,.82)','--logo-bg':'#EAF1FF','--chat-bg':'#F6F9FE','--bubble-bot':'#FFFFFF','--ai-bg1':'#F6F9FE','--ai-bg2':'#EEF3FB','--ai-bdr':'#E7EDF7'},
+    light:{'--bg':'#EEF3FB','--s0':'#F6F9FE','--s1':'#FFFFFF','--s2':'#F2F6FC','--b1':'#E7EDF7','--b2':'#DBE3F1','--text':'#0F1B33','--muted':'#5F6B85','--faint':'#9AA6BD','--header-bg':'rgba(246,249,254,.82)','--logo-bg':'#EAF1FF','--chat-bg':'#F6F9FE','--bubble-bot':'#FFFFFF','--ai-bg1':'#F6F9FE','--ai-bg2':'#EEF3FB','--ai-bdr':'#E7EDF7'},
     blue:{'--bg':'#0A0E17','--s0':'#0E1320','--s1':'#141B2B','--s2':'#1B2436','--b1':'#232E45','--b2':'#303D5A','--text':'#EAEFF8','--muted':'#8190AE','--faint':'#79839A','--header-bg':'rgba(10,14,23,.82)','--logo-bg':'#1B2436','--chat-bg':'#0E1320','--bubble-bot':'#1B2436','--ai-bg1':'#0E1320','--ai-bg2':'#120E22','--ai-bdr':'#232E45'},
     violet:{'--bg':'#0B0814','--s0':'#110C1E','--s1':'#181227','--s2':'#211934','--b1':'#2C2348','--b2':'#3A2F5C','--text':'#ECE8FB','--muted':'#897FB0','--faint':'#79839A','--header-bg':'rgba(11,8,20,.84)','--logo-bg':'#181227','--chat-bg':'#110C1E','--bubble-bot':'#181227','--ai-bg1':'#110C1E','--ai-bg2':'#150E24','--ai-bdr':'#2C2348'},
   };
@@ -85,11 +83,6 @@
   Object.entries(vars).forEach(([k,v])=>r.setProperty(k,v));
 })();
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Polices non bloquantes : on charge en media=print puis on bascule en all une fois prêtes (le thème est déjà appliqué avant le paint, swap géré par display=swap) -->
-<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"></noscript>
 </head>
 <body>
 
@@ -100,18 +93,18 @@
   </button>
   <div class="brand" onclick="goTab('overview',null)" style="cursor:pointer">
     <div class="brand-ico">
-      <img src="icon.png" width="30" height="30" alt="MyFinanx">
+      <img src="/icons/icon-96.png" width="30" height="30" alt="MyFinanx">
     </div>
     <span class="brand-name">MyFinanx</span>
   </div>
 
   <!-- Month nav -->
   <div class="month-nav">
-    <button class="mnb" onclick="changeMonth(-1)" title="Mois précédent">
+    <button class="mnb" onclick="changeMonth(-1)" title="Mois précédent" aria-label="Mois précédent">
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
     <div id="ml">…</div>
-    <button class="mnb" onclick="changeMonth(1)" title="Mois suivant">
+    <button class="mnb" onclick="changeMonth(1)" title="Mois suivant" aria-label="Mois suivant">
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
     </button>
   </div>
@@ -199,7 +192,7 @@
 <div class="drawer" id="drawer">
   <div class="drawer-hd">
     <div class="drawer-brand">
-      <img src="icon.png" width="26" height="26" alt="MyFinanx">
+      <img src="/icons/icon-96.png" width="26" height="26" alt="MyFinanx">
       MyFinanx
     </div>
     <button class="drawer-close" onclick="toggleDrawer(false)" aria-label="Fermer">
@@ -355,6 +348,10 @@
       <span class="dash-act-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
       <span class="dash-act-lbl">Ajouter</span>
     </button>
+    <button class="dash-act" onclick="openScanScreen()">
+      <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+      <span class="dash-act-lbl">Scanner</span>
+    </button>
     <button class="dash-act" onclick="openTxScreen('income')">
       <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
       <span class="dash-act-lbl">Revenu</span>
@@ -444,6 +441,18 @@
 <div id="page-tracker" class="page">
   <div class="page-hd"><h1 class="bud-title">Dépenses</h1></div>
 
+  <!-- Actions explicites : ajouter à la main ou scanner -->
+  <div class="dep-actions">
+    <button class="dep-act primary" onclick="openTxScreen('expense')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvelle dépense
+    </button>
+    <button class="dep-act" onclick="openScanScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Scanner un ticket
+    </button>
+  </div>
+
   <!-- Résumé du mois -->
   <section class="dep-sum">
     <div class="dep-sum-head">
@@ -482,7 +491,7 @@
   <div class="txl" id="txl">
     <div class="empty">
       <div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      Aucune transaction.<br>Ajoute ta première ci-dessus.
+      Aucune transaction ce mois-ci.<br>Touche « Ajouter une dépense » ou scanne un ticket.
     </div>
   </div>
 </div>
@@ -491,12 +500,15 @@
 <div id="page-goals" class="page">
   <div class="page-hd">
     <h1 class="bud-title">Mes Objectifs</h1>
-    <button class="page-hd-btn primary" onclick="openGoalScreen()" aria-label="Nouvel objectif" title="Nouvel objectif">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
   </div>
 
   <div id="goals-grid"></div>
+  <div class="add-reveal">
+    <button class="add-btn" onclick="openGoalScreen()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvel objectif
+    </button>
+  </div>
 </div>
 
 <!-- ─── AI ─── -->
@@ -545,7 +557,7 @@
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <div class="pwa-icon">
-      <img src="icon.png" width="34" height="34" style="border-radius:8px;" alt="MyFinanx">
+      <img src="/icons/icon-96.png" width="34" height="34" style="border-radius:8px;" alt="MyFinanx">
     </div>
     <div class="pwa-title">Installe MyFinanx</div>
     <div class="pwa-sub">Pour ne jamais perdre tes données, installe l'app sur ton écran d'accueil. Gratuit, rapide, sans inscription.</div>
@@ -603,141 +615,6 @@
   </div>
 </div>
 
-<!-- ob-overlay removed, replaced by src/ui/tutorial.js -->
-<div class="pwa-overlay" id="ob-overlay" style="display:none!important">
-  <div class="pwa-card">
-    <div class="ob-progress" id="ob-progress-bar">
-      <div class="ob-dot on" id="ob-d0"></div>
-      <div class="ob-dot" id="ob-d1"></div>
-      <div class="ob-dot" id="ob-d2"></div>
-      <div class="ob-dot" id="ob-d3"></div>
-      <div class="ob-dot" id="ob-d4"></div>
-      <div class="ob-dot" id="ob-d5"></div>
-      <div class="ob-dot" id="ob-d6"></div>
-    </div>
-
-    <!-- Étape 0 : Bienvenue -->
-    <div class="ob-step on" id="ob-s0">
-      <div class="ob-ico" style="width:64px;height:64px;border-radius:18px;">
-        <img src="/icon.png" width="40" height="40" alt="MyFinanx" style="border-radius:10px;">
-      </div>
-      <div class="ob-title" style="font-size:1.25rem;">Bienvenue sur MyFinanx 🎉</div>
-      <div class="ob-txt">Ton espace personnel pour prendre le contrôle de ton argent. Gratuit, sans compte, sans inscription. Tes données restent sur ton téléphone.</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Revenus, dépenses et budget en un coup d'œil</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Objectifs d'épargne avec barre de progression</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Conseiller IA qui connait tes vrais chiffres</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Rappels intelligents basés sur ta situation</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Étape 1 : Revenus -->
-    <div class="ob-step" id="ob-s1">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      </div>
-      <div class="ob-title">Commence par tes revenus</div>
-      <div class="ob-txt">Salaire, freelance, commerce, tontine, agriculture, dividendes... 14 catégories couvrent toutes les situations. Saisis tes sources de revenus une fois, elles se reportent chaque mois automatiquement.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--green);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Pourquoi c'est essentiel</div>
-        <div style="font-size:.78rem;color:var(--text);">Sans revenus saisis, ton solde et ton budget restent à 0. C'est la première étape à faire dès maintenant.</div>
-      </div>
-    </div>
-
-    <!-- Étape 2 : Budget -->
-    <div class="ob-step" id="ob-s2">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-      </div>
-      <div class="ob-title">Planifie ton budget</div>
-      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport, épargne... L'app te prévient en temps réel si tu dépasses. Et chaque mois, ton budget du mois précédent se recopie automatiquement, tu ajustes seulement ce qui change.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Bonne habitude</div>
-        <div style="font-size:.78rem;color:var(--text);">5 minutes en début de mois pour revoir ton plan. C'est la clé pour ne jamais être à court en fin de mois.</div>
-      </div>
-    </div>
-
-    <!-- Étape 3 : Dépenses -->
-    <div class="ob-step" id="ob-s3">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      </div>
-      <div class="ob-title">Note chaque dépense</div>
-      <div class="ob-txt">16 catégories couvrent toutes tes dépenses : alimentation, transport, famille, scolarité, cérémonie, business... Le bouton <strong>+</strong> en bas de l'écran est là en permanence. La Vue globale affiche ensuite un graphique de tes postes de dépenses.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--gold);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Discipline = liberté</div>
-        <div style="font-size:.78rem;color:var(--text);">30 secondes après chaque achat pour le noter. En 21 jours, c'est un réflexe automatique, et tu sais exactement où va ton argent.</div>
-      </div>
-    </div>
-
-    <!-- Étape 4 : Objectifs -->
-    <div class="ob-step" id="ob-s4">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-      </div>
-      <div class="ob-title">Fixe tes objectifs</div>
-      <div class="ob-txt">Voyage, épargne de précaution, remboursement de dette, achat immobilier... Crée un objectif avec un montant cible et une date. Alimente-le depuis la Vue globale ou l'onglet Objectifs, la barre de progression avance en temps réel.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--violet);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Motivation</div>
-        <div style="font-size:.78rem;color:var(--text);">Un objectif visible chaque jour avance 3 fois plus vite qu'un objectif vague dans ta tête. L'app te notifie quand tu approches du but.</div>
-      </div>
-    </div>
-
-    <!-- Étape 5 : IA -->
-    <div class="ob-step" id="ob-s5">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <div class="ob-title">Ton conseiller IA</div>
-      <div class="ob-txt">Il a accès à tes revenus, dépenses, budget et objectifs du moment. Il ne donne pas des conseils génériques, il raisonne avec tes vrais chiffres pour des réponses personnalisées.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Questions à lui poser</div>
-        <div style="font-size:.78rem;color:var(--text);font-style:italic;">"Combien puis-je épargner ce mois ?" · "Où est-ce que je dépense trop ?" · "Mon objectif voyage est-il réaliste ?" · "Comment rembourser ma dette plus vite ?"</div>
-      </div>
-    </div>
-
-    <!-- Étape 6 : Go -->
-    <div class="ob-step" id="ob-s6">
-      <div class="ob-ico" style="width:64px;height:64px;border-radius:18px;background:rgba(77,120,212,.15);color:var(--pr);">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div class="ob-title">Tu es prêt. 🚀</div>
-      <div class="ob-txt">Ceux qui notent leurs finances progressent 40% plus vite vers leurs objectifs. L'app t'envoie des rappels intelligents basés sur ta situation réelle, pas besoin de tout retenir.</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">1 minute le matin pour vérifier ton solde du mois</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">30 secondes après chaque achat pour le noter</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">Bilan chaque lundi, l'app te le rappelle automatiquement</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">5 minutes en début de mois pour ajuster le budget</span>
-        </div>
-      </div>
-    </div>
-
-    <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
-  </div>
-</div>
 
 <!-- ════ DESKTOP MADE-BY FOOTER ════ -->
 <div class="desktop-made">
@@ -755,27 +632,27 @@
 <div class="bottom-nav">
   <div class="bnav-inner">
     <div class="bnav-pill" id="bnav-pill"></div>
-    <button class="bnav-btn active" id="bn-overview" onclick="goTabMobile('overview')">
+    <button class="bnav-btn active" id="bn-overview" onclick="goTabMobile('overview')" aria-label="Accueil">
       <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12.204c0-2.289 0-3.433.52-4.381c.518-.949 1.467-1.537 3.364-2.715l2-1.241C9.889 2.622 10.892 2 12 2s2.11.622 4.116 1.867l2 1.241c1.897 1.178 2.846 1.766 3.365 2.715S22 9.915 22 12.203v1.522c0 3.9 0 5.851-1.172 7.063S17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.212S2 17.626 2 13.725z"/><path stroke-linecap="round" d="M9 16c.85.63 1.885 1 3 1s2.15-.37 3-1"/></g></svg></span>
       <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M2.52 7.823C2 8.77 2 9.915 2 12.203v1.522c0 3.9 0 5.851 1.172 7.063S6.229 22 10 22h4c3.771 0 5.657 0 6.828-1.212S22 17.626 22 13.725v-1.521c0-2.289 0-3.433-.52-4.381c-.518-.949-1.467-1.537-3.364-2.715l-2-1.241C14.111 2.622 13.108 2 12 2s-2.11.622-4.116 1.867l-2 1.241C3.987 6.286 3.038 6.874 2.519 7.823m6.927 7.575a.75.75 0 1 0-.894 1.204A5.77 5.77 0 0 0 12 17.75a5.77 5.77 0 0 0 3.447-1.148a.75.75 0 1 0-.894-1.204A4.27 4.27 0 0 1 12 16.25a4.27 4.27 0 0 1-2.553-.852" clip-rule="evenodd"/></svg></span>
       <span class="bnav-lbl">Accueil</span>
     </button>
-    <button class="bnav-btn" id="bn-budget" onclick="goTabMobile('budget')">
+    <button class="bnav-btn" id="bn-budget" onclick="goTabMobile('budget')" aria-label="Budget">
       <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601Z"/><path d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931Z"/></g></svg></span>
       <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601"/><path fill="currentColor" d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931"/></svg></span>
       <span class="bnav-lbl">Budget</span>
     </button>
-    <button class="bnav-btn" id="bn-tracker" onclick="goTabMobile('tracker')">
+    <button class="bnav-btn" id="bn-tracker" onclick="goTabMobile('tracker')" aria-label="Dépenses">
       <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 8h4"/><path d="M20.833 9h-2.602C16.446 9 15 10.343 15 12s1.447 3 3.23 3h2.603c.084 0 .125 0 .16-.002c.54-.033.97-.432 1.005-.933c.002-.032.002-.071.002-.148v-3.834c0-.077 0-.116-.002-.148c-.036-.501-.465-.9-1.005-.933C20.959 9 20.918 9 20.834 9Z"/><path d="M20.965 9c-.078-1.872-.328-3.02-1.137-3.828C18.657 4 16.771 4 13 4h-3C6.229 4 4.343 4 3.172 5.172S2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h3c3.771 0 5.657 0 6.828-1.172c.809-.808 1.06-1.956 1.137-3.828"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.991 12h.01"/></g></svg></span>
       <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M21.1 8.004q-.085-.005-.181-.004h-2.525c-2.068 0-3.837 1.628-3.837 3.75s1.77 3.75 3.837 3.75h2.525q.096.001.182-.004a1.755 1.755 0 0 0 1.645-1.628c.004-.06.004-.125.004-.185V9.817c0-.06 0-.125-.004-.185a1.755 1.755 0 0 0-1.645-1.628m-2.928 4.746c.532 0 .963-.448.963-1s-.431-1-.963-1c-.533 0-.964.448-.964 1s.431 1 .964 1"/><path d="M20.918 17a.22.22 0 0 1 .221.278c-.2.712-.519 1.32-1.03 1.83c-.749.75-1.698 1.081-2.87 1.239c-1.14.153-2.595.153-4.433.153h-2.112c-1.838 0-3.294 0-4.433-.153c-1.172-.158-2.121-.49-2.87-1.238c-.748-.749-1.08-1.698-1.238-2.87C2 15.099 2 13.644 2 11.806v-.112C2 9.856 2 8.4 2.153 7.26c.158-1.172.49-2.121 1.238-2.87c.749-.748 1.698-1.08 2.87-1.238C7.401 3 8.856 3 10.694 3h2.112c1.838 0 3.294 0 4.433.153c1.172.158 2.121.49 2.87 1.238c.511.512.83 1.119 1.03 1.831a.22.22 0 0 1-.221.278h-2.524c-2.837 0-5.337 2.24-5.337 5.25s2.5 5.25 5.337 5.25zM5.75 7a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5z"/></g></svg></span>
       <span class="bnav-lbl">Dépenses</span>
     </button>
-    <button class="bnav-btn" id="bn-goals" onclick="goTabMobile('goals')">
+    <button class="bnav-btn" id="bn-goals" onclick="goTabMobile('goals')" aria-label="Objectifs">
       <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10Z"/><path stroke-linecap="round" d="M2 12h3m14 0h3M12 22v-3m0-14V2"/><path stroke-linecap="round" stroke-linejoin="round" d="M10 12h4m-2 2v-4"/></g></svg></span>
       <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M11.248 2A10.03 10.03 0 0 0 2 11.248h2.98a.752.752 0 1 1 0 1.504H2A10.03 10.03 0 0 0 11.248 22v-2.98a.752.752 0 0 1 1.504 0V22A10.03 10.03 0 0 0 22 12.752h-2.98a.752.752 0 0 1 0-1.504H22A10.03 10.03 0 0 0 12.752 2v2.98a.752.752 0 1 1-1.504 0zM9.242 12c0-.415.337-.752.752-.752h1.254V9.994a.752.752 0 1 1 1.504 0v1.254h1.254a.752.752 0 0 1 0 1.504h-1.254v1.254a.752.752 0 0 1-1.504 0v-1.254H9.994A.75.75 0 0 1 9.242 12" clip-rule="evenodd"/></svg></span>
       <span class="bnav-lbl">Objectifs</span>
     </button>
-    <button class="bnav-btn" id="bn-ai" onclick="goTabMobile('ai')">
+    <button class="bnav-btn" id="bn-ai" onclick="goTabMobile('ai')" aria-label="Conseils IA">
       <span class="bnav-ico bnav-ico-line"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.845 7.922a2.883 2.883 0 1 1 4.077-4.077l12.234 12.233a2.884 2.884 0 0 1-4.078 4.078z"/><path stroke-linecap="round" d="m6 10l4-4"/><path d="M16.1 2.307a.483.483 0 0 1 .9 0l.43 1.095a.48.48 0 0 0 .272.274l1.091.432a.486.486 0 0 1 0 .903l-1.09.432a.5.5 0 0 0-.273.273L17 6.81a.483.483 0 0 1-.9 0l-.43-1.095a.5.5 0 0 0-.273-.273l-1.09-.432a.486.486 0 0 1 0-.903l1.09-.432a.5.5 0 0 0 .273-.274zm3.867 6.823a.483.483 0 0 1 .9 0l.156.399c.05.125.148.224.273.273l.398.158a.486.486 0 0 1 0 .902l-.398.158a.5.5 0 0 0-.273.273l-.156.4a.483.483 0 0 1-.9 0l-.157-.4a.5.5 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.902l.398-.158a.5.5 0 0 0 .272-.273zM5.133 15.307a.483.483 0 0 1 .9 0l.157.4a.48.48 0 0 0 .272.273l.398.157a.486.486 0 0 1 0 .903l-.398.158a.48.48 0 0 0-.272.273l-.157.4a.483.483 0 0 1-.9 0l-.157-.4a.48.48 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.903l.398-.157a.48.48 0 0 0 .272-.274z"/></g></svg></span>
       <span class="bnav-ico bnav-ico-fill"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M3.845 7.922a2.883 2.883 0 1 1 4.077-4.077l12.234 12.233a2.884 2.884 0 0 1-4.078 4.078z"/><path d="M16.1 2.307a.483.483 0 0 1 .9 0l.43 1.095a.48.48 0 0 0 .272.274l1.091.432a.486.486 0 0 1 0 .903l-1.09.432a.5.5 0 0 0-.273.273L17 6.81a.483.483 0 0 1-.9 0l-.43-1.095a.5.5 0 0 0-.273-.273l-1.09-.432a.486.486 0 0 1 0-.903l1.09-.432a.5.5 0 0 0 .273-.274zm3.867 6.823a.483.483 0 0 1 .9 0l.156.399c.05.125.148.224.273.273l.398.158a.486.486 0 0 1 0 .902l-.398.158a.5.5 0 0 0-.273.273l-.156.4a.483.483 0 0 1-.9 0l-.157-.4a.5.5 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.902l.398-.158a.5.5 0 0 0 .272-.273zM5.133 15.307a.483.483 0 0 1 .9 0l.157.4a.48.48 0 0 0 .272.273l.398.157a.486.486 0 0 1 0 .903l-.398.158a.48.48 0 0 0-.272.273l-.157.4a.483.483 0 0 1-.9 0l-.157-.4a.48.48 0 0 0-.272-.273l-.398-.158a.486.486 0 0 1 0-.903l.398-.157a.48.48 0 0 0 .272-.274z"/></g></svg></span>
       <span class="bnav-lbl">Conseils IA</span>
@@ -1132,6 +1009,12 @@
     <span class="screen-head-spacer"></span>
   </div>
   <div class="screen-body">
+    <!-- Raccourci vers le scan (nouvelle dépense uniquement) -->
+    <button type="button" class="txs-scan" id="txs-scan" onclick="openScanScreen()">
+      <span class="txs-scan-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+      <span class="txs-scan-txt"><strong>Tu as un ticket ou une facture ?</strong><small>Scanne-le, l'IA remplit tout pour toi</small></span>
+      <svg class="txs-scan-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
     <!-- Hero : montant en grand -->
     <div class="scr-hero is-expense" id="txs-hero">
       <div class="scr-hero-ico" id="txs-hero-ico">
@@ -1162,7 +1045,7 @@
     <div class="scr-field">
       <label for="txs-desc">Description</label>
       <div class="txs-desc-wrap">
-        <input type="text" id="txs-desc" placeholder="Ex : Courses Lidl" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
+        <input type="text" id="txs-desc" placeholder="Ex : Courses du mois" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
         <div class="txs-ac" id="txs-ac"></div>
       </div>
     </div>
@@ -1176,9 +1059,89 @@
     </div>
   </div>
   <div class="screen-foot">
+    <button class="scr-del" id="txs-del" onclick="deleteTxFromScreen()" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Supprimer
+    </button>
     <button class="scr-save" onclick="saveTxScreen()">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span id="txs-save-lbl">Ajouter</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════ SCAN : ticket, facture ou relevé (photo / PDF) ════ -->
+<div class="screen" id="screen-scan" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title">Scanner un document</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <!-- 1. Choix du document -->
+    <section id="scan-pick" class="scan-pick">
+      <div class="scan-intro">
+        <div class="scan-intro-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        </div>
+        <h2 class="scan-intro-title">Ajoute tes dépenses en une photo</h2>
+        <p class="scan-intro-txt">Prends en photo un ticket de caisse ou une facture, ou importe un relevé bancaire en PDF. L'IA lit le document et te propose les opérations. Tu vérifies avant que quoi que ce soit soit ajouté.</p>
+      </div>
+
+      <label class="scan-btn primary" for="scan-in-camera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span><strong>Prendre une photo</strong><small>Ticket de caisse, facture</small></span>
+      </label>
+      <input type="file" id="scan-in-camera" accept="image/*" capture="environment" class="sr-only">
+
+      <label class="scan-btn" for="scan-in-image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span><strong>Choisir dans la galerie</strong><small>Jusqu'à 3 photos pour un long ticket</small></span>
+      </label>
+      <input type="file" id="scan-in-image" accept="image/*" multiple class="sr-only">
+
+      <label class="scan-btn" for="scan-in-pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        <span><strong>Importer un PDF</strong><small>Relevé bancaire, facture numérique</small></span>
+      </label>
+      <input type="file" id="scan-in-pdf" accept="application/pdf,.pdf" class="sr-only">
+
+      <ul class="scan-tips">
+        <li>Pose le ticket à plat, bien éclairé, en entier dans le cadre.</li>
+        <li>Pour un ticket, seul le total payé est proposé.</li>
+        <li>Pour un relevé, chaque ligne devient une opération.</li>
+      </ul>
+      <p class="scan-privacy">Le document est envoyé à notre service d'IA uniquement pour être lu, puis oublié. Il n'est jamais conservé.</p>
+    </section>
+
+    <!-- 2. Lecture en cours -->
+    <section id="scan-busy" class="scan-busy" hidden aria-live="polite">
+      <div class="scan-busy-preview" id="scan-busy-preview"></div>
+      <div class="scan-spinner" aria-hidden="true"></div>
+      <p class="scan-busy-step" id="scan-busy-step">Lecture en cours…</p>
+      <p class="scan-busy-sub">Quelques secondes suffisent en général.</p>
+    </section>
+
+    <!-- 3. Erreur -->
+    <section id="scan-error" class="scan-error" hidden role="alert">
+      <p id="scan-error-msg"></p>
+      <button class="scr-save" onclick="retryScan()">Réessayer avec un autre document</button>
+      <button class="scan-link" onclick="closeScreen();openTxScreen('expense')">Saisir la dépense à la main</button>
+    </section>
+
+    <!-- 4. Vérification -->
+    <section id="scan-review" hidden>
+      <div class="scan-sum" id="scan-sum"></div>
+      <div class="scan-list" id="scan-list"></div>
+      <button class="scan-link" onclick="retryScan()">Scanner un autre document</button>
+    </section>
+  </div>
+  <div class="screen-foot" id="scan-foot" hidden>
+    <button class="scr-save" id="scan-save" onclick="saveScan()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="scan-save-lbl">Ajouter</span>
     </button>
   </div>
 </div>
@@ -1197,10 +1160,7 @@
   </div>
 </div>
 
-<!-- FAB -->
-<button class="fab" onclick="openTxScreen('expense')" title="Ajouter une dépense">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-</button>
+
 
 
 <!-- ════ PUSH PERMISSION, bottom sheet, même design que le tutoriel ════ -->

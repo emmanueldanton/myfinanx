@@ -1,5 +1,5 @@
 // ═══ Tutorial — parcours plein écran (5 écrans, aperçus maquettés) ═══
-import iconSrc from '../../icon.png';
+const iconSrc = '/icons/icon-192.png';
 import { openOverlay, closeOverlay } from './overlay.js';
 
 // v2 : le tutoriel a été refondu (plein écran). Nouvelle clé pour que tous les
@@ -47,7 +47,7 @@ const SLIDES = [
         <div class="tm-catrow"><span class="tm-cat">Alimentation</span><span class="tm-auto">rempli tout seul</span></div>
       </div>`,
     title: 'Tes dépenses en un geste',
-    body:  "Ajoute un achat en quelques secondes. L'app te propose tes dépenses fréquentes et <strong>devine la catégorie à partir de tes habitudes</strong>. Tu n'as plus qu'à valider.",
+    body:  "Ajoute un achat en quelques secondes, ou <strong>prends ton ticket en photo</strong> : l'IA lit le montant, la date et la catégorie. Un relevé bancaire en PDF ? Toutes les lignes sont proposées d'un coup. Tu n'as plus qu'à valider.",
   },
   {
     accent: '#a78bfa',

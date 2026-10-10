@@ -1,4 +1,7 @@
 // ═══ CSS — Vite extracts and injects these into the build output ═══
+// Polices auto-hébergées (hors ligne, sans aller-retour vers Google Fonts)
+import '@fontsource-variable/plus-jakarta-sans/wght.css';
+import '@fontsource/playfair-display/latin-800.css';
 import './styles/main.css';
 import './styles/themes.css';
 import './styles/components.css';
@@ -14,6 +17,8 @@ import { renderAll, initDashboard } from './ui/index.js';
 import { bridgeLoad, bridgeLoadGoals, bridgeSave, bridgeLoadPrefs } from './data-bridge.js';
 import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
+import './styles/scan.css';
+import './styles/ux.css';
 import { initTutorial, maybeShowTuto } from './ui/tutorial.js';
 import { initBudgetUI, renderRevRows, renderBudRows, renderBudgetFooter } from './ui/budget-ui.js';
 import { initTransactionsUI, renderExpenses, updateTracker, resetTxFilters } from './ui/transactions-ui.js';
@@ -28,6 +33,7 @@ import { initToast } from './ui/toast.js';
 import { initAds } from './ui/ads.js';
 import { initScreens } from './ui/screens.js';
 import { initStatsUI } from './ui/stats-ui.js';
+import { initScanUI } from './ui/scan-ui.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -35,9 +41,10 @@ let _Y, _M;
 // Exposed on window so monolith's onclick="changeMonth(d)" continues to work
 function changeMonth(delta) {
   const now  = new Date();
-  const newM = _M + delta;
-  const newY = newM < 0 ? _Y - 1 : newM > 11 ? _Y + 1 : _Y;
-  const adjM = ((newM % 12) + 12) % 12;
+  // Calcul en mois absolus : fonctionne aussi pour un saut de plusieurs années (scan d'un vieux relevé)
+  const total = _Y * 12 + _M + delta;
+  const newY = Math.floor(total / 12);
+  const adjM = ((total % 12) + 12) % 12;
   // Block future months
   if (newY > now.getFullYear() || (newY === now.getFullYear() && adjM > now.getMonth())) return;
   _M = adjM; _Y = newY;
@@ -180,6 +187,9 @@ function init() {
   // Wire page Statistiques (expose openStats/setStatsPeriod)
   initStatsUI(() => [_Y, _M]);
 
+  // Wire scan de tickets / relevés (expose openScanScreen/saveScan)
+  initScanUI(() => [_Y, _M]);
+
   // Refresh currency DOM labels with saved currency (setActiveCurrency already set module state above)
   setCurrency(prefs.currency);
 
@@ -216,6 +226,21 @@ function init() {
 
   // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)
   scheduleDailyPush();
+
+  // Raccourcis de l'icône d'app (manifeste) : ?action=scan ou ?action=add
+  _handleLaunchAction();
+
+  // Demande un stockage persistant : sans lui, le navigateur (Safari surtout) peut effacer
+  // les données locales d'une app peu utilisée. Silencieux si refusé ou non supporté.
+  try { navigator.storage?.persist?.().catch(() => {}); } catch (e) {}
+}
+
+function _handleLaunchAction() {
+  const action = new URLSearchParams(location.search).get('action');
+  if (!action) return;
+  history.replaceState(null, '', location.pathname);
+  if (action === 'scan') setTimeout(() => window.openScanScreen?.(), 50);
+  else if (action === 'add') setTimeout(() => window.openTxScreen?.('expense'), 50);
 }
 
 // Modules are deferred — monolith's inline init() runs first, then this wires the modular layer
