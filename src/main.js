@@ -18,6 +18,7 @@ import { bridgeLoad, bridgeLoadGoals, bridgeSave, bridgeLoadPrefs } from './data
 import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
 import './styles/scan.css';
+import './styles/ux.css';
 import { initTutorial, maybeShowTuto } from './ui/tutorial.js';
 import { initBudgetUI, renderRevRows, renderBudRows, renderBudgetFooter } from './ui/budget-ui.js';
 import { initTransactionsUI, renderExpenses, updateTracker, resetTxFilters } from './ui/transactions-ui.js';

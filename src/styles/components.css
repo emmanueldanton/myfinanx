@@ -818,31 +818,6 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
   }
 }
 
-/* ════ ONBOARDING ════ */
-.ob-progress { display:flex; gap:6px; margin-bottom:24px; }
-.ob-dot { flex:1; height:3px; border-radius:99px; background:var(--b1); transition:.3s; }
-.ob-dot.on { background:var(--pr); }
-.ob-step { display:none; }
-.ob-step.on { display:block; animation:fadeUp .22s ease; }
-.ob-ico {
-  width:52px; height:52px; border-radius:14px;
-  background:var(--s2); border:1px solid var(--b1);
-  display:flex; align-items:center; justify-content:center;
-  margin-bottom:18px; color:var(--pr);
-}
-.ob-title {
-  font-family:var(--fh); font-size:1.1rem; font-weight:800;
-  color:var(--text); margin-bottom:8px;
-}
-.ob-txt { font-size:.82rem; color:var(--muted); line-height:1.6; margin-bottom:28px; }
-.ob-next {
-  width:100%; padding:13px; border-radius:12px;
-  background:var(--pr); border:none; color:#fff;
-  font-size:.88rem; font-weight:700; font-family:var(--fb);
-  cursor:pointer; transition:.15s;
-}
-.ob-next:hover { background:var(--pr-d); }
-
 /* ════ PWA INSTALL POPUP ════ */
 .pwa-overlay {
   display:none; position:fixed; inset:0; z-index:1000;
@@ -859,13 +834,6 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
   position:relative;
 }
 /* ════ ONBOARDING (centré, réutilise .pwa-overlay/.pwa-card) ════ */
-#ob-overlay { align-items:center; padding:16px; }
-#ob-overlay .pwa-card {
-  border-radius:20px;
-  max-height:88vh; max-height:88svh;
-  overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding-bottom:28px;
-}
 @keyframes slideUp { from{opacity:0;transform:translateY(60px)} to{opacity:1;transform:none} }
 .pwa-close {
   position:absolute; top:16px; right:16px;
@@ -1177,18 +1145,6 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .drawer-made-li svg { fill:#0A66C2; flex-shrink:0; }
 
 /* ════ FAB ════ */
-.fab {
-  display:none; position:fixed;
-  bottom:calc(16px + env(safe-area-inset-bottom)); right:16px; z-index:200;
-  width:50px; height:50px; border-radius:50%;
-  background:var(--pr); color:#fff; border:none; cursor:pointer;
-  box-shadow:0 6px 20px color-mix(in srgb, var(--pr) 45%, transparent);
-  align-items:center; justify-content:center; transition:.15s;
-  -webkit-tap-highlight-color:transparent;
-}
-.fab svg { stroke:#fff; }
-.fab:hover { transform:scale(1.08); }
-.fab:active { transform:scale(0.94); }
 
 /* ════ BOTTOM NAV (mobile) ════ */
 .bottom-nav {
@@ -1205,34 +1161,34 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
   overflow:hidden;
 }
 .bnav-inner {
-  display:flex; height:70px; align-items:center; padding:0 10px;
+  display:flex; height:70px; align-items:center; padding:0 6px;
   position:relative;
 }
 /* Indicateur "pilule" en verre qui glisse/morphe — position/largeur posées par moveBnavPill() */
 .bnav-pill {
-  position:absolute; top:13px; bottom:13px; left:0; width:0;
-  border-radius:999px; z-index:0; pointer-events:none;
-  background:var(--pr);
+  position:absolute; top:7px; bottom:7px; left:0; width:0;
+  border-radius:20px; z-index:0; pointer-events:none;
+  background:color-mix(in srgb, var(--pr) 13%, transparent);
   transform:translateX(0);
   transition:
     transform .46s cubic-bezier(.34,1.42,.5,1),
     width     .46s cubic-bezier(.34,1.42,.5,1),
     background-color .3s ease;
 }
-/* Inactif : zone flexible, icône seule */
+/* Chaque onglet : icône + nom toujours visibles (l'utilisateur ne devine jamais une icône) */
 .bnav-btn {
-  flex:1; display:flex; flex-direction:row;
-  align-items:center; justify-content:center; gap:8px;
+  flex:1; min-width:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px;
   background:transparent; border:none;
   color:var(--muted); font-family:var(--fh);
-  font-size:.75rem; font-weight:700; cursor:pointer;
+  font-size:.66rem; font-weight:700; cursor:pointer;
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
-  height:52px; padding:0; position:relative; z-index:1;
-  border-radius:999px; transition:color .28s ease;
+  height:56px; padding:0 2px; position:relative; z-index:1;
+  border-radius:20px; transition:color .28s ease;
 }
 .bnav-btn svg {
-  stroke:currentColor; flex-shrink:0; width:24px; height:24px;
+  stroke:currentColor; flex-shrink:0; width:22px; height:22px;
   transition:transform .4s cubic-bezier(.34,1.5,.5,1);
 }
 /* Icônes jumelées : line (défaut) / fill (onglet actif) */
@@ -1241,23 +1197,17 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .bnav-ico-fill svg { stroke:none; }        /* les tracés sont déjà en fill=currentColor */
 .bnav-btn.active .bnav-ico-line { display:none; }
 .bnav-btn.active .bnav-ico-fill { display:inline-flex; }
-/* Le nom de l'onglet n'apparaît que sur l'onglet actif (au clic) */
-.bnav-btn .bnav-lbl { display:none; white-space:nowrap; letter-spacing:-.01em; }
-/* Actif : la pilule s'élargit pour révéler le label */
-.bnav-btn.active {
-  flex:0 0 auto;
-  color:#fff;
-  padding:0 18px;
+.bnav-btn .bnav-lbl {
+  display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; letter-spacing:-.01em; line-height:1.1;
 }
+.bnav-btn.active { color:var(--pr-l); }
 .bnav-btn.active svg { transform:scale(1.06); }
-.bnav-btn.active .bnav-lbl { display:inline; }
-/* Neutralise l'ancienne pilule statique (héritée du <style> inline) */
 .bnav-btn.active::before { display:none; content:none; }
 
 @media(max-width:620px){
   .hbg-btn { display:none !important; }
   .bottom-nav { display:block; }
-  .fab { display:flex; bottom:calc(12px + 70px + 18px + env(safe-area-inset-bottom)); }
   nav { display:none; }
   .wrap { padding-bottom:calc(12px + 70px + 18px + env(safe-area-inset-bottom)); }
 }
@@ -1658,7 +1608,6 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 }
 
 /* FAB masque sur l accueil (action Ajouter dediee) */
-body:has(#page-overview.active) .fab { display: none; }
 
 /* ═══ Refonte epuree — composants partages a plat (sans ombres) ═══ */
 .kpi {
@@ -1842,7 +1791,6 @@ body:has(#page-overview.active) .fab { display: none; }
 .gc-grid-pct { font-family: var(--fb); font-size: .72rem; color: var(--muted); text-align: center; margin-top: 6px; }
 
 /* FAB masque sur Budget et Objectifs (en-tete + dediee) */
-body:has(#page-budget.active) .fab, body:has(#page-goals.active) .fab, body:has(#page-ai.active) .fab { display: none; }
 
 /* ════ SOUS-ÉCRANS PLEIN ÉCRAN (configuration / édition) — style « vraie app » ════ */
 .screen {

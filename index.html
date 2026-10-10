@@ -100,11 +100,11 @@
 
   <!-- Month nav -->
   <div class="month-nav">
-    <button class="mnb" onclick="changeMonth(-1)" title="Mois précédent">
+    <button class="mnb" onclick="changeMonth(-1)" title="Mois précédent" aria-label="Mois précédent">
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
     <div id="ml">…</div>
-    <button class="mnb" onclick="changeMonth(1)" title="Mois suivant">
+    <button class="mnb" onclick="changeMonth(1)" title="Mois suivant" aria-label="Mois suivant">
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
     </button>
   </div>
@@ -445,7 +445,7 @@
   <div class="dep-actions">
     <button class="dep-act primary" onclick="openTxScreen('expense')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Ajouter une dépense
+      Nouvelle dépense
     </button>
     <button class="dep-act" onclick="openScanScreen()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -500,12 +500,15 @@
 <div id="page-goals" class="page">
   <div class="page-hd">
     <h1 class="bud-title">Mes Objectifs</h1>
-    <button class="page-hd-btn primary" onclick="openGoalScreen()" aria-label="Nouvel objectif" title="Nouvel objectif">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
   </div>
 
   <div id="goals-grid"></div>
+  <div class="add-reveal">
+    <button class="add-btn" onclick="openGoalScreen()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvel objectif
+    </button>
+  </div>
 </div>
 
 <!-- ─── AI ─── -->
@@ -612,141 +615,6 @@
   </div>
 </div>
 
-<!-- ob-overlay removed, replaced by src/ui/tutorial.js -->
-<div class="pwa-overlay" id="ob-overlay" style="display:none!important">
-  <div class="pwa-card">
-    <div class="ob-progress" id="ob-progress-bar">
-      <div class="ob-dot on" id="ob-d0"></div>
-      <div class="ob-dot" id="ob-d1"></div>
-      <div class="ob-dot" id="ob-d2"></div>
-      <div class="ob-dot" id="ob-d3"></div>
-      <div class="ob-dot" id="ob-d4"></div>
-      <div class="ob-dot" id="ob-d5"></div>
-      <div class="ob-dot" id="ob-d6"></div>
-    </div>
-
-    <!-- Étape 0 : Bienvenue -->
-    <div class="ob-step on" id="ob-s0">
-      <div class="ob-ico" style="width:64px;height:64px;border-radius:18px;">
-        <img src="/icons/icon-96.png" width="40" height="40" alt="MyFinanx" style="border-radius:10px;">
-      </div>
-      <div class="ob-title" style="font-size:1.25rem;">Bienvenue sur MyFinanx 🎉</div>
-      <div class="ob-txt">Ton espace personnel pour prendre le contrôle de ton argent. Gratuit, sans compte, sans inscription. Tes données restent sur ton téléphone.</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Revenus, dépenses et budget en un coup d'œil</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Objectifs d'épargne avec barre de progression</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Conseiller IA qui connait tes vrais chiffres</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style="font-size:.78rem;color:var(--text);">Rappels intelligents basés sur ta situation</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Étape 1 : Revenus -->
-    <div class="ob-step" id="ob-s1">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      </div>
-      <div class="ob-title">Commence par tes revenus</div>
-      <div class="ob-txt">Salaire, freelance, commerce, tontine, agriculture, dividendes... 14 catégories couvrent toutes les situations. Saisis tes sources de revenus une fois, elles se reportent chaque mois automatiquement.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--green);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Pourquoi c'est essentiel</div>
-        <div style="font-size:.78rem;color:var(--text);">Sans revenus saisis, ton solde et ton budget restent à 0. C'est la première étape à faire dès maintenant.</div>
-      </div>
-    </div>
-
-    <!-- Étape 2 : Budget -->
-    <div class="ob-step" id="ob-s2">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-      </div>
-      <div class="ob-title">Planifie ton budget</div>
-      <div class="ob-txt">Répartis tes revenus par poste : loyer, courses, transport, épargne... L'app te prévient en temps réel si tu dépasses. Et chaque mois, ton budget du mois précédent se recopie automatiquement, tu ajustes seulement ce qui change.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Bonne habitude</div>
-        <div style="font-size:.78rem;color:var(--text);">5 minutes en début de mois pour revoir ton plan. C'est la clé pour ne jamais être à court en fin de mois.</div>
-      </div>
-    </div>
-
-    <!-- Étape 3 : Dépenses -->
-    <div class="ob-step" id="ob-s3">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      </div>
-      <div class="ob-title">Note chaque dépense</div>
-      <div class="ob-txt">16 catégories couvrent toutes tes dépenses : alimentation, transport, famille, scolarité, cérémonie, business... Le bouton <strong>+</strong> en bas de l'écran est là en permanence. La Vue globale affiche ensuite un graphique de tes postes de dépenses.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--gold);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Discipline = liberté</div>
-        <div style="font-size:.78rem;color:var(--text);">30 secondes après chaque achat pour le noter. En 21 jours, c'est un réflexe automatique, et tu sais exactement où va ton argent.</div>
-      </div>
-    </div>
-
-    <!-- Étape 4 : Objectifs -->
-    <div class="ob-step" id="ob-s4">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-      </div>
-      <div class="ob-title">Fixe tes objectifs</div>
-      <div class="ob-txt">Voyage, épargne de précaution, remboursement de dette, achat immobilier... Crée un objectif avec un montant cible et une date. Alimente-le depuis la Vue globale ou l'onglet Objectifs, la barre de progression avance en temps réel.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--violet);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Motivation</div>
-        <div style="font-size:.78rem;color:var(--text);">Un objectif visible chaque jour avance 3 fois plus vite qu'un objectif vague dans ta tête. L'app te notifie quand tu approches du but.</div>
-      </div>
-    </div>
-
-    <!-- Étape 5 : IA -->
-    <div class="ob-step" id="ob-s5">
-      <div class="ob-ico">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      </div>
-      <div class="ob-title">Ton conseiller IA</div>
-      <div class="ob-txt">Il a accès à tes revenus, dépenses, budget et objectifs du moment. Il ne donne pas des conseils génériques, il raisonne avec tes vrais chiffres pour des réponses personnalisées.</div>
-      <div style="background:var(--s2);border-radius:10px;padding:12px 14px;margin-bottom:20px;border-left:3px solid var(--pr);">
-        <div style="font-size:.75rem;color:var(--muted);margin-bottom:4px;">Questions à lui poser</div>
-        <div style="font-size:.78rem;color:var(--text);font-style:italic;">"Combien puis-je épargner ce mois ?" · "Où est-ce que je dépense trop ?" · "Mon objectif voyage est-il réaliste ?" · "Comment rembourser ma dette plus vite ?"</div>
-      </div>
-    </div>
-
-    <!-- Étape 6 : Go -->
-    <div class="ob-step" id="ob-s6">
-      <div class="ob-ico" style="width:64px;height:64px;border-radius:18px;background:rgba(77,120,212,.15);color:var(--pr);">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div class="ob-title">Tu es prêt. 🚀</div>
-      <div class="ob-txt">Ceux qui notent leurs finances progressent 40% plus vite vers leurs objectifs. L'app t'envoie des rappels intelligents basés sur ta situation réelle, pas besoin de tout retenir.</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">1 minute le matin pour vérifier ton solde du mois</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">30 secondes après chaque achat pour le noter</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">Bilan chaque lundi, l'app te le rappelle automatiquement</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--pr-l)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span style="font-size:.77rem;color:var(--text);">5 minutes en début de mois pour ajuster le budget</span>
-        </div>
-      </div>
-    </div>
-
-    <button class="ob-next" id="ob-next" onclick="obNext()">Commencer</button>
-  </div>
-</div>
 
 <!-- ════ DESKTOP MADE-BY FOOTER ════ -->
 <div class="desktop-made">
@@ -1177,7 +1045,7 @@
     <div class="scr-field">
       <label for="txs-desc">Description</label>
       <div class="txs-desc-wrap">
-        <input type="text" id="txs-desc" placeholder="Ex : Courses Lidl" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
+        <input type="text" id="txs-desc" placeholder="Ex : Courses du mois" autocomplete="off" onkeydown="if(event.key==='Enter')document.getElementById('txs-amt').focus()">
         <div class="txs-ac" id="txs-ac"></div>
       </div>
     </div>
@@ -1191,6 +1059,10 @@
     </div>
   </div>
   <div class="screen-foot">
+    <button class="scr-del" id="txs-del" onclick="deleteTxFromScreen()" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Supprimer
+    </button>
     <button class="scr-save" onclick="saveTxScreen()">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span id="txs-save-lbl">Ajouter</span>
@@ -1288,10 +1160,7 @@
   </div>
 </div>
 
-<!-- FAB -->
-<button class="fab" onclick="openTxScreen('expense')" title="Ajouter une dépense">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-</button>
+
 
 
 <!-- ════ PUSH PERMISSION, bottom sheet, même design que le tutoriel ════ -->

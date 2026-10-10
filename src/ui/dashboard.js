@@ -100,7 +100,8 @@ function renderRecent(txs) {
     const isE = t.type === 'expense';
     const col = isE ? 'var(--red-l)' : 'var(--green)';
     const ibg = isE ? 'rgba(196,58,58,.12)' : 'rgba(52,211,153,.12)';
-    return `<div class="dash-recent-row">
+    return `<div class="dash-recent-row" role="button" tabindex="0" data-id="${esc(t.id)}"
+      onclick="openTxScreenEdit(this.dataset.id)" onkeydown="if(event.key==='Enter')openTxScreenEdit(this.dataset.id)">
       <div class="dash-recent-ico" style="background:${ibg};color:${col}">${catIco(t.category, 15)}</div>
       <div class="dash-recent-info">
         <div class="dash-recent-desc">${esc(t.description || t.category || '')}</div>

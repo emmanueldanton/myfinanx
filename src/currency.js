@@ -38,8 +38,9 @@ export function fmt(eurAmount) {
   const formatted = val.toLocaleString('fr-FR', {
     minimumFractionDigits: cur.decimals,
     maximumFractionDigits: cur.decimals,
-  });
-  return formatted + ' ' + cur.symbol;
+  }).replace(/ /g, ' ');
+  // Espace insécable normale : l'espace fine (U+202F) devenait invisible sur les grands montants à interlettrage serré.
+  return formatted + ' ' + cur.symbol;
 }
 
 export function fmtInput(eurAmount) {

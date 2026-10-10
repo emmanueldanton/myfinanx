@@ -28,6 +28,7 @@ export function initTransactionsUI(getYM) {
   window.openTxScreenEdit = openTxScreenEdit;
   window.setTxScreenType  = setTxScreenType;
   window.saveTxScreen     = saveTxScreen;
+  window.deleteTxFromScreen = deleteTxFromScreen;
 
   const txDt = document.getElementById('tx-dt');
   if (txDt && !txDt.value) txDt.value = todayISO();
@@ -132,7 +133,9 @@ export function renderExpenses(state) {
     const ibg  = isE ? 'rgba(196,58,58,.14)' : 'rgba(52,211,153,.12)';
     const sign = isE ? '−' : '+';
     const ico  = catIco(t.category, 14);
-    return `<div class="txi" id="txi-${esc(t.id)}">
+    return `<div class="txi" id="txi-${esc(t.id)}" role="button" tabindex="0" data-id="${esc(t.id)}"
+        onclick="openTxScreenEdit(this.dataset.id)" onkeydown="if(event.key==='Enter')openTxScreenEdit(this.dataset.id)"
+        aria-label="${esc(t.description || '')}, ${esc(sign + ' ' + fmt(t.amountEUR ?? 0))}. Toucher pour modifier ou supprimer">
       <div class="txii" style="background:${ibg};color:${col}">${ico}</div>
       <div class="txif">
         <div class="txid">${esc(t.description || '')}</div>
@@ -142,12 +145,7 @@ export function renderExpenses(state) {
         </div>
       </div>
       <div class="txam" style="color:${col}">${sign} ${fmt(t.amountEUR ?? 0)}</div>
-      <button class="txed" data-id="${esc(t.id)}" onclick="openTxScreenEdit(this.dataset.id)" title="Modifier">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
-      <button class="txdl" data-id="${esc(t.id)}" onclick="delTx(this.dataset.id)" title="Supprimer">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      </button>
+      <svg class="txgo" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`;
   }).join('');
   renderCatBk(allTxs.filter(t => t.type !== 'income'));
@@ -266,6 +264,8 @@ export function openTxScreen(type) {
   _setVal('txs-date', todayISO());
   _setText('txs-title', _txScrType === 'income' ? 'Nouveau revenu' : 'Nouvelle dépense');
   _setText('txs-save-lbl', 'Ajouter');
+  const del = document.getElementById('txs-del');
+  if (del) del.hidden = true;
   const sym = document.getElementById('txs-cur-sym');
   if (sym) sym.textContent = getActiveCurrency().symbol;
   _hideAutocomplete();
@@ -286,6 +286,8 @@ export function openTxScreenEdit(id) {
   _setVal('txs-date', tx.date || todayISO());
   _setText('txs-title', 'Modifier la transaction');
   _setText('txs-save-lbl', 'Enregistrer');
+  const del = document.getElementById('txs-del');
+  if (del) del.hidden = false;
   const sym = document.getElementById('txs-cur-sym');
   if (sym) sym.textContent = getActiveCurrency().symbol;
   _hideAutocomplete();
@@ -419,6 +421,15 @@ export function saveTxScreen() {
   window.closeScreen?.();
   showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
   _txEditId = null;
+}
+
+// Suppression depuis l'écran d'édition (annulable via le toast)
+export function deleteTxFromScreen() {
+  if (!_txEditId) return;
+  const id = _txEditId;
+  _txEditId = null;
+  window.closeScreen?.();
+  delTx(id);
 }
 
 function _setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
