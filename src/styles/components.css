@@ -1161,34 +1161,34 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
   overflow:hidden;
 }
 .bnav-inner {
-  display:flex; height:70px; align-items:center; padding:0 6px;
+  display:flex; height:70px; align-items:center; padding:0 10px;
   position:relative;
 }
 /* Indicateur "pilule" en verre qui glisse/morphe — position/largeur posées par moveBnavPill() */
 .bnav-pill {
-  position:absolute; top:7px; bottom:7px; left:0; width:0;
-  border-radius:20px; z-index:0; pointer-events:none;
-  background:color-mix(in srgb, var(--pr) 13%, transparent);
+  position:absolute; top:13px; bottom:13px; left:0; width:0;
+  border-radius:999px; z-index:0; pointer-events:none;
+  background:var(--pr);
   transform:translateX(0);
   transition:
     transform .46s cubic-bezier(.34,1.42,.5,1),
     width     .46s cubic-bezier(.34,1.42,.5,1),
     background-color .3s ease;
 }
-/* Chaque onglet : icône + nom toujours visibles (l'utilisateur ne devine jamais une icône) */
+/* Inactif : zone flexible, icône seule */
 .bnav-btn {
-  flex:1; min-width:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:3px;
+  flex:1; display:flex; flex-direction:row;
+  align-items:center; justify-content:center; gap:8px;
   background:transparent; border:none;
   color:var(--muted); font-family:var(--fh);
-  font-size:.66rem; font-weight:700; cursor:pointer;
+  font-size:.75rem; font-weight:700; cursor:pointer;
   touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
-  height:56px; padding:0 2px; position:relative; z-index:1;
-  border-radius:20px; transition:color .28s ease;
+  height:52px; padding:0; position:relative; z-index:1;
+  border-radius:999px; transition:color .28s ease;
 }
 .bnav-btn svg {
-  stroke:currentColor; flex-shrink:0; width:22px; height:22px;
+  stroke:currentColor; flex-shrink:0; width:24px; height:24px;
   transition:transform .4s cubic-bezier(.34,1.5,.5,1);
 }
 /* Icônes jumelées : line (défaut) / fill (onglet actif) */
@@ -1197,12 +1197,17 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .bnav-ico-fill svg { stroke:none; }        /* les tracés sont déjà en fill=currentColor */
 .bnav-btn.active .bnav-ico-line { display:none; }
 .bnav-btn.active .bnav-ico-fill { display:inline-flex; }
-.bnav-btn .bnav-lbl {
-  display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis;
-  white-space:nowrap; letter-spacing:-.01em; line-height:1.1;
+/* Le nom de l'onglet n'apparaît que sur l'onglet actif (au clic) */
+.bnav-btn .bnav-lbl { display:none; white-space:nowrap; letter-spacing:-.01em; }
+/* Actif : la pilule s'élargit pour révéler le label */
+.bnav-btn.active {
+  flex:0 0 auto;
+  color:#fff;
+  padding:0 18px;
 }
-.bnav-btn.active { color:var(--pr-l); }
 .bnav-btn.active svg { transform:scale(1.06); }
+.bnav-btn.active .bnav-lbl { display:inline; }
+/* Neutralise l'ancienne pilule statique (héritée du <style> inline) */
 .bnav-btn.active::before { display:none; content:none; }
 
 @media(max-width:620px){

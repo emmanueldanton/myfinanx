@@ -19,13 +19,21 @@ export function openScreen(id) {
   scr.classList.add('open');
   scr.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  // Historique : le bouton/geste « retour » du téléphone ferme l'écran au lieu de quitter l'app
+  if (!_ignoreNextPop) {
+    if (history.state?.screen) history.replaceState({ screen: id }, '');
+    else history.pushState({ screen: id }, '');
+  }
   if (id === 'screen-settings') syncSettings();
   scr.querySelector('.screen-body')?.scrollTo?.(0, 0);
 }
 
-export function closeScreen() {
+let _ignoreNextPop = false;
+
+export function closeScreen(fromPop) {
   const open = document.querySelector('.screen.open');
   if (!open) return;
+  if (fromPop !== true && history.state?.screen) { _ignoreNextPop = true; history.back(); }
   document.querySelectorAll('.screen-menu.open').forEach(m => m.classList.remove('open'));
   open.classList.remove('open');
   open.setAttribute('aria-hidden', 'true');
@@ -124,7 +132,22 @@ export function setProfileGender(g) {
   window.renderGreeting?.();
 }
 
+// Retour système : ferme l'écran ouvert. Si un écran a été rouvert entre-temps
+// (ex. « Saisir à la main » depuis le scan), on lui redonne son entrée d'historique.
+function _onPopState() {
+  if (_ignoreNextPop) {
+    _ignoreNextPop = false;
+    const open = document.querySelector('.screen.open');
+    if (open) history.pushState({ screen: open.id }, '');
+    return;
+  }
+  if (document.querySelector('.screen.open')) closeScreen(true);
+}
+
 export function initScreens() {
+  window.addEventListener('popstate', _onPopState);
+  // Après un rechargement, aucun écran n'est ouvert : on nettoie un éventuel état hérité
+  if (history.state?.screen) history.replaceState(null, '');
   window.openScreen      = openScreen;
   window.closeScreen     = closeScreen;
   window.toggleScreenMenu = toggleScreenMenu;
