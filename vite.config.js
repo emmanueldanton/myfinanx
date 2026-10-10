@@ -29,7 +29,7 @@ export default defineConfig({
             handler: 'NetworkOnly'
           },
           {
-            urlPattern: /^https:\/\/api\.frankfurter\.app\//,
+            urlPattern: /^https:\/\/api\.frankfurter\.dev\//,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'exchange-rates',

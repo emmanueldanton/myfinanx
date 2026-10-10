@@ -3,7 +3,7 @@ export const CURRENCIES = {
   USD: { code: 'USD', symbol: '$',    name: 'Dollar US',       rate: 1.08,   flag: '🇺🇸', decimals: 2 },
   GBP: { code: 'GBP', symbol: '£',   name: 'Livre sterling',  rate: 0.856,  flag: '🇬🇧', decimals: 2 },
   CAD: { code: 'CAD', symbol: 'CA$',  name: 'Dollar canadien', rate: 1.47,   flag: '🇨🇦', decimals: 2 },
-  XOF: { code: 'XOF', symbol: 'CFA', name: 'Franc CFA',       rate: 655.96, flag: '🌍', decimals: 0 },
+  XOF: { code: 'XOF', symbol: 'CFA', name: 'Franc CFA',       rate: 655.957, flag: '🌍', decimals: 0 },
   MAD: { code: 'MAD', symbol: 'MAD', name: 'Dirham marocain', rate: 10.82,  flag: '🇲🇦', decimals: 2 },
 };
 
@@ -24,10 +24,12 @@ export function toDisplay(eurAmount) {
   return eurAmount * getActiveCurrency().rate;
 }
 
+// Montant saisi dans la devise d'affichage -> EUR stocké.
+// On garde 6 décimales : arrondir aux décimales de la devise (0 pour le XOF)
+// faussait les montants (5 000 XOF stockés 8 EUR, réaffichés 5 248 XOF).
 export function fromDisplay(amount) {
   const cur = getActiveCurrency();
-  const d = cur.decimals;
-  return Math.round((amount / cur.rate) * Math.pow(10, d)) / Math.pow(10, d);
+  return Math.round((amount / cur.rate) * 1e6) / 1e6;
 }
 
 export function fmt(eurAmount) {
@@ -53,7 +55,7 @@ export async function fetchLiveRates() {
       _refreshRateUI(cached.rates);
       return;
     }
-    const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,GBP,CAD,MAD');
+    const res = await fetch('https://api.frankfurter.dev/v1/latest?from=EUR&to=USD,GBP,CAD');
     if (!res.ok) return;
     const data = await res.json();
     if (!data.rates) return;

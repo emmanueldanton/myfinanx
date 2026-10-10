@@ -1,34 +1,13 @@
 // Serverless endpoint — programme une notification push personnalisée via OneSignal REST API
 
-// ── Garde-fous : origine autorisée + débit (best-effort, par instance) ──
-const _hits = new Map();
-
-function allowedOrigin(req) {
-  const extra = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-  const src = req.headers.origin || req.headers.referer || '';
-  let host = '';
-  try { host = src ? new URL(src).host : ''; } catch (e) { host = ''; }
-  if (!host) return false;
-  if (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host)) return true;
-  if (host.endsWith('.vercel.app')) return true;
-  return extra.some(o => { try { return new URL(o).host === host; } catch (e) { return false; } });
-}
-
-function rateLimited(req, max, windowMs) {
-  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
-  const now = Date.now();
-  const arr = (_hits.get(ip) || []).filter(t => now - t < windowMs);
-  arr.push(now);
-  _hits.set(ip, arr);
-  return arr.length > max;
-}
+import { allowedOrigin, rateLimited } from './_lib/guard.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   // Empêche un tiers d'utiliser ce relais pour envoyer des notifs arbitraires
   if (!allowedOrigin(req)) return res.status(403).json({ error: 'FORBIDDEN' });
-  if (rateLimited(req, 10, 60000)) return res.status(429).json({ error: 'RATE_LIMITED' });
+  if (rateLimited(req, 10, 60000, 'push')) return res.status(429).json({ error: 'RATE_LIMITED' });
 
   const { subscriptionId, title, message, deliverAt } = req.body || {};
   if (!subscriptionId || !message) {

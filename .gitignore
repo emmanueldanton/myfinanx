@@ -11,3 +11,6 @@ Thumbs.db
 
 # Maquettes / fichiers de design (pas du code applicatif)
 design-*.html
+
+# Suivi de projet (hors depot)
+.planning/
