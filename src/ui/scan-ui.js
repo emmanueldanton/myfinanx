@@ -226,7 +226,11 @@ export function initScanUI(getYM) {
   if (getYM) _getYM = getYM;
   window.openScanScreen = openScanScreen;
   window.saveScan = saveScan;
-  window.retryScan = () => _state('pick');
+  window.retryScan = () => {
+    // Vider les champs : sinon choisir à nouveau le même fichier ne déclenche rien
+    ['scan-in-camera', 'scan-in-image', 'scan-in-pdf'].forEach(id => { const i = $(id); if (i) i.value = ''; });
+    _state('pick');
+  };
 
   ['scan-in-camera', 'scan-in-image', 'scan-in-pdf'].forEach(id => {
     $(id)?.addEventListener('change', e => _onFiles(e.target.files));

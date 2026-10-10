@@ -41,9 +41,10 @@ let _Y, _M;
 // Exposed on window so monolith's onclick="changeMonth(d)" continues to work
 function changeMonth(delta) {
   const now  = new Date();
-  const newM = _M + delta;
-  const newY = newM < 0 ? _Y - 1 : newM > 11 ? _Y + 1 : _Y;
-  const adjM = ((newM % 12) + 12) % 12;
+  // Calcul en mois absolus : fonctionne aussi pour un saut de plusieurs années (scan d'un vieux relevé)
+  const total = _Y * 12 + _M + delta;
+  const newY = Math.floor(total / 12);
+  const adjM = ((total % 12) + 12) % 12;
   // Block future months
   if (newY > now.getFullYear() || (newY === now.getFullYear() && adjM > now.getMonth())) return;
   _M = adjM; _Y = newY;
