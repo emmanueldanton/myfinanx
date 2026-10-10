@@ -348,6 +348,10 @@
       <span class="dash-act-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
       <span class="dash-act-lbl">Ajouter</span>
     </button>
+    <button class="dash-act" onclick="openScanScreen()">
+      <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+      <span class="dash-act-lbl">Scanner</span>
+    </button>
     <button class="dash-act" onclick="openTxScreen('income')">
       <span class="dash-act-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
       <span class="dash-act-lbl">Revenu</span>
@@ -437,6 +441,18 @@
 <div id="page-tracker" class="page">
   <div class="page-hd"><h1 class="bud-title">Dépenses</h1></div>
 
+  <!-- Actions explicites : ajouter à la main ou scanner -->
+  <div class="dep-actions">
+    <button class="dep-act primary" onclick="openTxScreen('expense')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Ajouter une dépense
+    </button>
+    <button class="dep-act" onclick="openScanScreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Scanner un ticket
+    </button>
+  </div>
+
   <!-- Résumé du mois -->
   <section class="dep-sum">
     <div class="dep-sum-head">
@@ -475,7 +491,7 @@
   <div class="txl" id="txl">
     <div class="empty">
       <div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      Aucune transaction.<br>Ajoute ta première ci-dessus.
+      Aucune transaction ce mois-ci.<br>Touche « Ajouter une dépense » ou scanne un ticket.
     </div>
   </div>
 </div>
@@ -1125,6 +1141,12 @@
     <span class="screen-head-spacer"></span>
   </div>
   <div class="screen-body">
+    <!-- Raccourci vers le scan (nouvelle dépense uniquement) -->
+    <button type="button" class="txs-scan" id="txs-scan" onclick="openScanScreen()">
+      <span class="txs-scan-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+      <span class="txs-scan-txt"><strong>Tu as un ticket ou une facture ?</strong><small>Scanne-le, l'IA remplit tout pour toi</small></span>
+      <svg class="txs-scan-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
     <!-- Hero : montant en grand -->
     <div class="scr-hero is-expense" id="txs-hero">
       <div class="scr-hero-ico" id="txs-hero-ico">
@@ -1172,6 +1194,82 @@
     <button class="scr-save" onclick="saveTxScreen()">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span id="txs-save-lbl">Ajouter</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════ SCAN : ticket, facture ou relevé (photo / PDF) ════ -->
+<div class="screen" id="screen-scan" aria-hidden="true">
+  <div class="screen-head">
+    <button class="screen-back" onclick="closeScreen()" aria-label="Retour">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
+    </button>
+    <div class="screen-title">Scanner un document</div>
+    <span class="screen-head-spacer"></span>
+  </div>
+  <div class="screen-body">
+    <!-- 1. Choix du document -->
+    <section id="scan-pick" class="scan-pick">
+      <div class="scan-intro">
+        <div class="scan-intro-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        </div>
+        <h2 class="scan-intro-title">Ajoute tes dépenses en une photo</h2>
+        <p class="scan-intro-txt">Prends en photo un ticket de caisse ou une facture, ou importe un relevé bancaire en PDF. L'IA lit le document et te propose les opérations. Tu vérifies avant que quoi que ce soit soit ajouté.</p>
+      </div>
+
+      <label class="scan-btn primary" for="scan-in-camera">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span><strong>Prendre une photo</strong><small>Ticket de caisse, facture</small></span>
+      </label>
+      <input type="file" id="scan-in-camera" accept="image/*" capture="environment" class="sr-only">
+
+      <label class="scan-btn" for="scan-in-image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span><strong>Choisir dans la galerie</strong><small>Jusqu'à 3 photos pour un long ticket</small></span>
+      </label>
+      <input type="file" id="scan-in-image" accept="image/*" multiple class="sr-only">
+
+      <label class="scan-btn" for="scan-in-pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        <span><strong>Importer un PDF</strong><small>Relevé bancaire, facture numérique</small></span>
+      </label>
+      <input type="file" id="scan-in-pdf" accept="application/pdf,.pdf" class="sr-only">
+
+      <ul class="scan-tips">
+        <li>Pose le ticket à plat, bien éclairé, en entier dans le cadre.</li>
+        <li>Pour un ticket, seul le total payé est proposé.</li>
+        <li>Pour un relevé, chaque ligne devient une opération.</li>
+      </ul>
+      <p class="scan-privacy">Le document est envoyé à notre service d'IA uniquement pour être lu, puis oublié. Il n'est jamais conservé.</p>
+    </section>
+
+    <!-- 2. Lecture en cours -->
+    <section id="scan-busy" class="scan-busy" hidden aria-live="polite">
+      <div class="scan-busy-preview" id="scan-busy-preview"></div>
+      <div class="scan-spinner" aria-hidden="true"></div>
+      <p class="scan-busy-step" id="scan-busy-step">Lecture en cours…</p>
+      <p class="scan-busy-sub">Quelques secondes suffisent en général.</p>
+    </section>
+
+    <!-- 3. Erreur -->
+    <section id="scan-error" class="scan-error" hidden role="alert">
+      <p id="scan-error-msg"></p>
+      <button class="scr-save" onclick="retryScan()">Réessayer avec un autre document</button>
+      <button class="scan-link" onclick="closeScreen();openTxScreen('expense')">Saisir la dépense à la main</button>
+    </section>
+
+    <!-- 4. Vérification -->
+    <section id="scan-review" hidden>
+      <div class="scan-sum" id="scan-sum"></div>
+      <div class="scan-list" id="scan-list"></div>
+      <button class="scan-link" onclick="retryScan()">Scanner un autre document</button>
+    </section>
+  </div>
+  <div class="screen-foot" id="scan-foot" hidden>
+    <button class="scr-save" id="scan-save" onclick="saveScan()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="scan-save-lbl">Ajouter</span>
     </button>
   </div>
 </div>

@@ -1,0 +1,140 @@
+/* ═══ Scan de documents (ticket, facture, relevé) ═══ */
+
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* Raccourci dans l'écran « Nouvelle dépense » */
+.txs-scan {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; margin-bottom: 18px; border-radius: var(--r);
+  border: 1px dashed color-mix(in srgb, var(--pr) 55%, var(--b1));
+  background: color-mix(in srgb, var(--pr) 7%, var(--s1));
+  color: var(--text); text-align: left; cursor: pointer; font-family: var(--fb);
+  transition: background .15s, transform .12s;
+}
+.txs-scan[hidden] { display: none; }
+.txs-scan:active { transform: scale(.99); }
+.txs-scan-ico {
+  width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pr); color: #fff;
+}
+.txs-scan-ico svg { width: 19px; height: 19px; }
+.txs-scan-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.txs-scan-txt strong { font-size: .88rem; font-weight: 700; }
+.txs-scan-txt small { font-size: .76rem; color: var(--muted); }
+.txs-scan-go { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+
+/* Actions explicites de l'onglet Dépenses */
+.dep-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; }
+.dep-act {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 12px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fh); font-weight: 700; font-size: .86rem; cursor: pointer;
+  transition: transform .12s, background .15s;
+}
+.dep-act svg { width: 18px; height: 18px; flex-shrink: 0; }
+.dep-act:active { transform: scale(.98); }
+.dep-act.primary { background: var(--pr); border-color: var(--pr); color: #fff; }
+
+/* Écran de scan : choix */
+.scan-pick, .scan-busy, .scan-error, #scan-review { max-width: 560px; margin: 0 auto; }
+.scan-intro { text-align: center; padding: 6px 4px 20px; }
+.scan-intro-ico {
+  width: 60px; height: 60px; margin: 0 auto 14px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--pr) 12%, var(--s1)); color: var(--pr);
+}
+.scan-intro-ico svg { width: 30px; height: 30px; }
+.scan-intro-title { font-family: var(--fh); font-size: 1.2rem; font-weight: 800; color: var(--text); margin: 0 0 8px; }
+.scan-intro-txt { font-size: .88rem; line-height: 1.55; color: var(--muted); margin: 0; }
+
+.scan-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 15px 16px; margin-bottom: 10px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  cursor: pointer; transition: transform .12s, border-color .15s;
+}
+.scan-btn:active { transform: scale(.99); }
+.scan-btn:focus-within, .scan-btn:hover { border-color: var(--pr); }
+.scan-btn svg { width: 24px; height: 24px; flex-shrink: 0; color: var(--pr); }
+.scan-btn span { display: flex; flex-direction: column; gap: 2px; }
+.scan-btn strong { font-family: var(--fh); font-weight: 700; font-size: .95rem; }
+.scan-btn small { font-size: .78rem; color: var(--muted); }
+.scan-btn.primary { background: linear-gradient(135deg, var(--pr), var(--pr-d)); border-color: transparent; color: #fff; }
+.scan-btn.primary svg, .scan-btn.primary small { color: rgba(255,255,255,.9); }
+
+.scan-tips { margin: 18px 0 0; padding: 0 0 0 18px; color: var(--muted); font-size: .82rem; line-height: 1.7; }
+.scan-privacy {
+  margin: 16px 0 0; padding: 12px 14px; border-radius: var(--r);
+  background: var(--s2); color: var(--muted); font-size: .78rem; line-height: 1.5;
+}
+
+/* Lecture en cours */
+.scan-busy { text-align: center; padding-top: 10px; }
+.scan-busy-preview img {
+  display: block; max-height: 220px; max-width: 70%; margin: 0 auto 22px;
+  border-radius: 12px; border: 1px solid var(--b1); object-fit: contain;
+}
+.scan-spinner {
+  width: 38px; height: 38px; margin: 0 auto 14px; border-radius: 50%;
+  border: 3px solid var(--b1); border-top-color: var(--pr);
+  animation: scanSpin .8s linear infinite;
+}
+@keyframes scanSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .scan-spinner { animation-duration: 2.4s; } }
+.scan-busy-step { font-family: var(--fh); font-weight: 700; color: var(--text); margin: 0 0 4px; }
+.scan-busy-sub { font-size: .82rem; color: var(--muted); margin: 0; }
+
+/* Erreur */
+.scan-error { text-align: center; padding-top: 24px; }
+.scan-error p { color: var(--text); font-size: .92rem; line-height: 1.55; margin: 0 0 20px; }
+.scan-link {
+  display: block; margin: 14px auto 0; padding: 10px; border: none; background: none;
+  color: var(--pr); font-family: var(--fb); font-weight: 600; font-size: .86rem; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* Vérification */
+.scan-sum { margin-bottom: 14px; }
+.scan-sum-title { font-family: var(--fh); font-weight: 800; font-size: 1.15rem; color: var(--text); }
+.scan-sum-sub { font-size: .84rem; color: var(--muted); margin-top: 2px; }
+.scan-sum-hint { font-size: .84rem; color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
+.scan-sum-warn {
+  margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; font-size: .82rem; line-height: 1.45;
+  background: color-mix(in srgb, #F59E0B 14%, var(--s1)); color: var(--text);
+}
+
+.scan-list { display: flex; flex-direction: column; gap: 12px; }
+.scan-row {
+  padding: 14px; border-radius: var(--r); border: 1px solid var(--b1); background: var(--s1);
+  transition: opacity .15s, border-color .15s;
+}
+.scan-row.off { opacity: .55; }
+.scan-row.invalid { border-color: var(--red); }
+.scan-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer; }
+.scan-check input { width: 20px; height: 20px; accent-color: var(--pr); }
+.scan-type { font-size: .74rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.scan-type.out { background: color-mix(in srgb, var(--red) 12%, transparent); color: var(--red-l); }
+.scan-type.in { background: color-mix(in srgb, var(--green) 14%, transparent); color: var(--green); }
+.scan-dup {
+  font-size: .74rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+  background: color-mix(in srgb, #F59E0B 18%, transparent); color: var(--text);
+}
+.scan-desc, .scan-fld input, .scan-fld select {
+  width: 100%; padding: 11px 12px; border-radius: 10px;
+  border: 1px solid var(--b1); background: var(--s0); color: var(--text);
+  font-family: var(--fb); font-weight: 600; font-size: .9rem;
+}
+.scan-desc { margin-bottom: 10px; }
+.scan-desc:focus, .scan-fld input:focus, .scan-fld select:focus { outline: none; border-color: var(--pr); }
+.scan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.scan-fld { display: flex; flex-direction: column; gap: 5px; }
+.scan-fld > span { font-size: .74rem; font-weight: 600; color: var(--muted); }
+.scan-conv { margin-top: 8px; font-size: .76rem; color: var(--muted); }
+
+#scan-save:disabled { opacity: .5; cursor: not-allowed; }
+.screen-foot[hidden], .scan-pick[hidden], .scan-busy[hidden], .scan-error[hidden], #scan-review[hidden] { display: none; }

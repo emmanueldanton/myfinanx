@@ -138,6 +138,39 @@ export function bridgeSave(Y, M) {
   }
 }
 
+// Transactions d'un mois quelconque (format modulaire), lues directement dans le stockage.
+export function readMonthTransactions(Y, M) {
+  try {
+    const p = JSON.parse(localStorage.getItem(monthKey(Y, M)) || 'null');
+    return (p && Array.isArray(p.expenses) ? p.expenses : []).map(e => ({
+      id: e.id, date: e.date, type: e.type,
+      description: e.desc ?? e.description ?? '',
+      category: e.cat ?? e.category ?? 'Autre',
+      amountEUR: e.amount ?? 0,
+    }));
+  } catch (e) { return []; }
+}
+
+// Ajoute des transactions à un mois qui n'est PAS celui affiché (ex. ticket du mois dernier).
+// Un mois encore jamais ouvert hérite des revenus et postes du mois précédent, comme à l'ouverture.
+export function appendToMonth(Y, M, txs) {
+  let mono;
+  try { mono = JSON.parse(localStorage.getItem(monthKey(Y, M)) || 'null'); } catch (e) { mono = null; }
+  if (!mono || typeof mono !== 'object') {
+    const prev = findPreviousMonthData(Y, M);
+    mono = {
+      revenus: prev ? prev.revenus.map(r => ({ ...r, id: uid() })) : [],
+      budget:  prev ? prev.budget.map(b => ({ ...b, id: uid() })) : [],
+      expenses: [],
+    };
+  }
+  if (!Array.isArray(mono.expenses)) mono.expenses = [];
+  mono.expenses.unshift(...txs.map(t => ({
+    id: t.id, date: t.date, type: t.type, desc: t.description, cat: t.category, amount: t.amountEUR ?? 0,
+  })));
+  localStorage.setItem(monthKey(Y, M), JSON.stringify(mono));
+}
+
 // Load goals from monolith localStorage → populate mfx_goals in store
 export function bridgeLoadGoals() {
   try {
