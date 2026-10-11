@@ -250,7 +250,7 @@ Taux d'épargne implicite: ${tauxEpargne}%
 ━━ OBJECTIFS D'ÉPARGNE ━━
 ${goalsStr}
 
-INSTRUCTIONS: Réponds en français. Sois précis, chiffré et actionnable. Maximum 180 mots.
+INSTRUCTIONS: Réponds en français, court et concret : 90 mots maximum, 3 points clés au plus. Ne recopie pas toute la situation poste par poste : va à l'essentiel et termine par une action simple.
 Base-toi UNIQUEMENT sur les données réelles ci-dessus, ne suppose rien qui n'y figure pas.
 Si une donnée nécessaire est absente, dis-le clairement et propose à l'utilisateur de la renseigner, n'invente aucun montant.
 Exprime tous les montants dans la devise de l'utilisateur (${cur.symbol}), jamais en euros par défaut.

@@ -1,3 +1,5 @@
+import { focusOnDesktop } from '../utils.js';
+import { dismissToast } from './toast.js';
 // ═══ Screens — sous-écrans plein écran (configuration / édition), style « vraie app » ═══
 // Un seul écran ouvert à la fois. Ouverture/fermeture par simple bascule de classe
 // (animation minimale, cf. demande de stabilité). Retour via en-tête ou touche Échap.
@@ -9,6 +11,14 @@ const GENDER_KEY = 'monargent-usergender';
 
 const THEME_LABELS = { light: 'Clair', blue: 'Bleu nuit', violet: 'Violet' };
 
+// Grand montant : le champ prend la largeur du nombre, le symbole reste collé (« 25 000 € »)
+export function fitAmount(el) {
+  if (!el) return;
+  const n = (el.value || el.placeholder || '0').length;
+  el.style.width = Math.max(1, n) * 0.92 + 0.2 + 'ch';
+}
+function fitAmounts(scr) { scr.querySelectorAll('.scr-big-amt').forEach(fitAmount); }
+
 export function openScreen(id) {
   const scr = document.getElementById(id);
   if (!scr) return;
@@ -16,8 +26,10 @@ export function openScreen(id) {
     s.classList.remove('open');
     s.setAttribute('aria-hidden', 'true');
   });
+  dismissToast();
   scr.classList.add('open');
   scr.setAttribute('aria-hidden', 'false');
+  fitAmounts(scr);
   document.body.style.overflow = 'hidden';
   // Historique : le bouton/geste « retour » du téléphone ferme l'écran au lieu de quitter l'app
   if (!_ignoreNextPop) {
@@ -101,7 +113,7 @@ export function syncSettings() {
 export function openProfile() {
   syncProfile();
   openScreen('screen-profile');
-  setTimeout(() => document.getElementById('prof-name')?.focus(), 60);
+  focusOnDesktop('prof-name');
 }
 
 export function syncProfile() {
@@ -146,6 +158,8 @@ function _onPopState() {
 
 export function initScreens() {
   window.addEventListener('popstate', _onPopState);
+  document.addEventListener('input', e => { if (e.target.classList?.contains('scr-big-amt')) fitAmount(e.target); });
+  window.fitAmount = fitAmount;
   // Après un rechargement, aucun écran n'est ouvert : on nettoie un éventuel état hérité
   if (history.state?.screen) history.replaceState(null, '');
   window.openScreen      = openScreen;

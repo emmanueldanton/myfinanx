@@ -1,7 +1,7 @@
 // ═══ Goals UI — objectifs d'épargne (onglet Objectifs + vue globale) ═══
 import { store }           from '../store.js';
 import { bridgeSaveGoals }  from '../data-bridge.js';
-import { uid, esc, parseAmt, fmtDate, todayISO } from '../utils.js';
+import { uid, esc, parseAmt, fmtDate, todayISO, focusOnDesktop } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
 
@@ -199,13 +199,13 @@ export function openGoalScreen() {
   _setVal('gsc-name', '');
   _setVal('gsc-target', '');
   _setVal('gsc-saved', '');
-  _setVal('gsc-deadline', todayISO());
+  _setVal('gsc-deadline', '');
   _syncGoalSwatches();
   _setGoalCurSym();
   _setTextG('gsc-title', 'Nouvel objectif');
   _setTextG('gsc-save-lbl', "Créer l'objectif");
   window.openScreen?.('screen-goal');
-  setTimeout(() => document.getElementById('gsc-name')?.focus(), 60);
+  focusOnDesktop('gsc-name');
 }
 
 export function openGoalScreenEdit(id) {
@@ -216,7 +216,7 @@ export function openGoalScreenEdit(id) {
   _setVal('gsc-name', g.name || '');
   _setVal('gsc-target', g.targetEUR != null ? fmtInput(g.targetEUR) : '');
   _setVal('gsc-saved', g.savedEUR != null ? fmtInput(g.savedEUR) : '');
-  _setVal('gsc-deadline', g.deadline || todayISO());
+  _setVal('gsc-deadline', g.deadline || '');
   _syncGoalSwatches();
   _setGoalCurSym();
   _setTextG('gsc-title', "Modifier l'objectif");

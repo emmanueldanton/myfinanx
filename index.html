@@ -971,7 +971,7 @@
       <input type="text" id="gsc-name" placeholder="Ex : Caution appartement">
     </div>
     <div class="scr-field">
-      <label for="gsc-deadline">Échéance</label>
+      <label for="gsc-deadline">Échéance (facultatif)</label>
       <input type="date" id="gsc-deadline">
     </div>
     <div class="scr-field">
@@ -1008,14 +1008,12 @@
     </button>
     <div class="screen-title" id="txs-title">Nouvelle dépense</div>
     <span class="screen-head-spacer"></span>
+    <button type="button" class="screen-head-act" id="txs-scan" onclick="openScanScreen('tx')" aria-label="Scanner un ticket">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Scanner
+    </button>
   </div>
   <div class="screen-body">
-    <!-- Raccourci vers le scan (nouvelle dépense uniquement) -->
-    <button type="button" class="txs-scan" id="txs-scan" onclick="openScanScreen('tx')">
-      <span class="txs-scan-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
-      <span class="txs-scan-txt"><strong>Scanner un ticket</strong><small>L'IA remplit tout</small></span>
-      <svg class="txs-scan-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
     <!-- Hero : montant en grand -->
     <div class="scr-hero is-expense" id="txs-hero">
       <div class="scr-hero-ico" id="txs-hero-ico">

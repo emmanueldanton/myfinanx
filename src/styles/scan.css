@@ -5,28 +5,6 @@
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
-/* Raccourci dans l'écran « Nouvelle dépense » */
-.txs-scan {
-  width: 100%; display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; margin-bottom: 18px; border-radius: var(--r);
-  border: 1px dashed color-mix(in srgb, var(--pr) 55%, var(--b1));
-  background: color-mix(in srgb, var(--pr) 7%, var(--s1));
-  color: var(--text); text-align: left; cursor: pointer; font-family: var(--fb);
-  transition: background .15s, transform .12s;
-}
-.txs-scan[hidden] { display: none; }
-.txs-scan:active { transform: scale(.99); }
-.txs-scan-ico {
-  width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--pr); color: #fff;
-}
-.txs-scan-ico svg { width: 19px; height: 19px; }
-.txs-scan-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.txs-scan-txt strong { font-size: .88rem; font-weight: 700; }
-.txs-scan-txt small { font-size: .76rem; color: var(--muted); }
-.txs-scan-go { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
-
 /* Actions explicites de l'onglet Dépenses */
 .dep-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 18px; }
 .dep-act {

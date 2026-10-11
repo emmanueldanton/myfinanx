@@ -12,9 +12,9 @@ export function fmtDate(iso) {
   if (!iso) return '';
   const parts = iso.split('-');
   if (parts.length !== 3) return iso;
-  const [, mo, d] = parts.map(Number);
+  const [y, mo, d] = parts.map(Number);
   const SHORT = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
-  return `${d} ${SHORT[mo-1]}`;
+  return y && y !== new Date().getFullYear() ? `${d} ${SHORT[mo-1]} ${y}` : `${d} ${SHORT[mo-1]}`;
 }
 
 // Accept comma or dot as decimal separator
@@ -91,3 +91,10 @@ export const CAT_SUBTITLES = {
   'Épargne':'Mise de côté', 'Autre':'Divers',
 };
 export function catSubtitle(cat) { return CAT_SUBTITLES[cat] || ''; }
+
+// Focus à l'ouverture d'un écran : seulement avec souris/clavier. Sur téléphone, le clavier
+// surgissait et décalait tout l'écran ; il n'apparaît plus que quand on touche un champ.
+export function focusOnDesktop(id) {
+  if (window.matchMedia?.('(pointer: coarse)').matches) return;
+  setTimeout(() => document.getElementById(id)?.focus(), 60);
+}

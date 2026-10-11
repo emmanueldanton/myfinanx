@@ -52,3 +52,38 @@
 :root[data-theme="blue"] .scan-btn.primary, :root[data-theme="violet"] .scan-btn.primary {
   background: var(--pr-d);
 }
+
+/* ═══ Stabilité mobile (parcours complet du 11 oct.) ═══ */
+
+/* Bouton Scanner dans l'en-tête de « Nouvelle dépense » : le titre reste centré */
+.screen-head { position: relative; }
+.screen-head-act {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px;
+  border-radius: 999px; border: 1px solid var(--b1); background: var(--s1); color: var(--pr);
+  font-family: var(--fh); font-weight: 700; font-size: .8rem; cursor: pointer;
+}
+.screen-head-act[hidden] { display: none; }
+.screen-head-act svg { width: 16px; height: 16px; }
+.screen-head-act:active { transform: translateY(-50%) scale(.96); }
+
+/* Grand montant : « 25 000 € » centré d'un seul bloc */
+.scr-amount-input { gap: 6px; }
+.scr-amount-input .scr-cur { order: 2; padding: 0; }
+.scr-big-amt { min-width: 1.6ch; }
+
+/* Les montants ne sont jamais coupés : c'est le libellé qui cède la place */
+.rn, .bn { min-width: 0; flex: 1; }
+.ra, .ba-wrap, .txam { flex-shrink: 0; }
+.ra .amt, .ba .amt { white-space: nowrap; overflow: visible; text-overflow: clip; max-width: none; }
+.bud-status.is-none { color: var(--muted); background: var(--s2); }
+
+/* Libellé de transaction : jusqu'à deux lignes plutôt que « Courses Carrefo… » */
+.txid { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+
+/* Zones tactiles : au moins 40 px sans changer l'apparence */
+.mnb { position: relative; }
+.mnb::before { content: ""; position: absolute; inset: -8px; }
+.tx-cat-pill { padding: 8px 14px; }
+.dash-see-all { padding: 10px 6px; margin: -10px -6px; }
+.ra, .ba { width: auto !important; min-width: 0; text-align: right; }

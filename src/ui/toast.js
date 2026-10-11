@@ -48,6 +48,8 @@ function _show(message, type, duration) {
   _timer = setTimeout(_dismiss, duration);
 }
 
+export function dismissToast() { _dismiss(); }
+
 function _dismiss() {
   _undoFn = null;
   document.getElementById('toast-wrap')?.classList.remove('show');
