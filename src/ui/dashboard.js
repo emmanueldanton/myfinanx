@@ -5,6 +5,7 @@ import { calcTotalExpenses, calcTotalPunctualIncomes, getRecent } from '../trans
 import { catIco, esc, fmtDate } from '../utils.js';
 import { getPreviousMonthAvailableEUR, bridgeLoadPrefs } from '../data-bridge.js';
 import { ico } from './icons.js';
+import { leftToPayInMonth } from '../goals.js';
 
 // initDashboard (ResizeObserver du donut) reste défini dans index.js
 export { initDashboard } from './index.js';
@@ -69,6 +70,9 @@ export function renderDashboard(state) {
   // Carte objectif prioritaire
   renderGoalCard(goals || []);
 
+  // Rappel de fin de mois : versements d'objectifs encore à faire (mois réel affiché)
+  renderGoalDue(goals || [], Y, M);
+
   // Récents
   renderRecent(getRecent(transactions, 4));
 }
@@ -87,6 +91,39 @@ function renderGoalCard(goals) {
     <div class="dash-card-val">${fmt(g.savedEUR ?? 0)}</div>
     <div class="pt dash-card-gauge"><div class="pf" style="width:${pct}%;background:${g.color || 'var(--pr)'}"></div></div>
     <div class="dash-card-sub">${pct}% · objectif ${fmt(g.targetEUR ?? 0)}</div>`;
+}
+
+const DUE_WINDOW_DAYS = 7;   // le rappel apparaît sur l'accueil les 7 derniers jours du mois
+
+function renderGoalDue(goals, Y, M) {
+  const el = document.getElementById('dash-goal-due');
+  if (!el) return;
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const daysLeft = lastDay - now.getDate();
+  const isNow = Y === now.getFullYear() && M === now.getMonth();
+  const due = isNow && daysLeft < DUE_WINDOW_DAYS
+    ? goals.map(g => ({ g, left: leftToPayInMonth(g, Y, M) })).filter(x => x.left > 0.004)
+    : [];
+  if (!due.length) { el.innerHTML = ''; return; }
+  const when = daysLeft === 0 ? "aujourd'hui" : `d'ici ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`;
+  const bell = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+  if (due.length === 1) {
+    const { g, left } = due[0];
+    el.innerHTML = `<div class="dash-due" role="button" tabindex="0" data-goal-id="${esc(g.id)}"
+      onclick="openGoalDetail(this.dataset.goalId)" onkeydown="if(event.key==='Enter')openGoalDetail(this.dataset.goalId)">
+      <span class="dash-due-ico">${bell}</span>
+      <span class="dash-due-txt"><strong>${fmt(left)} à verser</strong><small>${esc(g.name)} · ${when}</small></span>
+      <span class="dash-due-btn">Verser</span>
+    </div>`;
+  } else {
+    const total = due.reduce((a, x) => a + x.left, 0);
+    el.innerHTML = `<div class="dash-due" role="button" tabindex="0" onclick="goTab('goals')" onkeydown="if(event.key==='Enter')goTab('goals')">
+      <span class="dash-due-ico">${bell}</span>
+      <span class="dash-due-txt"><strong>${fmt(total)} à verser</strong><small>${due.length} objectifs · ${when}</small></span>
+      <span class="dash-due-btn">Voir</span>
+    </div>`;
+  }
 }
 
 function renderRecent(txs) {

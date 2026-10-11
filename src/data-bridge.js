@@ -185,6 +185,9 @@ export function bridgeLoadGoals() {
           savedEUR:  g.saved  ?? g.savedEUR  ?? 0,
           deadline:  g.deadline,
           color:     g.color || '#4D78D4',
+          plan:       g.plan,
+          monthlyEUR: g.monthly ?? g.monthlyEUR ?? 0,
+          deposits:   Array.isArray(g.deposits) ? g.deposits : [],
         })));
         return;
       }
@@ -203,6 +206,9 @@ export function bridgeSaveGoals() {
     saved:    g.savedEUR  ?? 0,
     deadline: g.deadline,
     color:    g.color || '#4D78D4',
+    plan:     g.plan,
+    monthly:  g.monthlyEUR ?? 0,
+    deposits: g.deposits || [],
   }));
   try {
     localStorage.setItem(GOALS_KEY, JSON.stringify(mono));

@@ -28,12 +28,13 @@ import { initGreetingUI, renderGreeting, scheduleAiGreeting } from './ui/greetin
 import { initSettingsUI, setCurrency } from './ui/settings-ui.js';
 import { initDataManagementUI } from './ui/data-management-ui.js';
 import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
-import { scheduleDailyPush } from './ui/push-notify.js';
+import { scheduleDailyPush, syncGoalReminder } from './ui/push-notify.js';
 import { initToast } from './ui/toast.js';
 import { initAds } from './ui/ads.js';
 import { initScreens } from './ui/screens.js';
 import { initStatsUI } from './ui/stats-ui.js';
 import { initScanUI } from './ui/scan-ui.js';
+import { initMonthPicker, maxMonthIndex } from './ui/month-picker.js';
 
 // ═══ Active month state ═══
 let _Y, _M;
@@ -45,8 +46,8 @@ function changeMonth(delta) {
   const total = _Y * 12 + _M + delta;
   const newY = Math.floor(total / 12);
   const adjM = ((total % 12) + 12) % 12;
-  // Block future months
-  if (newY > now.getFullYear() || (newY === now.getFullYear() && adjM > now.getMonth())) return;
+  // Mois futurs : autorisés jusqu'à 12 mois à l'avance (préparer le budget du mois prochain)
+  if (total > maxMonthIndex(now)) return;
   _M = adjM; _Y = newY;
   bridgeLoad(_Y, _M);
   resetTxFilters();
@@ -165,6 +166,9 @@ function init() {
   // Wire goals UI module (exposes addGoal, delGoal etc. on window)
   initGoalsUI();
 
+  // Sélecteur de mois (panneau ouvert depuis la pastille de l'en-tête)
+  initMonthPicker(() => [_Y, _M]);
+
   // Wire AI chat UI module (exposes sendAI, clearAiHistory, typeWriter on window)
   initAiChatUI(() => [_Y, _M]);
 
@@ -227,6 +231,9 @@ function init() {
 
   // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)
   scheduleDailyPush();
+  // Rappel de fin de mois pour les versements d'objectifs (programmé ou annulé selon les versements)
+  window.syncGoalReminder = syncGoalReminder;
+  syncGoalReminder();
 
   // Raccourcis de l'icône d'app (manifeste) : ?action=scan ou ?action=add
   _handleLaunchAction();

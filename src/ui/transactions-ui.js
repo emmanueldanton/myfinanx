@@ -253,6 +253,15 @@ export function delTx(id) {
 let _txScrType = 'expense';
 let _txEditId  = null;
 
+// Date proposée : aujourd'hui, ou le même jour dans le mois affiché s'il s'agit d'un autre mois
+function _defaultDate() {
+  const [Y, M] = _getYM();
+  const now = new Date();
+  if (Y === now.getFullYear() && M === now.getMonth()) return todayISO();
+  const d = Math.min(now.getDate(), new Date(Y, M + 1, 0).getDate());
+  return `${Y}-${String(M + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
 export function openTxScreen(type) {
   _txEditId  = null;
   _catTouched = false;
@@ -261,7 +270,7 @@ export function openTxScreen(type) {
   setTxScreenType(_txScrType);
   _setVal('txs-desc', '');
   _setVal('txs-amt', '');
-  _setVal('txs-date', todayISO());
+  _setVal('txs-date', _defaultDate());
   _setText('txs-title', _txScrType === 'income' ? 'Nouveau revenu' : 'Nouvelle dépense');
   _setText('txs-save-lbl', 'Ajouter');
   _setSaveIcon('add');

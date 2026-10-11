@@ -104,7 +104,7 @@
     <button class="mnb" onclick="changeMonth(-1)" title="Mois précédent" aria-label="Mois précédent">
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m15 5l-6 7l6 7"/></svg>
     </button>
-    <div id="ml">…</div>
+    <button type="button" id="ml" onclick="openMonthPicker()" aria-haspopup="dialog" title="Choisir un mois">…</button>
     <button class="mnb" onclick="changeMonth(1)" title="Mois suivant" aria-label="Mois suivant">
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m9 5l6 7l-6 7"/></svg>
     </button>
@@ -362,6 +362,9 @@
       <span class="dash-act-lbl">Objectif</span>
     </button>
   </section>
+
+  <!-- RAPPEL : versement du mois pour les objectifs (fin de mois) -->
+  <div id="dash-goal-due"></div>
 
   <!-- CARTES RÉSUMÉ (scroll horizontal) -->
   <section class="dash-cards">
@@ -961,7 +964,7 @@
       </div>
       <div class="scr-amount-input">
         <span class="scr-cur">€</span>
-        <input type="text" inputmode="decimal" id="gsc-target" class="scr-big-amt" placeholder="0" onkeydown="if(event.key==='Enter')document.getElementById('gsc-name').focus()">
+        <input type="text" inputmode="decimal" id="gsc-target" class="scr-big-amt" placeholder="0" oninput="updateGoalPlanHint()" onkeydown="if(event.key==='Enter')document.getElementById('gsc-name').focus()">
       </div>
       <div class="scr-hero-lbl">Montant cible</div>
     </div>
@@ -971,12 +974,24 @@
       <input type="text" id="gsc-name" placeholder="Ex : Caution appartement">
     </div>
     <div class="scr-field">
-      <label for="gsc-deadline">Échéance (facultatif)</label>
-      <input type="date" id="gsc-deadline">
+      <label>Comment tu vas payer ?</label>
+      <div class="txs-type gpl-type" role="group">
+        <button type="button" class="txs-ty on" id="gpl-monthly" onclick="setGoalPlan('monthly')">Chaque mois</button>
+        <button type="button" class="txs-ty" id="gpl-once" onclick="setGoalPlan('once')">En une fois</button>
+      </div>
+    </div>
+    <div class="scr-field" id="gpl-monthly-fld">
+      <label for="gsc-monthly">Je peux mettre par mois</label>
+      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-monthly" placeholder="0" oninput="updateGoalPlanHint()"></div>
     </div>
     <div class="scr-field">
+      <label for="gsc-deadline" id="gsc-deadline-lbl">Échéance (facultatif)</label>
+      <input type="date" id="gsc-deadline" onchange="updateGoalPlanHint()">
+    </div>
+    <div class="gpl-hint" id="gpl-hint" hidden></div>
+    <div class="scr-field">
       <label for="gsc-saved">Déjà épargné</label>
-      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-saved" placeholder="0"></div>
+      <div class="scr-amt"><span class="scr-cur">€</span><input type="text" inputmode="decimal" id="gsc-saved" placeholder="0" oninput="updateGoalPlanHint()"></div>
     </div>
     <div class="scr-field">
       <label>Couleur</label>

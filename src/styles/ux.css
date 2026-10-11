@@ -87,3 +87,135 @@
 .tx-cat-pill { padding: 8px 14px; }
 .dash-see-all { padding: 10px 6px; margin: -10px -6px; }
 .ra, .ba { width: auto !important; min-width: 0; text-align: right; }
+
+/* ═══ Pastille du mois : ouvre le sélecteur ═══ */
+#ml {
+  display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+  background: none; border: none; padding: 4px 4px; border-radius: 999px; cursor: pointer;
+}
+#ml::after {
+  content: ""; width: 5px; height: 5px; margin-top: -3px; flex-shrink: 0;
+  border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted);
+  transform: rotate(45deg);
+}
+#ml:active { background: var(--s2); }
+
+/* ═══ Sélecteur de mois (panneau du bas, même design que les autres) ═══ */
+.mp-overlay { z-index: 2100; }
+.mp-card { padding-left: 20px; padding-right: 20px; }
+.mp-card::before { margin-bottom: 14px; }
+.mp-title { font-family: var(--fh); font-weight: 800; font-size: 1.05rem; color: var(--text); margin: 0 0 14px; }
+.mp-year {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 0 0 14px; padding: 4px; border-radius: 999px;
+  background: var(--s2); border: 1px solid var(--b1);
+}
+.mp-ylbl { font-family: var(--fh); font-weight: 800; font-size: 1.05rem; color: var(--text); font-variant-numeric: tabular-nums; }
+.mp-ynav {
+  width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--s1);
+  color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.mp-ynav svg { width: 18px; height: 18px; }
+.mp-ynav:disabled { opacity: .3; cursor: default; }
+.mp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.mp-m {
+  position: relative; min-height: 52px; border-radius: 14px;
+  border: 1px solid var(--b1); background: var(--s1); color: var(--text);
+  font-family: var(--fh); font-weight: 700; font-size: .9rem; cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.mp-m:active { transform: scale(.97); }
+.mp-m.is-future { color: var(--muted); border-style: dashed; }
+.mp-m.is-now { border-color: var(--pr); border-style: solid; color: var(--pr); }
+.mp-m.is-sel { background: var(--pr); border-color: var(--pr); color: #fff; }
+.mp-m:disabled { opacity: .3; cursor: default; }
+.mp-dot {
+  position: absolute; left: 50%; bottom: 7px; width: 4px; height: 4px; margin-left: -2px;
+  border-radius: 50%; background: currentColor; opacity: .7;
+}
+.mp-today {
+  display: block; width: 100%; margin: 16px 0 0; padding: 14px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s2); color: var(--pr);
+  font-family: var(--fh); font-weight: 700; font-size: .9rem; cursor: pointer;
+}
+.mp-today[hidden] { display: none; }
+
+/* ═══ Objectifs : plan de versement ═══ */
+.gpl-type { margin-bottom: 0; }
+#gpl-monthly-fld[hidden] { display: none; }
+.gpl-hint {
+  margin: -4px 0 16px; padding: 12px 14px; border-radius: var(--r);
+  background: color-mix(in srgb, var(--pr) 9%, var(--s1)); color: var(--text);
+  font-size: .84rem; line-height: 1.55;
+}
+.gpl-hint[hidden] { display: none; }
+.gpl-use {
+  display: inline-block; margin-top: 6px; padding: 7px 12px; border-radius: 999px;
+  border: none; background: var(--pr); color: #fff;
+  font-family: var(--fh); font-weight: 700; font-size: .78rem; cursor: pointer;
+}
+
+/* Détail : carte « ce mois-ci » */
+.gpl-card {
+  margin: 0 0 14px; padding: 14px 16px; border-radius: var(--r);
+  border: 1px solid var(--b1); background: var(--s1);
+}
+.gpl-plan { font-size: .8rem; color: var(--muted); margin-bottom: 10px; }
+.gpl-card .gpl-plan:last-child { margin-bottom: 0; }
+.gpl-month-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-family: var(--fh); font-weight: 700; color: var(--text); }
+.gpl-month-top strong { font-size: .9rem; white-space: nowrap; }
+.gpl-bar { height: 8px; border-radius: 99px; background: var(--s2); overflow: hidden; margin: 8px 0; }
+.gpl-bar > div { height: 100%; border-radius: inherit; background: var(--pr); transition: width .3s; }
+.gpl-month-sub { font-size: .82rem; color: var(--muted); }
+.gpl-month-sub.is-ok { color: var(--green); font-weight: 600; }
+.gpl-quick {
+  display: block; width: 100%; margin-top: 12px; padding: 13px; border-radius: var(--r);
+  border: none; background: var(--pr); color: #fff;
+  font-family: var(--fh); font-weight: 700; font-size: .9rem; cursor: pointer;
+}
+.gpl-quick:active { transform: scale(.99); }
+.gpl-cta {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 14px; padding: 14px 16px;
+  border-radius: var(--r); border: 1px dashed var(--b2); background: var(--s1); color: var(--text);
+  text-align: left; cursor: pointer;
+}
+.gpl-cta svg { width: 22px; height: 22px; flex-shrink: 0; color: var(--pr); }
+.gpl-cta span { display: flex; flex-direction: column; gap: 2px; }
+.gpl-cta strong { font-family: var(--fh); font-size: .9rem; }
+.gpl-cta small { font-size: .78rem; color: var(--muted); }
+.gpl-hist { margin-top: 16px; }
+.gpl-hist-hd { font-size: .78rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.gpl-hist-row {
+  display: flex; justify-content: space-between; padding: 10px 2px;
+  border-bottom: 1px solid var(--b1); font-size: .86rem; color: var(--muted);
+}
+.gpl-hist-row strong { color: var(--green); font-family: var(--fh); }
+
+/* Cartes de la liste */
+.gf-month { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.18); color: #fff; }
+.gf-month-top { display: flex; justify-content: space-between; gap: 8px; font-size: .78rem; font-weight: 600; opacity: .95; }
+.gf-month-bar { height: 5px; border-radius: 99px; background: rgba(255,255,255,.22); overflow: hidden; margin-top: 7px; }
+.gf-month-bar > div { height: 100%; background: #fff; border-radius: inherit; }
+.gc-month { margin-top: 6px; font-size: .72rem; font-weight: 700; color: var(--gold, #f59e0b); }
+.gc-month.is-ok { color: var(--green); }
+
+/* Accueil : rappel de versement */
+#dash-goal-due:empty { display: none; }
+.dash-due {
+  display: flex; align-items: center; gap: 12px; margin: 0 0 16px; padding: 12px 14px;
+  border-radius: var(--r); cursor: pointer;
+  background: color-mix(in srgb, var(--pr) 10%, var(--s1));
+  border: 1px solid color-mix(in srgb, var(--pr) 30%, var(--b1));
+}
+.dash-due-ico {
+  width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; background: var(--pr); color: #fff;
+}
+.dash-due-ico svg { width: 19px; height: 19px; }
+.dash-due-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-due-txt strong { font-family: var(--fh); font-size: .92rem; color: var(--text); }
+.dash-due-txt small { font-size: .78rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-due-btn {
+  padding: 8px 14px; border-radius: 999px; background: var(--pr); color: #fff;
+  font-family: var(--fh); font-weight: 700; font-size: .8rem; flex-shrink: 0;
+}

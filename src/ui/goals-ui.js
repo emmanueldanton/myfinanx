@@ -2,8 +2,22 @@
 import { store }           from '../store.js';
 import { bridgeSaveGoals }  from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, todayISO, focusOnDesktop } from '../utils.js';
-import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
+import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
+import { paidInMonth, dueInMonth, leftToPayInMonth, finishMonth, monthsToReach, requiredMonthly } from '../goals.js';
+import { MONTHS } from '../utils.js';
+
+// Mois réel (les versements et rappels suivent le calendrier, pas le mois affiché)
+function _nowYM() { const n = new Date(); return [n.getFullYear(), n.getMonth()]; }
+function _monthName(M) { return MONTHS[M].toLowerCase(); }
+function _monthLabel(Y, M) { const [nY] = _nowYM(); return _monthName(M) + (Y !== nY ? ' ' + Y : ''); }
+function _hasPlan(g) { return (g.plan === 'monthly' && g.monthlyEUR > 0) || (g.plan === 'once' && !!g.deadline); }
+
+// Objectifs avec un versement encore à faire ce mois-ci : [{ g, left }]
+export function goalsDueNow(goals) {
+  const [Y, M] = _nowYM();
+  return (goals || []).map(g => ({ g, left: leftToPayInMonth(g, Y, M) })).filter(x => x.left > 0.004);
+}
 
 // ── Init ──────────────────────────────────────────────────────────
 
@@ -21,6 +35,10 @@ export function initGoalsUI() {
   window.pinCurrentGoal      = pinCurrentGoal;
   window.deleteCurrentGoal   = deleteCurrentGoal;
   window.addFundsCurrentGoal = addFundsCurrentGoal;
+  window.quickDepositCurrentGoal = quickDepositCurrentGoal;
+  window.setGoalPlan         = setGoalPlan;
+  window.updateGoalPlanHint  = updateGoalPlanHint;
+  window.useRequiredMonthly  = useRequiredMonthly;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
@@ -32,6 +50,7 @@ function _goals() {
 function _mutate(goals) {
   store.set('mfx_goals', goals);
   bridgeSaveGoals();
+  window.syncGoalReminder?.();   // reprogramme (ou annule) le rappel de fin de mois
 }
 
 function _setHTML(id, html) {
@@ -78,6 +97,7 @@ export function buildGoalCard(g, mode) {
       <div class="gc-grid-amt" style="color:${g.color}">${fmt(g.savedEUR)}</div>
       <div class="pt" style="height:6px;margin-top:8px;"><div class="pf" style="width:${pct}%;background:${g.color}"></div></div>
       <div class="gc-grid-pct">${pct}%</div>
+      ${_monthLine(g, 'grid')}
     </div>`;
   }
 
@@ -102,7 +122,25 @@ export function buildGoalCard(g, mode) {
       <span class="gf-pct">${pct}% complété</span>
       <span class="gf-tgt">Sur ${fmt(g.targetEUR)}</span>
     </div>
+    ${_monthLine(g, 'featured')}
     ${done ? '' : `<div class="gf-cta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Ajouter de l'épargne</div>`}
+  </div>`;
+}
+
+// Ligne « ce mois-ci » d'une carte : le versement du mois traité comme un mini-objectif
+function _monthLine(g, mode) {
+  const [Y, M] = _nowYM();
+  const due = dueInMonth(g, Y, M);
+  if (!(due > 0)) return '';
+  const paid = Math.min(due, paidInMonth(g, Y, M));
+  const ok = paid >= due - 0.004;
+  if (mode === 'grid') {
+    return `<div class="gc-month${ok ? ' is-ok' : ''}">${ok ? '✓ Mois versé' : 'À verser : ' + fmt(due - paid)}</div>`;
+  }
+  const p = Math.round((paid / due) * 100);
+  return `<div class="gf-month">
+    <div class="gf-month-top"><span>${ok ? '✓ Versement du mois fait' : 'Versement du mois'}</span><span>${fmt(paid)} / ${fmt(due)}</span></div>
+    <div class="gf-month-bar"><div style="width:${p}%"></div></div>
   </div>`;
 }
 
@@ -160,10 +198,68 @@ function _renderGoalDetail(g) {
       <div class="isc-usage-top"><span>${pct}% complété</span>${done ? '<span style="color:var(--green)">Objectif atteint 🎉</span>' : ''}</div>
       <div class="isc-bar"><div class="isc-bar-fill" style="width:${pct}%;background:${col}"></div></div>
     </div>
+    ${_planBlock(g, done)}
     <div class="isc-stats">
       <div class="isc-stat"><span>${done ? 'Objectif atteint' : 'Reste à épargner'}</span><strong>${fmt(reste)}</strong></div>
       <div class="isc-stat"><span>Montant cible</span><strong>${fmt(g.targetEUR)}</strong></div>
-    </div>`;
+    </div>
+    ${_depositsBlock(g)}`;
+  const inp = document.getElementById('gdc-add');
+  const [Y, M] = _nowYM();
+  const left = leftToPayInMonth(g, Y, M);
+  if (inp) inp.placeholder = left > 0 ? `Montant (${fmt(left)} prévu)` : 'Ajouter un montant…';
+}
+
+// Bloc « Ce mois-ci » du détail : progression du versement du mois + résumé du plan
+function _planBlock(g, done) {
+  const [Y, M] = _nowYM();
+  if (!_hasPlan(g)) {
+    if (done) return '';
+    return `<button class="gpl-cta" onclick="editCurrentGoal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span><strong>Planifier mes versements</strong><small>Par mois ou en une fois, avec un rappel</small></span>
+    </button>`;
+  }
+  const due  = dueInMonth(g, Y, M);
+  const paid = Math.min(due, paidInMonth(g, Y, M));
+  const left = Math.max(0, due - paid);
+  let planTxt;
+  if (g.plan === 'monthly') {
+    const fin = finishMonth(g, Y, M);
+    const n = monthsToReach(g, Y, M);
+    planTxt = `${fmt(g.monthlyEUR)} par mois` + (!done && fin ? ` · fin prévue en ${_monthLabel(fin.Y, fin.M)}${n > 1 ? ` (${n} mois)` : ''}` : '');
+  } else {
+    const [dy, dm] = g.deadline.split('-').map(Number);
+    planTxt = `Paiement en une fois · ${_monthLabel(dy, dm - 1)}`;
+  }
+  let monthHtml = '';
+  if (due > 0) {
+    const p = Math.round((paid / due) * 100);
+    const lastDay = new Date(Y, M + 1, 0).getDate();
+    const cap = _monthName(M).replace(/^./, c => c.toUpperCase());
+    monthHtml = `
+      <div class="gpl-month-top"><span>${cap}</span><strong>${fmt(paid)} / ${fmt(due)}</strong></div>
+      <div class="gpl-bar"><div style="width:${p}%"></div></div>
+      ${left > 0
+        ? `<div class="gpl-month-sub">Reste ${fmt(left)} à verser avant le ${lastDay} ${_monthName(M)}.</div>
+           <button class="gpl-quick" onclick="quickDepositCurrentGoal()">Verser ${fmt(left)}</button>`
+        : `<div class="gpl-month-sub is-ok">✓ Versement du mois fait.</div>`}`;
+  } else if (!done && g.plan === 'once') {
+    monthHtml = `<div class="gpl-month-sub">Rappel à la fin du mois prévu.</div>`;
+  }
+  return `<div class="gpl-card">
+    <div class="gpl-plan">${planTxt}</div>
+    ${monthHtml}
+  </div>`;
+}
+
+function _depositsBlock(g) {
+  const list = (g.deposits || []).slice(-5).reverse();
+  if (!list.length) return '';
+  return `<div class="gpl-hist">
+    <div class="gpl-hist-hd">Derniers versements</div>
+    ${list.map(x => `<div class="gpl-hist-row"><span>${fmtDate(x.d)}</span><strong>+ ${fmt(x.a)}</strong></div>`).join('')}
+  </div>`;
 }
 
 export function editCurrentGoal()  { if (_detailGoalId) openGoalScreenEdit(_detailGoalId); }
@@ -182,11 +278,31 @@ export function addFundsCurrentGoal() {
   const goals = _goals();
   const g = goals.find(x => x.id === _detailGoalId);
   if (!g) return;
-  g.savedEUR = Math.min(g.targetEUR, g.savedEUR + a);
   inp.value = '';
+  _deposit(goals, g, a);
+}
+
+// Versement en un geste : le reste prévu pour ce mois
+export function quickDepositCurrentGoal() {
+  const goals = _goals();
+  const g = goals.find(x => x.id === _detailGoalId);
+  if (!g) return;
+  const [Y, M] = _nowYM();
+  const left = leftToPayInMonth(g, Y, M);
+  if (left > 0) _deposit(goals, g, left);
+}
+
+function _deposit(goals, g, a) {
+  const added = Math.max(0, Math.min(g.targetEUR, g.savedEUR + a) - g.savedEUR);
+  if (added <= 0) { showSuccessToast('Objectif déjà atteint 🎉'); return; }
+  g.savedEUR += added;
+  g.deposits = [...(g.deposits || []), { d: todayISO(), a: added }].slice(-60);
   _mutate(goals);
   _renderGoalDetail(g);
-  showSuccessToast(`${fmt(a)} ajouté à l'objectif`);
+  const [Y, M] = _nowYM();
+  const monthDone = dueInMonth(g, Y, M) > 0 && leftToPayInMonth(g, Y, M) <= 0.004;
+  showSuccessToast(g.savedEUR >= g.targetEUR ? 'Objectif atteint 🎉'
+    : monthDone ? `${fmt(added)} versé · mois validé ✓` : `${fmt(added)} ajouté à l'objectif`);
 }
 
 // ── Écran dédié Objectif (ajout + édition) ────────────────────────
@@ -200,6 +316,8 @@ export function openGoalScreen() {
   _setVal('gsc-target', '');
   _setVal('gsc-saved', '');
   _setVal('gsc-deadline', '');
+  _setVal('gsc-monthly', '');
+  setGoalPlan('monthly');
   _syncGoalSwatches();
   _setGoalCurSym();
   _setTextG('gsc-title', 'Nouvel objectif');
@@ -217,6 +335,8 @@ export function openGoalScreenEdit(id) {
   _setVal('gsc-target', g.targetEUR != null ? fmtInput(g.targetEUR) : '');
   _setVal('gsc-saved', g.savedEUR != null ? fmtInput(g.savedEUR) : '');
   _setVal('gsc-deadline', g.deadline || '');
+  _setVal('gsc-monthly', g.monthlyEUR > 0 ? fmtInput(g.monthlyEUR) : '');
+  setGoalPlan(g.plan === 'once' ? 'once' : 'monthly');
   _syncGoalSwatches();
   _setGoalCurSym();
   _setTextG('gsc-title', "Modifier l'objectif");
@@ -234,6 +354,7 @@ export function saveGoalScreen() {
   const target = fromDisplay(parseAmt(document.getElementById('gsc-target')?.value || ''));
   const saved  = fromDisplay(parseAmt(document.getElementById('gsc-saved')?.value || ''));
   const dl     = document.getElementById('gsc-deadline')?.value || '';
+  const monthly = _gPlan === 'monthly' ? fromDisplay(parseAmt(document.getElementById('gsc-monthly')?.value || '')) : 0;
   if (!name || target <= 0) {
     const el = !name ? document.getElementById('gsc-name') : document.getElementById('gsc-target');
     if (el) { el.classList.add('invalid'); setTimeout(() => el.classList.remove('invalid'), 1400); }
@@ -242,14 +363,82 @@ export function saveGoalScreen() {
   const goals = _goals();
   if (_goalEditId) {
     const g = goals.find(x => x.id === _goalEditId);
-    if (g) { g.name = name; g.targetEUR = target; g.savedEUR = Math.min(saved, target); g.deadline = dl; g.color = _gScrColor; }
+    if (g) { g.name = name; g.targetEUR = target; g.savedEUR = Math.min(saved, target); g.deadline = dl; g.color = _gScrColor; g.plan = _gPlan; g.monthlyEUR = monthly; }
   } else {
-    goals.push({ id: uid(), name, targetEUR: target, savedEUR: Math.min(saved, target), deadline: dl, color: _gScrColor });
+    goals.push({ id: uid(), name, targetEUR: target, savedEUR: Math.min(saved, target), deadline: dl, color: _gScrColor, plan: _gPlan, monthlyEUR: monthly, deposits: [] });
   }
   _mutate(goals);
   window.closeScreen?.();
   showSuccessToast(_goalEditId ? 'Objectif modifié' : `Objectif "${name}" créé`);
   _goalEditId = null;
+  // Un plan avec rappel : proposer les notifications si elles n'ont jamais été demandées
+  if ((monthly > 0 || (_gPlan === 'once' && dl)) && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+    setTimeout(() => window.requestPushPermission?.(), 900);
+  }
+}
+
+// ── Plan de versement (écran Objectif) ──
+let _gPlan = 'monthly';
+
+export function setGoalPlan(plan) {
+  _gPlan = plan === 'once' ? 'once' : 'monthly';
+  document.getElementById('gpl-monthly')?.classList.toggle('on', _gPlan === 'monthly');
+  document.getElementById('gpl-once')?.classList.toggle('on', _gPlan === 'once');
+  const fld = document.getElementById('gpl-monthly-fld');
+  if (fld) fld.hidden = _gPlan !== 'monthly';
+  _setTextG('gsc-deadline-lbl', _gPlan === 'once' ? 'Date du paiement' : 'Échéance (facultatif)');
+  updateGoalPlanHint();
+}
+
+function _formGoal() {
+  return {
+    targetEUR:  fromDisplay(parseAmt(document.getElementById('gsc-target')?.value || '')),
+    savedEUR:   fromDisplay(parseAmt(document.getElementById('gsc-saved')?.value || '')),
+    monthlyEUR: fromDisplay(parseAmt(document.getElementById('gsc-monthly')?.value || '')),
+    deadline:   document.getElementById('gsc-deadline')?.value || '',
+  };
+}
+
+// Phrase d'aide sous le plan : date d'arrivée, ou mensualité nécessaire pour l'échéance
+export function updateGoalPlanHint() {
+  const el = document.getElementById('gpl-hint');
+  if (!el) return;
+  const f = _formGoal();
+  const [Y, M] = _nowYM();
+  const useBtn = `<button type="button" class="gpl-use" onclick="useRequiredMonthly()">Mettre ce montant</button>`;
+  let html = '';
+  if (f.targetEUR > 0 && f.savedEUR < f.targetEUR) {
+    if (_gPlan === 'monthly') {
+      const req = requiredMonthly(f, Y, M);
+      if (f.monthlyEUR > 0) {
+        const fin = finishMonth(f, Y, M);
+        const n = monthsToReach(f, Y, M);
+        html = `Objectif atteint en <strong>${_monthLabel(fin.Y, fin.M)}</strong>${n > 1 ? `, dans ${n} mois` : ''}. Rappel à chaque fin de mois.`;
+        if (req && f.monthlyEUR < req - 0.004) html += `<br>Pour l'échéance, il faut <strong>${fmt(req)}</strong> par mois. ${useBtn}`;
+      } else if (req) {
+        html = `Pour l'échéance : <strong>${fmt(req)}</strong> par mois. ${useBtn}`;
+      }
+    } else if (f.deadline) {
+      const [dy, dm] = f.deadline.split('-').map(Number);
+      html = `Rappel fin <strong>${_monthLabel(dy, dm - 1)}</strong> pour verser ${fmt(f.targetEUR - f.savedEUR)}.`;
+    } else {
+      html = 'Choisis la date du paiement pour recevoir un rappel.';
+    }
+  }
+  el.innerHTML = html;
+  el.hidden = !html;
+}
+
+export function useRequiredMonthly() {
+  const f = _formGoal();
+  const [Y, M] = _nowYM();
+  const req = requiredMonthly(f, Y, M);
+  if (!req) return;
+  const inp = document.getElementById('gsc-monthly');
+  // Arrondi à l'unité supérieure dans la devise affichée (75 000 CFA, pas 75 002)
+  const f10 = 10 ** getActiveCurrency().decimals;
+  if (inp) inp.value = String(Math.ceil(toDisplay(req) * f10 - 0.01) / f10).replace('.', ',');
+  updateGoalPlanHint();
 }
 
 function _syncGoalSwatches() {

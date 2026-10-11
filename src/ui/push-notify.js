@@ -3,10 +3,12 @@ import { store }                                        from '../store.js';
 import { fmt }                                          from '../currency.js';
 import { calcTotalIncomes, calcTotalAllocated }         from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes }  from '../transactions.js';
+import { leftToPayInMonth }                             from '../goals.js';
 
 const SCHEDULED_KEY = 'mfx-push-scheduled-date';
 const USER_KEY      = 'monargent-username';
 const GOAL_CELEB_KEY = 'mfx-goals-celebrated';   // objectifs déjà félicités (évite de répéter)
+const GOAL_REMIND_KEY = 'mfx-goal-reminder';     // rappel de fin de mois programmé : { m, id, msg }
 
 // ── Entry point — appeler une fois au lancement ───────────────────
 
@@ -40,6 +42,74 @@ export async function scheduleDailyPush() {
   } catch (e) {
     // Non bloquant — échec silencieux
   }
+}
+
+// ── Rappel de fin de mois : versements des objectifs ──────────────
+// Programmé pour le dernier jour du mois à 18h. Annulé (ou mis à jour) dès que les
+// versements changent : pas de rappel si le mois est déjà validé.
+
+function _goalsDue() {
+  const n = new Date();
+  return (store.get('mfx_goals') || [])
+    .map(g => ({ g, left: leftToPayInMonth(g, n.getFullYear(), n.getMonth()) }))
+    .filter(x => x.left > 0.004);
+}
+
+export function goalReminderMessage(due, prenom) {
+  if (!due.length) return null;
+  const s = prenom ? `${prenom}, ` : '';
+  if (due.length === 1) {
+    return `${s}dernier jour du mois : il te reste ${fmt(due[0].left)} à verser pour "${due[0].g.name}".`;
+  }
+  const total = due.reduce((a, x) => a + x.left, 0);
+  return `${s}dernier jour du mois : ${due.length} versements à faire pour tes objectifs (${fmt(total)} au total).`;
+}
+
+function _monthEndAt() {
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth() + 1, 0, 18, 0, 0, 0);
+}
+
+let _syncTimer = null;
+export function syncGoalReminder() {
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(_syncGoalReminder, 2500);   // regroupe les modifications rapprochées
+}
+
+async function _syncGoalReminder() {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const n = new Date();
+  const m = `${n.getFullYear()}-${n.getMonth()}`;
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(GOAL_REMIND_KEY) || 'null'); } catch (e) {}
+
+  const at  = _monthEndAt();
+  const msg = n < at ? goalReminderMessage(_goalsDue(), localStorage.getItem(USER_KEY) || '') : null;
+  if (saved && saved.m === m && saved.msg === msg) return;   // rien n'a changé
+
+  // L'ancien rappel du mois n'est plus juste : on l'annule
+  if (saved?.id && saved.m === m) {
+    try {
+      await fetch('/api/push-notify', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cancelId: saved.id }),
+      });
+    } catch (e) {}
+  }
+  if (!msg) {
+    try { localStorage.setItem(GOAL_REMIND_KEY, JSON.stringify({ m, id: null, msg: null })); } catch (e) {}
+    return;
+  }
+  const subscriptionId = await _getSubscriptionId();
+  if (!subscriptionId) return;
+  try {
+    const res = await fetch('/api/push-notify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscriptionId, title: 'MyFinanx 🎯', message: msg, deliverAt: at.toISOString() }),
+    });
+    const data = res.ok ? await res.json().catch(() => ({})) : null;
+    if (data) localStorage.setItem(GOAL_REMIND_KEY, JSON.stringify({ m, id: data.id || null, msg }));
+  } catch (e) {}
 }
 
 // ── OneSignal subscription ID ─────────────────────────────────────
@@ -94,6 +164,20 @@ function _buildNotification() {
       `${s}budget presque au maximum : ${pct}% utilisés. ${fmt(reste)} restants, chaque dépense compte maintenant.`,
     ]),
   };
+
+  // ①bis Fin de mois proche : versements d'objectifs encore à faire
+  const now = new Date();
+  const daysLeft = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate();
+  const due = _goalsDue();
+  if (due.length && daysLeft >= 1 && daysLeft <= 5) {
+    const total = due.reduce((a, x) => a + x.left, 0);
+    return {
+      title:   'MyFinanx 🎯',
+      message: due.length === 1
+        ? `${s}plus que ${daysLeft} jour${daysLeft > 1 ? 's' : ''} pour verser ${fmt(due[0].left)} sur "${due[0].g.name}".`
+        : `${s}plus que ${daysLeft} jour${daysLeft > 1 ? 's' : ''} pour tes versements d'objectifs (${fmt(total)}).`,
+    };
+  }
 
   // ② Objectif atteint (félicité une seule fois)
   const goalDone = goals.find(g => g.targetEUR > 0 && g.savedEUR >= g.targetEUR && !_celebratedGoals().includes(g.id));

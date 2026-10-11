@@ -81,7 +81,10 @@ export function confirmPushPermission() {
   window.loadOneSignal?.();   // charge le SDK OneSignal maintenant (à la demande)
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(function(OneSignal) {
-    OneSignal.Notifications.requestPermission();
+    Promise.resolve(OneSignal.Notifications.requestPermission()).then(() => {
+      // Permission accordée : programme tout de suite le rappel de fin de mois des objectifs
+      setTimeout(() => window.syncGoalReminder?.(), 1500);
+    }).catch(() => {});
   });
 }
 
