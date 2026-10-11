@@ -10,8 +10,9 @@ export function todayISO() {
 
 export function fmtDate(iso) {
   if (!iso) return '';
+  // Uniquement une vraie date AAAA-MM-JJ : le résultat est inséré tel quel dans le HTML
+  if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return '';
   const parts = iso.split('-');
-  if (parts.length !== 3) return iso;
   const [y, mo, d] = parts.map(Number);
   const SHORT = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
   return y && y !== new Date().getFullYear() ? `${d} ${SHORT[mo-1]} ${y}` : `${d} ${SHORT[mo-1]}`;

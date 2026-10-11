@@ -171,6 +171,11 @@ export function appendToMonth(Y, M, txs) {
   localStorage.setItem(monthKey(Y, M), JSON.stringify(mono));
 }
 
+// Valeurs insérées dans le HTML (style, texte) : on n'accepte que des formats sûrs,
+// car une sauvegarde importée peut contenir n'importe quoi.
+function _isoDate(v) { return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v); }
+function _safeColor(v) { return typeof v === 'string' && /^#[0-9a-f]{3,8}$/i.test(v) ? v : '#4D78D4'; }
+
 // Load goals from monolith localStorage → populate mfx_goals in store
 export function bridgeLoadGoals() {
   try {
@@ -183,11 +188,13 @@ export function bridgeLoadGoals() {
           name:      g.name,
           targetEUR: g.target ?? g.targetEUR ?? 0,
           savedEUR:  g.saved  ?? g.savedEUR  ?? 0,
-          deadline:  g.deadline,
-          color:     g.color || '#4D78D4',
-          plan:       g.plan,
-          monthlyEUR: g.monthly ?? g.monthlyEUR ?? 0,
-          deposits:   Array.isArray(g.deposits) ? g.deposits : [],
+          deadline:  _isoDate(g.deadline) ? g.deadline : '',
+          color:     _safeColor(g.color),
+          plan:       g.plan === 'monthly' || g.plan === 'once' ? g.plan : undefined,
+          monthlyEUR: +(g.monthly ?? g.monthlyEUR) || 0,
+          deposits:   (Array.isArray(g.deposits) ? g.deposits : [])
+            .filter(x => x && _isoDate(x.d) && Number.isFinite(+x.a))
+            .map(x => ({ d: x.d, a: +x.a })),
         })));
         return;
       }
