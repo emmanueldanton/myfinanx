@@ -75,7 +75,18 @@ const SLIDES = [
 const TUTO_TOTAL = SLIDES.length;
 let _idx = 0;
 
+// Tutoriel déjà vu (clé actuelle ou anciennes clés) : source unique pour toute l'app
+export function isTutoDone() {
+  try {
+    return !!(localStorage.getItem(TUTO_KEY) || localStorage.getItem('myfinanx-tuto-done') || localStorage.getItem('monargent-onboarded'));
+  } catch (e) { return false; }
+}
+
+// Vrai si le tutoriel a été affiché pendant cette session (on n'enchaîne pas une autre fenêtre)
+export let tutoShownThisSession = false;
+
 export function openTuto(startIdx = 0) {
+  tutoShownThisSession = true;
   _idx = Math.max(0, Math.min(startIdx, TUTO_TOTAL - 1));
   openOverlay('tuto-overlay');
   _tutoRender();

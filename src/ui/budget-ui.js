@@ -1,7 +1,7 @@
 // ═══ Budget UI — revenue sources + budget items (onglet Budget) ═══
 import { store }      from '../store.js';
 import { bridgeSave, getRecentMonthsExpenseAverages } from '../data-bridge.js';
-import { uid, esc, parseAmt, catIco, catSubtitle } from '../utils.js';
+import { uid, esc, parseAmt, catIco, catSubtitle, focusOnDesktop } from '../utils.js';
 import { calcByCategory } from '../transactions.js';
 import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast }  from './toast.js';
@@ -93,7 +93,7 @@ export function renderBudRows(state) {
       </div>
       <div class="ba-wrap">
         <div class="ba">
-          <span class="row-view-txt amt" style="color:var(--red-l)">${fmt(b.allocatedEUR)}</span>
+          <span class="row-view-txt amt" style="color:${b.allocatedEUR > 0 ? 'var(--red-l)' : 'var(--muted)'}">${fmt(b.allocatedEUR)}</span>
         </div>
         ${status}
       </div>
@@ -253,7 +253,7 @@ export function openBudgetScreen(kind) {
   _bsText('bsc-save-lbl', 'Ajouter');
   _setBudCurSym();
   window.openScreen?.('screen-budget');
-  setTimeout(() => document.getElementById('bsc-name')?.focus(), 60);
+  focusOnDesktop('bsc-name');
 }
 
 export function openBudgetScreenEdit(kind, id) {
@@ -404,7 +404,7 @@ Règles :
 - Vérifie ton addition avant de répondre : le total doit valoir ${revNum}.`;
 
   const question = `Propose ma répartition de budget mensuel. Réponds UNIQUEMENT en JSON valide selon ce schéma exact :
-{"repartition": {"<categorie>": <montant_nombre>, ...}, "note": "<une phrase d'explication, max 25 mots>"}
+{"repartition": {"<categorie>": <montant_nombre>, ...}, "note": "<un conseil personnel en une phrase, max 20 mots, sans parler du total ni de la méthode>"}
 Le total de "repartition" doit valoir exactement ${revNum}.`;
 
   const res = await fetch('/api/ai', {

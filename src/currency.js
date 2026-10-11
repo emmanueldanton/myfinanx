@@ -45,7 +45,8 @@ export function fmt(eurAmount) {
 
 export function fmtInput(eurAmount) {
   const cur = getActiveCurrency();
-  return toDisplay(eurAmount).toFixed(cur.decimals);
+  // Saisie à la française : « 25000 » plutôt que « 25000.00 », « 12,50 » plutôt que « 12.50 »
+  return toDisplay(eurAmount).toFixed(cur.decimals).replace(/\.0+$/, '').replace('.', ',');
 }
 
 export async function fetchLiveRates() {

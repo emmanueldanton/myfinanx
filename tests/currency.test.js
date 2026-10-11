@@ -21,3 +21,11 @@ describe('conversion de devises', () => {
     expect(fromDisplay(12.34)).toBe(12.34);
   });
 });
+
+describe('fmtInput (saisie à la française)', () => {
+  it('pas de décimales inutiles, virgule décimale', () => {
+    setActiveCurrency('EUR');
+    expect(fmtInput(25000)).toBe('25000');
+    expect(fmtInput(12.5)).toBe('12,50');
+  });
+});

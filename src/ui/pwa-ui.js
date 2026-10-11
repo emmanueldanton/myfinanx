@@ -1,5 +1,6 @@
 // ═══ PWA UI — invite d'installation (mobile uniquement) ═══
 import { openOverlay, closeOverlay } from './overlay.js';
+import { isTutoDone, tutoShownThisSession } from './tutorial.js';
 
 const PWA_DISMISSED_KEY = 'mfx-pwa-popup-dismissed';
 const PWA_COOLDOWN_MS   = 7 * 24 * 60 * 60 * 1000; // 7 jours
@@ -25,6 +26,10 @@ export function showPwaPopup() {
   if (_isStandalone()) return;
 
   if (!window.matchMedia('(pointer: coarse)').matches) return;
+
+  // Une seule fenêtre à la fois : au premier lancement, le tutoriel passe d'abord.
+  // L'invitation à installer viendra à une prochaine ouverture de l'app.
+  if (!isTutoDone() || tutoShownThisSession) return;
 
   const dismissed = parseInt(localStorage.getItem(PWA_DISMISSED_KEY) || '0', 10);
   if (dismissed && (Date.now() - dismissed) < PWA_COOLDOWN_MS) return;
@@ -88,6 +93,5 @@ function _isStandalone() {
 }
 
 function _tutoDone() {
-  return !!(localStorage.getItem('myfinanx-tuto-done')
-         || localStorage.getItem('monargent-onboarded'));
+  return isTutoDone();
 }

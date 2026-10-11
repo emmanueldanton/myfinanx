@@ -169,5 +169,9 @@ function _greetFinancialSub() {
     return 'Commence par saisir tes revenus dans l\'onglet Budget pour activer les conseils personnalisés.';
   if (incomes.length && totalR === 0 && totalE === 0)
     return 'Sources de revenus créées. Renseigne les montants pour activer l\'analyse.';
-  return '…';
+  // Message local immédiat (remplacé par le conseil IA dès qu'il arrive ; reste valable hors ligne)
+  const reste = totalR - totalE;
+  if (reste < 0) return `⚠️ Tu as dépassé tes revenus de ${fmt(-reste)} ce mois-ci.`;
+  if (totalE === 0) return `💰 ${fmt(totalR)} de revenus prévus ce mois-ci. Ajoute tes dépenses au fil de l'eau.`;
+  return `💰 Il te reste ${fmt(reste)} ce mois-ci.`;
 }

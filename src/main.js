@@ -19,7 +19,7 @@ import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
 import './styles/scan.css';
 import './styles/ux.css';
-import { initTutorial, maybeShowTuto } from './ui/tutorial.js';
+import { initTutorial, maybeShowTuto, isTutoDone } from './ui/tutorial.js';
 import { initBudgetUI, renderRevRows, renderBudRows, renderBudgetFooter } from './ui/budget-ui.js';
 import { initTransactionsUI, renderExpenses, updateTracker, resetTxFilters } from './ui/transactions-ui.js';
 import { initGoalsUI, renderGoals } from './ui/goals-ui.js';
@@ -52,6 +52,7 @@ function changeMonth(delta) {
   resetTxFilters();
   // Goals are NOT reloaded on month change (FR-007 — independent lifecycle)
   _notifyAll();
+  renderGreeting();   // le message d'accueil suit le mois affiché
 }
 
 function _buildState() {
@@ -75,7 +76,7 @@ function _renderViews(b, t, g) {
   if (t)      renderExpenses(state);                          // transaction list ← transactions
   if (b || t) updateTracker(state);                           // tracker totals ← budget + transactions
   if (g)      renderGoals(state);                             // goals page ← goals
-  scheduleAiGreeting();
+  renderGreeting();   // le message d'accueil suit les données (sinon « saisis tes revenus » restait après l'ajout)
 }
 
 // Coalesce multiple store writes in the same tick into a single targeted render.
@@ -221,7 +222,7 @@ function init() {
   showPwaPopup();
 
   // Si le tuto est déjà fait et app en standalone → demande les notifs après 1.5s
-  const tutoDone = localStorage.getItem('myfinanx-tuto-done') || localStorage.getItem('monargent-onboarded');
+  const tutoDone = isTutoDone();
   if (tutoDone) setTimeout(() => window.requestPushPermission?.(), 1500);
 
   // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)

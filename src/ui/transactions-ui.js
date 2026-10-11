@@ -1,7 +1,7 @@
 // ═══ Transactions UI — dépenses + revenus ponctuels (onglet Dépenses) ═══
 import { store }      from '../store.js';
 import { bridgeSave } from '../data-bridge.js';
-import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO } from '../utils.js';
+import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO, focusOnDesktop } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
 import { buildCorpus, frequentExpenses, matchDescriptions, guessCategory } from './expense-intel.js';
@@ -264,6 +264,7 @@ export function openTxScreen(type) {
   _setVal('txs-date', todayISO());
   _setText('txs-title', _txScrType === 'income' ? 'Nouveau revenu' : 'Nouvelle dépense');
   _setText('txs-save-lbl', 'Ajouter');
+  _setSaveIcon('add');
   const del = document.getElementById('txs-del');
   if (del) del.hidden = true;
   const sym = document.getElementById('txs-cur-sym');
@@ -271,7 +272,7 @@ export function openTxScreen(type) {
   _hideAutocomplete();
   _renderFreqChips();
   window.openScreen?.('screen-tx');
-  setTimeout(() => document.getElementById('txs-desc')?.focus(), 60);
+  focusOnDesktop('txs-desc');
 }
 
 export function openTxScreenEdit(id) {
@@ -286,6 +287,7 @@ export function openTxScreenEdit(id) {
   _setVal('txs-date', tx.date || todayISO());
   _setText('txs-title', 'Modifier la transaction');
   _setText('txs-save-lbl', 'Enregistrer');
+  _setSaveIcon('save');
   const del = document.getElementById('txs-del');
   if (del) del.hidden = false;
   const sym = document.getElementById('txs-cur-sym');
@@ -305,7 +307,7 @@ function _applyItem(it, setAmount) {
     cat.value = it.cat;
     _catTouched = true;
   }
-  if (amt && setAmount && it.amount != null) amt.value = fmtInput(it.amount);
+  if (amt && setAmount && it.amount != null) { amt.value = fmtInput(it.amount); window.fitAmount?.(amt); }
   _hideAutocomplete();
   amt?.focus();
 }
@@ -430,6 +432,14 @@ export function deleteTxFromScreen() {
   _txEditId = null;
   window.closeScreen?.();
   delTx(id);
+}
+
+// Icône du bouton principal : « + » pour ajouter, coche pour enregistrer une modification
+function _setSaveIcon(kind) {
+  const svg = document.querySelector('#screen-tx .scr-save svg');
+  if (svg) svg.innerHTML = kind === 'save'
+    ? '<polyline points="20 6 9 17 4 12"/>'
+    : '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
 }
 
 function _setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
