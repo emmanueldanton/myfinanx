@@ -1,7 +1,7 @@
 // ═══ Push Notify — programme une notif personnalisée à 20h via OneSignal REST ═══
 import { store }                                        from '../store.js';
 import { fmt }                                          from '../currency.js';
-import { calcTotalIncomes, calcTotalAllocated }         from '../budget.js';
+import { calcTotalIncomes, calcTotalAllocated, categoryAlerts, pushCategory } from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes }  from '../transactions.js';
 import { leftToPayInMonth }                             from '../goals.js';
 
@@ -191,6 +191,21 @@ function _buildNotification() {
       ]),
     };
   }
+
+  // ②bis Poste de budget à 80 % ou plus : on cite le plus avancé
+  const c = pushCategory(categoryAlerts(budget.budgetItems ?? [], transactions));
+  if (c) return {
+    title:   'MyFinanx',
+    message: c.level >= 100
+      ? _pick([
+          `${s}ton budget ${c.name} est dépassé de ${fmt(c.spentEUR - c.allocatedEUR)}.`,
+          `${s}le poste ${c.name} dépasse son budget de ${fmt(c.spentEUR - c.allocatedEUR)}.`,
+        ])
+      : _pick([
+          `${s}ton budget ${c.name} est à ${c.pct} %. Il te reste ${fmt(c.allocatedEUR - c.spentEUR)}.`,
+          `${s}${c.pct} % du poste ${c.name} déjà utilisés. Il reste ${fmt(c.allocatedEUR - c.spentEUR)}.`,
+        ]),
+  };
 
   // ③ Budget serré 75 à 90 %
   if (pct > 75) return {
