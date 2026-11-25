@@ -15,6 +15,8 @@ import { loadTheme, setTheme } from './theme.js';
 import { fetchLiveRates, setActiveCurrency } from './currency.js';
 import { renderAll, initDashboard } from './ui/index.js';
 import { bridgeLoad, bridgeLoadGoals, bridgeSave, bridgeLoadPrefs } from './data-bridge.js';
+import { generateDue } from './recurring.js';
+import { todayISO } from './utils.js';
 import { initNavigation } from './ui/navigation.js';
 import './styles/tutorial.css';
 import './styles/scan.css';
@@ -29,7 +31,7 @@ import { initSettingsUI, setCurrency } from './ui/settings-ui.js';
 import { initDataManagementUI } from './ui/data-management-ui.js';
 import { initPwaUI, showPwaPopup } from './ui/pwa-ui.js';
 import { scheduleDailyPush, syncGoalReminder } from './ui/push-notify.js';
-import { initToast } from './ui/toast.js';
+import { initToast, showSuccessToast } from './ui/toast.js';
 import { initAds } from './ui/ads.js';
 import { initScreens } from './ui/screens.js';
 import { initStatsUI } from './ui/stats-ui.js';
@@ -122,6 +124,12 @@ function initBreakpointManager() {
 }
 
 // ═══ Init ═══
+
+// Crée les dépenses récurrentes échues et le signale d'un toast
+function _runRecurring() {
+  const n = generateDue(todayISO(), [_Y, _M]);
+  if (n > 0) showSuccessToast(n === 1 ? '1 opération récurrente ajoutée' : `${n} opérations récurrentes ajoutées`);
+}
 
 function init() {
   // Schema migration (safe, idempotent)
@@ -228,6 +236,12 @@ function init() {
   // Si le tuto est déjà fait et app en standalone → demande les notifs après 1.5s
   const tutoDone = isTutoDone();
   if (tutoDone) setTimeout(() => window.requestPushPermission?.(), 1500);
+
+  // Dépenses récurrentes : crée les occurrences échues, puis à chaque retour sur l'appli
+  _runRecurring();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') _runRecurring();
+  });
 
   // Programme la notification push personnalisée du soir (une fois par jour, non bloquant)
   scheduleDailyPush();

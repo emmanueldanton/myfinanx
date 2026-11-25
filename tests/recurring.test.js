@@ -10,7 +10,9 @@ globalThis.localStorage = {
   get length() { return _mem.size; },
 };
 
-const { occurrencesBetween, loadRules, saveRules } = await import('../src/recurring.js');
+const { occurrencesBetween, loadRules, saveRules, generateDue } = await import('../src/recurring.js');
+const { store } = await import('../src/store.js');
+const { readMonthTransactions } = await import('../src/data-bridge.js');
 
 const rule = (freq, startDate) => ({ id: 'r1', freq, startDate, lastDate: startDate, active: true });
 
@@ -59,5 +61,50 @@ describe('loadRules / saveRules', () => {
     const rules = [{ ...rule('week', '2026-11-02'), description: 'Navigo', category: 'Transport', amountEUR: 22 }];
     saveRules(rules);
     expect(loadRules()).toEqual(rules);
+  });
+});
+
+describe('generateDue', () => {
+  const loyer = (extra = {}) => ({
+    id: 'r1', description: 'Loyer', category: 'Logement', amountEUR: 500,
+    freq: 'month', startDate: '2026-09-05', lastDate: '2026-09-05', active: true, ...extra,
+  });
+
+  beforeEach(() => {
+    _mem.clear();
+    store.set('mfx_budget', { incomes: [], budgetItems: [] });
+    store.set('mfx_transactions', []);
+  });
+
+  it('crée les occurrences échues, chacune dans son mois', () => {
+    saveRules([loyer()]);
+    expect(generateDue('2026-11-25', [2026, 10])).toBe(2);
+    const oct = readMonthTransactions(2026, 9);
+    expect(oct).toHaveLength(1);
+    expect(oct[0]).toMatchObject({ date: '2026-10-05', recurId: 'r1', type: 'expense', description: 'Loyer', category: 'Logement', amountEUR: 500 });
+    const nov = store.get('mfx_transactions');
+    expect(nov).toHaveLength(1);
+    expect(nov[0]).toMatchObject({ date: '2026-11-05', recurId: 'r1' });
+    expect(readMonthTransactions(2026, 10)).toHaveLength(1);
+    expect(loadRules()[0].lastDate).toBe('2026-11-05');
+  });
+
+  it('aucun doublon au second appel le même jour', () => {
+    saveRules([loyer()]);
+    generateDue('2026-11-25', [2026, 10]);
+    expect(generateDue('2026-11-25', [2026, 10])).toBe(0);
+    expect(store.get('mfx_transactions')).toHaveLength(1);
+  });
+
+  it('une occurrence supprimée n\'est pas recréée', () => {
+    saveRules([loyer()]);
+    generateDue('2026-11-25', [2026, 10]);
+    store.set('mfx_transactions', []);
+    expect(generateDue('2026-11-25', [2026, 10])).toBe(0);
+  });
+
+  it('une règle arrêtée ne crée rien', () => {
+    saveRules([loyer({ active: false })]);
+    expect(generateDue('2026-11-25', [2026, 10])).toBe(0);
   });
 });
