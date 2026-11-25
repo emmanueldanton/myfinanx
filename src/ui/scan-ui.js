@@ -10,6 +10,7 @@ import { showSuccessToast } from './toast.js';
 import { prepareFiles } from '../scan/prepare.js';
 import { buildReviewItems, groupByMonth } from '../scan/review.js';
 import { buildCorpus, guessCategory } from './expense-intel.js';
+import { announceCrossing } from './category-toast.js';
 
 let _getYM = () => [new Date().getFullYear(), new Date().getMonth()];
 let _rows = [];
@@ -197,11 +198,13 @@ export function saveScan() {
   const [cY, cM] = _getYM();
   const groups = groupByMonth(sel);
   const otherMonths = [];
+  let avantMois = null;   // transactions du mois courant avant l'import (toast de palier)
   try {
     for (const g of Object.values(groups)) {
       const txs = g.rows.map(toTx);
       if (g.Y === cY && g.M === cM) {
-        store.set('mfx_transactions', [...txs, ...(store.get('mfx_transactions') || [])]);
+        avantMois = store.get('mfx_transactions') || [];
+        store.set('mfx_transactions', [...txs, ...avantMois]);
         bridgeSave(cY, cM);
       } else {
         appendToMonth(g.Y, g.M, txs);
@@ -222,6 +225,8 @@ export function saveScan() {
   }
   const n = sel.length;
   showSuccessToast(`${n} opération${n > 1 ? 's ajoutées' : ' ajoutée'}${otherMonths.length && keys.length === 1 ? ` en ${otherMonths[0]}` : otherMonths.length ? `, dont certaines en ${otherMonths.join(', ')}` : ''}`);
+  // Palier franchi sur le mois courant : passe après le toast de confirmation
+  if (avantMois) announceCrossing(store.get('mfx_budget') ?? {}, avantMois, store.get('mfx_transactions') || [], cY, cM);
 }
 
 export function initScanUI(getYM) {

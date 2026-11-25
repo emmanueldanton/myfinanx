@@ -4,6 +4,7 @@ import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO, focusOnDesktop } from '../utils.js';
 import { fmt, fmtInput, fromDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast } from './toast.js';
+import { announceCrossing } from './category-toast.js';
 import { buildCorpus, frequentExpenses, matchDescriptions, guessCategory } from './expense-intel.js';
 
 let _txType      = 'expense';
@@ -52,9 +53,12 @@ function _txs() {
 }
 
 function _mutate(txs) {
+  const avant = _txs();
   store.set('mfx_transactions', txs);
   const [Y, M] = _getYM();
   bridgeSave(Y, M);
+  // Après les toasts existants : celui du palier les remplace
+  announceCrossing(store.get('mfx_budget') ?? {}, avant, txs, Y, M);
 }
 
 function _setText(id, v) {
