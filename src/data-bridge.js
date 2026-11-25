@@ -107,6 +107,7 @@ export function bridgeLoad(Y, M) {
     description: e.desc ?? e.description ?? '',
     category:    e.cat  ?? e.category    ?? 'Autre',
     amountEUR:   e.amount ?? 0,
+    ...(e.recurId ? { recurId: e.recurId } : {}),
   })));
 }
 
@@ -125,6 +126,7 @@ export function bridgeSave(Y, M) {
       desc:   t.description,
       cat:    t.category,
       amount: t.amountEUR ?? 0,
+      ...(t.recurId ? { recurId: t.recurId } : {}),
     })),
   };
 
@@ -147,6 +149,7 @@ export function readMonthTransactions(Y, M) {
       description: e.desc ?? e.description ?? '',
       category: e.cat ?? e.category ?? 'Autre',
       amountEUR: e.amount ?? 0,
+      ...(e.recurId ? { recurId: e.recurId } : {}),
     }));
   } catch (e) { return []; }
 }
@@ -167,6 +170,7 @@ export function appendToMonth(Y, M, txs) {
   if (!Array.isArray(mono.expenses)) mono.expenses = [];
   mono.expenses.unshift(...txs.map(t => ({
     id: t.id, date: t.date, type: t.type, desc: t.description, cat: t.category, amount: t.amountEUR ?? 0,
+    ...(t.recurId ? { recurId: t.recurId } : {}),
   })));
   localStorage.setItem(monthKey(Y, M), JSON.stringify(mono));
 }
