@@ -58,7 +58,7 @@ function _mutate(txs) {
   const [Y, M] = _getYM();
   bridgeSave(Y, M);
   // Après les toasts existants : celui du palier les remplace
-  announceCrossing(store.get('mfx_budget') ?? {}, avant, txs, Y, M);
+  return announceCrossing(store.get('mfx_budget') ?? {}, avant, txs, Y, M);
 }
 
 function _setText(id, v) {
@@ -228,7 +228,7 @@ export function addTx() {
     setTimeout(() => { a.style.borderColor = ''; a.style.boxShadow = ''; }, 1400);
     return;
   }
-  const txs = _txs();
+  const txs = [..._txs()];   // copie : le store garde l'ancienne liste pour le calcul du palier
   txs.unshift({
     id:          uid(),
     description: desc,
@@ -240,8 +240,7 @@ export function addTx() {
   });
   document.getElementById('tx-d').value = '';
   document.getElementById('tx-a').value = '';
-  _mutate(txs);
-  showSuccessToast('Transaction ajoutée');
+  if (!_mutate(txs)) showSuccessToast('Transaction ajoutée');
 }
 
 export function delTx(id) {
@@ -422,19 +421,19 @@ export function saveTxScreen() {
     if (a) { a.classList.add('invalid'); setTimeout(() => a.classList.remove('invalid'), 1400); }
     return;
   }
-  const txs = _txs();
+  const txs = [..._txs()];   // copie : jamais de mutation de la liste du store
   if (_txEditId) {
-    const tx = txs.find(t => t.id === _txEditId);
-    if (tx) { tx.description = desc; tx.category = cat; tx.amountEUR = amt; tx.date = date; tx.type = _txScrType; }
+    const i = txs.findIndex(t => t.id === _txEditId);
+    if (i >= 0) txs[i] = { ...txs[i], description: desc, category: cat, amountEUR: amt, date, type: _txScrType };
   } else {
     txs.unshift({
       id: uid(), description: desc, category: cat, amountEUR: amt,
       date, type: _txScrType, curCode: getActiveCurrency().code,
     });
   }
-  _mutate(txs);
+  const palier = _mutate(txs);
   window.closeScreen?.();
-  showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
+  if (!palier) showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
   _txEditId = null;
 }
 

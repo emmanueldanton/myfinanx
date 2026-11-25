@@ -22,6 +22,7 @@ function _messageFor({ name, level }) {
   return `${name} : ${level} % du budget atteint`;
 }
 
+// Renvoie true si un toast de palier a été affiché.
 // M est zéro-based (comme _getYM). Le nom du poste est du texte brut : showSuccessToast l'échappe.
 export function announceCrossing(budget, beforeTxs, afterTxs, Y, M) {
   const items = budget?.budgetItems ?? [];
@@ -29,9 +30,8 @@ export function announceCrossing(budget, beforeTxs, afterTxs, Y, M) {
   const after  = categoryAlerts(items, afterTxs || []);
   const announced = _readAnnounced(Y, M);
   const crossing = newCrossing(before, after, announced);
-  if (!crossing) return;
-  try {
-    store.set(_key(Y, M), { ...announced, [crossing.id]: crossing.level });
-  } catch (e) { /* stockage plein : on annonce quand même */ }
+  if (!crossing) return false;
+  store.set(_key(Y, M), { ...announced, [crossing.id]: crossing.level });
   showSuccessToast(_messageFor(crossing));
+  return true;
 }
