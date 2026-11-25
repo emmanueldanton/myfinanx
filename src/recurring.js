@@ -100,3 +100,14 @@ export function generateDue(todayISO, shownYM) {
   saveRules(rules);
   return created;
 }
+
+// Nouvelle règle à partir de l'opération saisie, qui en est la première occurrence
+export function makeRule({ description, category, amountEUR, date }, freq) {
+  return { id: uid(), description, category, amountEUR, freq, startDate: date, lastDate: date, active: true };
+}
+
+// Règle active rattachée à une opération, ou null
+export function activeRuleFor(tx, rules) {
+  if (!tx?.recurId) return null;
+  return rules.find(r => r.id === tx.recurId && r.active) || null;
+}

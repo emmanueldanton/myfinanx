@@ -10,7 +10,7 @@ globalThis.localStorage = {
   get length() { return _mem.size; },
 };
 
-const { occurrencesBetween, loadRules, saveRules, generateDue } = await import('../src/recurring.js');
+const { occurrencesBetween, loadRules, saveRules, generateDue, makeRule, activeRuleFor } = await import('../src/recurring.js');
 const { store } = await import('../src/store.js');
 const { readMonthTransactions } = await import('../src/data-bridge.js');
 
@@ -106,5 +106,21 @@ describe('generateDue', () => {
   it('une règle arrêtée ne crée rien', () => {
     saveRules([loyer({ active: false })]);
     expect(generateDue('2026-11-25', [2026, 10])).toBe(0);
+  });
+});
+
+describe('makeRule / activeRuleFor', () => {
+  it('makeRule part de l\'opération saisie', () => {
+    const r = makeRule({ description: 'Netflix', category: 'Abonnements', amountEUR: 13.49, date: '2026-11-08' }, 'month');
+    expect(r).toMatchObject({ description: 'Netflix', category: 'Abonnements', amountEUR: 13.49, freq: 'month', startDate: '2026-11-08', lastDate: '2026-11-08', active: true });
+    expect(typeof r.id).toBe('string');
+  });
+
+  it('activeRuleFor trouve la règle active de l\'opération, sinon null', () => {
+    const rules = [{ id: 'r1', active: true }, { id: 'r2', active: false }];
+    expect(activeRuleFor({ recurId: 'r1' }, rules)).toEqual(rules[0]);
+    expect(activeRuleFor({ recurId: 'r2' }, rules)).toBeNull();
+    expect(activeRuleFor({}, rules)).toBeNull();
+    expect(activeRuleFor({ recurId: 'inconnu' }, rules)).toBeNull();
   });
 });

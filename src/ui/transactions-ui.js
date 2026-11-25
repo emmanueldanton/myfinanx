@@ -1,4 +1,5 @@
 // ═══ Transactions UI — dépenses + revenus ponctuels (onglet Dépenses) ═══
+import { loadRules, saveRules, makeRule, activeRuleFor } from '../recurring.js';
 import { store }      from '../store.js';
 import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO, focusOnDesktop } from '../utils.js';
@@ -132,6 +133,7 @@ export function renderExpenses(state) {
     list.innerHTML = `<div class="empty"><div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>Aucun résultat pour ce filtre.</div>`;
     return;
   }
+  const rules = loadRules();
   list.innerHTML = filtered.map(t => {
     const isE  = t.type !== 'income';
     const col  = isE ? 'var(--red-l)' : 'var(--green)';
@@ -146,7 +148,7 @@ export function renderExpenses(state) {
         <div class="txid">${esc(t.description || '')}</div>
         <div class="txim">
           <span class="cpill">${esc(t.category || '')}</span>
-          <span class="txdt">${fmtDate(t.date)}</span>
+          <span class="txdt">${fmtDate(t.date)}${activeRuleFor(t, rules) ? ' · Répétée' : ''}</span>
         </div>
       </div>
       <div class="txam" style="color:${col}">${sign} ${fmt(t.amountEUR ?? 0)}</div>
@@ -398,6 +400,7 @@ export function setTxScreenType(t, keepCat) {
   const heroIco = document.getElementById('txs-hero-ico');
   if (heroIco) heroIco.innerHTML = _TX_ICO[_txScrType];
   _setText('txs-hero-lbl', _txScrType === 'income' ? 'Montant du revenu' : 'Montant de la dépense');
+  _syncRepField();
   const sel = document.getElementById('txs-cat');
   if (sel) {
     const cats = _txScrType === 'expense' ? CATS_E : CATS_I;
@@ -412,6 +415,29 @@ export function setTxScreenType(t, keepCat) {
   if (scan) scan.hidden = _txScrType !== 'expense' || !!_txEditId;
 }
 
+const _REP_LABELS = { once: 'Une seule fois', week: 'Chaque semaine', month: 'Chaque mois', quarter: 'Chaque trimestre' };
+
+// Champ « Répéter » : dépense nouvelle (toutes les fréquences) ou opération d'une
+// répétition active (sa fréquence ou « Une seule fois » pour l'arrêter) ; masqué sinon.
+function _syncRepField() {
+  const field = document.getElementById('txs-rep-field');
+  const sel   = document.getElementById('txs-rep');
+  if (!field || !sel) return;
+  let keys = null, value = 'once';
+  if (_txScrType === 'expense') {
+    if (!_txEditId) {
+      keys = ['once', 'week', 'month', 'quarter'];
+    } else {
+      const rule = activeRuleFor(_txs().find(t => t.id === _txEditId), loadRules());
+      if (rule) { keys = [rule.freq, 'once']; value = rule.freq; }
+    }
+  }
+  field.hidden = !keys;
+  if (!keys) { sel.innerHTML = ''; return; }
+  sel.innerHTML = keys.map(k => `<option value="${k}">${_REP_LABELS[k]}</option>`).join('');
+  sel.value = value;
+}
+
 export function saveTxScreen() {
   const desc = (document.getElementById('txs-desc')?.value || '').trim();
   const cat  = document.getElementById('txs-cat')?.value || '';
@@ -422,15 +448,29 @@ export function saveTxScreen() {
     if (a) { a.classList.add('invalid'); setTimeout(() => a.classList.remove('invalid'), 1400); }
     return;
   }
+  const repField = document.getElementById('txs-rep-field');
+  const freq = repField && !repField.hidden ? (document.getElementById('txs-rep')?.value || 'once') : 'once';
+  const rules = loadRules();
   const txs = [..._txs()];   // copie : jamais de mutation de la liste du store
   if (_txEditId) {
     const i = txs.findIndex(t => t.id === _txEditId);
-    if (i >= 0) txs[i] = { ...txs[i], description: desc, category: cat, amountEUR: amt, date, type: _txScrType };
+    if (i >= 0) {
+      txs[i] = { ...txs[i], description: desc, category: cat, amountEUR: amt, date, type: _txScrType };
+      // « Une seule fois » sur une opération répétée : la répétition s'arrête
+      const rule = activeRuleFor(txs[i], rules);
+      if (rule && freq === 'once') { rule.active = false; saveRules(rules); }
+    }
   } else {
-    txs.unshift({
+    const tx = {
       id: uid(), description: desc, category: cat, amountEUR: amt,
       date, type: _txScrType, curCode: getActiveCurrency().code,
-    });
+    };
+    if (_txScrType === 'expense' && freq !== 'once') {
+      const rule = makeRule(tx, freq);
+      tx.recurId = rule.id;
+      saveRules([...rules, rule]);
+    }
+    txs.unshift(tx);
   }
   const palier = _mutate(txs);
   window.closeScreen?.();
