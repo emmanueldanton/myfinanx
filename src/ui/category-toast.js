@@ -23,15 +23,17 @@ function _messageFor({ name, level }) {
 }
 
 // Renvoie true si un toast de palier a été affiché.
+// Avec { silent: true } : n'affiche rien, renvoie le message (ou null) et mémorise quand même le palier.
 // M est zéro-based (comme _getYM). Le nom du poste est du texte brut : showSuccessToast l'échappe.
-export function announceCrossing(budget, beforeTxs, afterTxs, Y, M) {
+export function announceCrossing(budget, beforeTxs, afterTxs, Y, M, { silent = false } = {}) {
   const items = budget?.budgetItems ?? [];
   const before = categoryAlerts(items, beforeTxs || []);
   const after  = categoryAlerts(items, afterTxs || []);
   const announced = _readAnnounced(Y, M);
   const crossing = newCrossing(before, after, announced);
-  if (!crossing) return false;
+  if (!crossing) return silent ? null : false;
   store.set(_key(Y, M), { ...announced, [crossing.id]: crossing.level });
+  if (silent) return _messageFor(crossing);
   showSuccessToast(_messageFor(crossing));
   return true;
 }

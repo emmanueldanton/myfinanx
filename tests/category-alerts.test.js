@@ -47,3 +47,27 @@ describe('pushCategory', () => {
     expect(pushCategory([{ id: 'a', level: 80, pct: 85 }, { id: 't', level: 100, pct: 120 }]).id).toBe('t');
   });
 });
+
+describe('niveaux selon le ratio brut', () => {
+  const one = amt => categoryAlerts([{ id: 'a', name: 'A', allocatedEUR: amt.alloc }], [ex('A', amt.spent)])[0];
+
+  it('199 sur 200 : niveau 80 et pct plafonné à 99', () => {
+    const a = one({ spent: 199, alloc: 200 });
+    expect(a.level).toBe(80);
+    expect(a.pct).toBe(99);
+  });
+  it('200 sur 200 : niveau 100', () => {
+    expect(one({ spent: 200, alloc: 200 }).level).toBe(100);
+  });
+  it('79,5 sur 100 : niveau 50', () => {
+    expect(one({ spent: 79.5, alloc: 100 }).level).toBe(50);
+  });
+  it('80 sur 100 : niveau 80', () => {
+    expect(one({ spent: 80, alloc: 100 }).level).toBe(80);
+  });
+  it('newCrossing : saut 50 vers 100 avec mémoire partielle', () => {
+    const before = [{ id: 'a', name: 'A', pct: 55, level: 50 }];
+    const after  = [{ id: 'a', name: 'A', pct: 105, level: 100 }];
+    expect(newCrossing(before, after, { a: 50 })).toEqual({ id: 'a', name: 'A', level: 100 });
+  });
+});

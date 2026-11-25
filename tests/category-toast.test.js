@@ -44,3 +44,22 @@ describe('announceCrossing', () => {
     expect(showSuccessToast).not.toHaveBeenCalled();
   });
 });
+
+describe('announceCrossing en mode silencieux', () => {
+  beforeEach(() => {
+    _mem.clear();
+    store.remove('mfx_cat_alerts_2026_11');
+    showSuccessToast.mockClear();
+  });
+
+  it('renvoie le message, n\'affiche aucun toast et mémorise le palier', () => {
+    const msg = announceCrossing(budget, [tx(40)], [tx(40), tx(45)], 2026, 10, { silent: true });
+    expect(msg).toContain('80 % du budget atteint');
+    expect(showSuccessToast).not.toHaveBeenCalled();
+    expect(announceCrossing(budget, [tx(40)], [tx(40), tx(45)], 2026, 10, { silent: true })).toBeNull();
+  });
+
+  it('renvoie null sans franchissement', () => {
+    expect(announceCrossing(budget, [tx(10)], [tx(10), tx(5)], 2026, 10, { silent: true })).toBeNull();
+  });
+});

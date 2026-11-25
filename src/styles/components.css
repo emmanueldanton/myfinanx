@@ -1314,13 +1314,6 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .donut-leg-val { font-family:var(--fh); font-weight:700; font-size:.75rem; }
 
 /* Budget progress lines */
-.ov-budget-line { margin-bottom:10px; }
-.ov-bline-hd { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
-.ov-bline-name { display:flex; align-items:center; gap:6px; font-size:.75rem; font-weight:500; }
-.ov-bline-name-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-.ov-bline-val { font-family:var(--fh); font-size:.75rem; font-weight:700; }
-.ov-bline-bar { height:5px; background:var(--b1); border-radius:99px; overflow:hidden; }
-.ov-bline-fill { height:100%; border-radius:99px; transition:width .5s cubic-bezier(.4,0,.2,1); }
 
 /* Recent transactions in overview */
 .ov-recent-row {

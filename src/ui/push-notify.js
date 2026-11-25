@@ -198,8 +198,8 @@ function _buildNotification() {
     title:   'MyFinanx',
     message: c.level >= 100
       ? _pick([
-          `${s}ton budget ${c.name} est dépassé de ${fmt(c.spentEUR - c.allocatedEUR)}.`,
-          `${s}le poste ${c.name} dépasse son budget de ${fmt(c.spentEUR - c.allocatedEUR)}.`,
+          `${s}ton budget ${c.name} est dépassé de ${fmt(Math.max(0, c.spentEUR - c.allocatedEUR))}.`,
+          `${s}le poste ${c.name} dépasse son budget de ${fmt(Math.max(0, c.spentEUR - c.allocatedEUR))}.`,
         ])
       : _pick([
           `${s}ton budget ${c.name} est à ${c.pct} %. Il te reste ${fmt(c.allocatedEUR - c.spentEUR)}.`,

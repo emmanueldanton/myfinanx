@@ -224,9 +224,12 @@ export function saveScan() {
     window.changeMonth?.((keys[0].Y - cY) * 12 + (keys[0].M - cM));
   }
   const n = sel.length;
-  showSuccessToast(`${n} opération${n > 1 ? 's ajoutées' : ' ajoutée'}${otherMonths.length && keys.length === 1 ? ` en ${otherMonths[0]}` : otherMonths.length ? `, dont certaines en ${otherMonths.join(', ')}` : ''}`);
-  // Palier franchi sur le mois courant : passe après le toast de confirmation
-  if (avantMois) announceCrossing(store.get('mfx_budget') ?? {}, avantMois, store.get('mfx_transactions') || [], cY, cM);
+  const confirmation = `${n} opération${n > 1 ? 's ajoutées' : ' ajoutée'}${otherMonths.length && keys.length === 1 ? ` en ${otherMonths[0]}` : otherMonths.length ? `, dont certaines en ${otherMonths.join(', ')}` : ''}`;
+  // Palier franchi sur le mois courant : message unique avec la confirmation
+  const palier = avantMois
+    ? announceCrossing(store.get('mfx_budget') ?? {}, avantMois, store.get('mfx_transactions') || [], cY, cM, { silent: true })
+    : null;
+  showSuccessToast(palier ? `${confirmation}. ${palier}` : confirmation);
 }
 
 export function initScanUI(getYM) {

@@ -30,11 +30,11 @@ export function copyFromPreviousMonth(prevBudget) {
   return { incomes: newIncome, budgetItems: newItems };
 }
 
-// Palier atteint selon le pourcentage de budget consommé
-function levelFor(pct) {
-  if (pct >= 100) return 100;
-  if (pct >= 80) return 80;
-  if (pct >= 50) return 50;
+// Palier atteint selon le ratio brut dépensé / alloué (100 seulement si le budget est atteint)
+function levelFor(ratio) {
+  if (ratio >= 1) return 100;
+  if (ratio >= 0.8) return 80;
+  if (ratio >= 0.5) return 50;
   return 0;
 }
 
@@ -45,8 +45,10 @@ export function categoryAlerts(budgetItems, transactions) {
     .filter(b => b.allocatedEUR > 0)
     .map(b => {
       const spentEUR = spentByCat[b.name] || 0;
-      const pct = Math.round((spentEUR / b.allocatedEUR) * 100);
-      return { id: b.id, name: b.name, spentEUR, allocatedEUR: b.allocatedEUR, pct, level: levelFor(pct) };
+      const ratio = spentEUR / b.allocatedEUR;
+      let pct = Math.round(ratio * 100);
+      if (ratio < 1 && pct >= 100) pct = 99;  // jamais 100 % affiché sous le budget
+      return { id: b.id, name: b.name, spentEUR, allocatedEUR: b.allocatedEUR, pct, level: levelFor(ratio) };
     });
 }
 

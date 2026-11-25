@@ -52,12 +52,13 @@ function _txs() {
   return store.get('mfx_transactions') || [];
 }
 
-function _mutate(txs) {
+function _mutate(txs, { announce = true } = {}) {
   const avant = _txs();
   store.set('mfx_transactions', txs);
   const [Y, M] = _getYM();
   bridgeSave(Y, M);
-  // Après les toasts existants : celui du palier les remplace
+  // Après les toasts existants : celui du palier les remplace (pas sur une annulation)
+  if (!announce) return false;
   return announceCrossing(store.get('mfx_budget') ?? {}, avant, txs, Y, M);
 }
 
@@ -249,7 +250,7 @@ export function delTx(id) {
   if (!tx) return;
   const snapshot = [...txs];
   _mutate(txs.filter(t => t.id !== id));
-  showUndoToast(`"${tx.description}" supprimée`, () => _mutate(snapshot));
+  showUndoToast(`"${tx.description}" supprimée`, () => _mutate(snapshot, { announce: false }));
 }
 
 // ── Écran dédié Dépense / Revenu (ajout + édition) ────────────────
