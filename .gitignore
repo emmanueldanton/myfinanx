@@ -22,3 +22,6 @@ specs/
 .claude/
 .superpowers/
 CLAUDE.md
+
+# Graphe de code local (Graphify)
+graphify-out/
