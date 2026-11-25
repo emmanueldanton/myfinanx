@@ -57,6 +57,19 @@ describe('loadRules / saveRules', () => {
     expect(loadRules()).toEqual([]);
   });
 
+  it('écarte les règles mal formées (sauvegarde importée)', () => {
+    const ok = { ...rule('month', '2026-11-05'), description: 'Loyer', category: 'Logement', amountEUR: 500 };
+    _mem.set('mfx_recurring', JSON.stringify([
+      ok,
+      { ...ok, id: 'x1', freq: '"><img src=x onerror=alert(1)>' },
+      { ...ok, id: 'x2', startDate: '05/11/2026' },
+      { ...ok, id: 'x3', lastDate: 'demain' },
+      { ...ok, id: 'x4', amountEUR: 'beaucoup' },
+      null,
+    ]));
+    expect(loadRules().map(r => r.id)).toEqual(['r1']);
+  });
+
   it('aller-retour', () => {
     const rules = [{ ...rule('week', '2026-11-02'), description: 'Navigo', category: 'Transport', amountEUR: 22 }];
     saveRules(rules);

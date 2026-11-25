@@ -47,10 +47,22 @@ export function occurrencesBetween(rule, afterISO, todayISO) {
   return out;
 }
 
+const FREQS = ['week', 'month', 'quarter'];
+const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Une sauvegarde importée peut contenir n'importe quoi : on ne garde que les règles bien formées
+function _isValidRule(r) {
+  return !!r && typeof r === 'object'
+    && typeof r.id === 'string' && r.id
+    && FREQS.includes(r.freq)
+    && ISO_RE.test(r.startDate) && ISO_RE.test(r.lastDate)
+    && typeof r.amountEUR === 'number' && Number.isFinite(r.amountEUR);
+}
+
 export function loadRules() {
   try {
     const parsed = JSON.parse(localStorage.getItem(RULES_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.filter(_isValidRule) : [];
   } catch (e) {
     return [];
   }
