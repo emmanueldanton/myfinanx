@@ -127,8 +127,13 @@ function initBreakpointManager() {
 
 // Crée les dépenses récurrentes échues et le signale d'un toast
 function _runRecurring() {
-  const n = generateDue(todayISO(), [_Y, _M]);
-  if (n > 0) showSuccessToast(n === 1 ? '1 opération récurrente ajoutée' : `${n} opérations récurrentes ajoutées`);
+  try {
+    const n = generateDue(todayISO(), [_Y, _M]);
+    if (n > 0) showSuccessToast(n === 1 ? '1 opération récurrente ajoutée' : `${n} opérations récurrentes ajoutées`);
+  } catch (e) {
+    // Stockage plein ou illisible : on le signale sans bloquer le reste du démarrage
+    window.showStorageError?.();
+  }
 }
 
 function init() {

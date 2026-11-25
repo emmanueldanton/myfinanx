@@ -3,7 +3,7 @@
 // freq : 'week' | 'month' | 'quarter' ; dates au format AAAA-MM-JJ (date locale).
 
 import { store } from './store.js';
-import { bridgeSave, appendToMonth } from './data-bridge.js';
+import { bridgeSave, appendToMonth, readMonthTransactions } from './data-bridge.js';
 import { uid } from './utils.js';
 
 const RULES_KEY = 'mfx_recurring';
@@ -79,7 +79,17 @@ export function saveRules(rules) {
 // sont écrits directement dans leur stockage. Renvoie le nombre d'opérations créées.
 export function generateDue(todayISO, shownYM) {
   const rules = loadRules();
-  const byMonth = new Map();   // 'Y-M' -> transactions
+  const [sY, sM] = shownYM;
+  const byMonth = new Map();   // 'Y-M' -> transactions à créer
+  const present = new Map();   // 'Y-M' -> occurrences déjà présentes ('recurId|date')
+  const _present = (y, m) => {
+    const key = `${y}-${m}`;
+    if (!present.has(key)) {
+      const txs = (y === sY && m === sM) ? (store.get('mfx_transactions') || []) : readMonthTransactions(y, m);
+      present.set(key, new Set(txs.filter(t => t.recurId).map(t => `${t.recurId}|${t.date}`)));
+    }
+    return present.get(key);
+  };
   let created = 0;
 
   for (const rule of rules) {
@@ -87,6 +97,8 @@ export function generateDue(todayISO, shownYM) {
     const dates = occurrencesBetween(rule, rule.lastDate || rule.startDate, todayISO);
     for (const date of dates) {
       const { y, m } = _parse(date);
+      // Déjà là (sauvegarde importée, autre onglet) : on ne la recrée pas
+      if (_present(y, m).has(`${rule.id}|${date}`)) continue;
       const key = `${y}-${m}`;
       if (!byMonth.has(key)) byMonth.set(key, []);
       byMonth.get(key).push({
@@ -97,9 +109,11 @@ export function generateDue(todayISO, shownYM) {
     }
     if (dates.length) rule.lastDate = dates[dates.length - 1];
   }
+  // Règles d'abord : si l'écriture d'un mois échoue ensuite, on perd au pire une
+  // occurrence, jamais de doublon aux ouvertures suivantes
+  saveRules(rules);
   if (!created) return 0;
 
-  const [sY, sM] = shownYM;
   for (const [key, txs] of byMonth) {
     const [y, m] = key.split('-').map(Number);
     if (y === sY && m === sM) {
@@ -109,7 +123,6 @@ export function generateDue(todayISO, shownYM) {
       appendToMonth(y, m, txs.reverse());
     }
   }
-  saveRules(rules);
   return created;
 }
 

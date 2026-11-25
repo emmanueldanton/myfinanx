@@ -1,5 +1,5 @@
 // ═══ Transactions UI — dépenses + revenus ponctuels (onglet Dépenses) ═══
-import { loadRules, saveRules, makeRule, activeRuleFor } from '../recurring.js';
+import { loadRules, saveRules, makeRule, activeRuleFor, generateDue } from '../recurring.js';
 import { store }      from '../store.js';
 import { bridgeSave } from '../data-bridge.js';
 import { uid, esc, parseAmt, fmtDate, catIco, CAT_COLORS, CATS_E, CATS_I, todayISO, focusOnDesktop } from '../utils.js';
@@ -252,7 +252,9 @@ export function delTx(id) {
   if (!tx) return;
   const snapshot = [...txs];
   _mutate(txs.filter(t => t.id !== id));
-  showUndoToast(`"${tx.description}" supprimée`, () => _mutate(snapshot, { announce: false }));
+  // Supprimer une opération répétée n'arrête pas la répétition : on le dit
+  const suite = activeRuleFor(tx, loadRules()) ? '. La répétition continue' : '';
+  showUndoToast(`"${tx.description}" supprimée${suite}`, () => _mutate(snapshot, { announce: false }));
 }
 
 // ── Écran dédié Dépense / Revenu (ajout + édition) ────────────────
@@ -474,7 +476,10 @@ export function saveTxScreen() {
   }
   const palier = _mutate(txs);
   window.closeScreen?.();
-  if (!palier) showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
+  // Répétition créée avec une date passée : les occurrences échues sont rattrapées tout de suite
+  const rattrapees = (!_txEditId && txs[0]?.recurId) ? generateDue(todayISO(), _getYM()) : 0;
+  if (rattrapees) showSuccessToast(rattrapees === 1 ? 'Répétition créée, 1 opération rattrapée' : `Répétition créée, ${rattrapees} opérations rattrapées`);
+  else if (!palier) showSuccessToast(_txEditId ? 'Transaction modifiée' : 'Transaction ajoutée');
   _txEditId = null;
 }
 

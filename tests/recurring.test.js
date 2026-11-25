@@ -116,6 +116,27 @@ describe('generateDue', () => {
     expect(generateDue('2026-11-25', [2026, 10])).toBe(0);
   });
 
+  it('ne recrée pas une occurrence déjà présente dans son mois (import, autre onglet)', () => {
+    saveRules([loyer()]);
+    _mem.set('monargent_2026_10', JSON.stringify({ revenus: [], budget: [], expenses: [
+      { id: 'x', date: '2026-10-05', type: 'expense', desc: 'Loyer', cat: 'Logement', amount: 500, recurId: 'r1' },
+    ] }));
+    expect(generateDue('2026-11-25', [2026, 10])).toBe(1);
+    expect(readMonthTransactions(2026, 9)).toHaveLength(1);
+  });
+
+  it('enregistre la règle avant les mois : un échec d’écriture ne crée pas de doublon plus tard', () => {
+    saveRules([loyer()]);
+    const setItem = localStorage.setItem;
+    localStorage.setItem = (k, v) => { if (k === 'monargent_2026_10') throw new Error('QuotaExceededError'); setItem(k, v); };
+    try {
+      expect(() => generateDue('2026-11-25', [2026, 10])).toThrow();
+    } finally {
+      localStorage.setItem = setItem;
+    }
+    expect(loadRules()[0].lastDate).toBe('2026-11-05');
+  });
+
   it('une règle arrêtée ne crée rien', () => {
     saveRules([loyer({ active: false })]);
     expect(generateDue('2026-11-25', [2026, 10])).toBe(0);
