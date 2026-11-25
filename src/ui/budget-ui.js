@@ -3,6 +3,7 @@ import { store }      from '../store.js';
 import { bridgeSave, getRecentMonthsExpenseAverages } from '../data-bridge.js';
 import { uid, esc, parseAmt, catIco, catSubtitle, focusOnDesktop } from '../utils.js';
 import { calcByCategory } from '../transactions.js';
+import { categoryAlerts } from '../budget.js';
 import { fmt, fmtInput, fromDisplay, toDisplay, getActiveCurrency } from '../currency.js';
 import { showSuccessToast, showUndoToast }  from './toast.js';
 import { openOverlay, closeOverlay }        from './overlay.js';
@@ -77,12 +78,20 @@ export function renderBudRows(state) {
   const items  = budget.budgetItems ?? [];
   const totalR = (budget.incomes ?? []).reduce((s, r) => s + r.amountEUR, 0);
   const spentByCat = calcByCategory(state?.transactions ?? []);
+  const alertById = {};
+  for (const a of categoryAlerts(items, state?.transactions ?? [])) alertById[a.id] = a;
   el.innerHTML = items.map(b => {
     const pct = totalR > 0 ? Math.round((b.allocatedEUR / totalR) * 100) : 0;
     const spent = spentByCat[b.name] || 0;
     let status;
     if (!(b.allocatedEUR > 0)) status = '<span class="bud-status is-none">Pas de budget</span>';
-    else if (spent > 0)        status = '<span class="bud-status is-ok">OK</span>';
+    else if (spent > 0) {
+      const lvl = alertById[b.id]?.level ?? 0;
+      if (lvl >= 100)     status = '<span class="bud-status is-over">Dépassé</span>';
+      else if (lvl >= 80) status = '<span class="bud-status is-warn">80 %</span>';
+      else if (lvl >= 50) status = '<span class="bud-status is-ok">50 %</span>';
+      else                status = '<span class="bud-status is-ok">OK</span>';
+    }
     else                       status = '<span class="bud-status is-plan">Prévu</span>';
     const sub = catSubtitle(b.name);
     return `<div class="poste-card bud-row" data-bud-id="${b.id}" role="button" tabindex="0" onclick="openItemDetail('bud','${b.id}')">

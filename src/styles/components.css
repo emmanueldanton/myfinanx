@@ -1737,6 +1737,8 @@ body:has(#page-ai.active) .hdr-spacer { height: 20px; }
 .bud-status.is-none { color: var(--red-l); background: color-mix(in srgb, var(--red-l) 12%, transparent); }
 .bud-status.is-ok   { color: var(--green); background: color-mix(in srgb, var(--green) 14%, transparent); }
 .bud-status.is-plan { color: var(--pr-l); background: color-mix(in srgb, var(--pr) 13%, transparent); }
+.bud-status.is-warn { color: var(--gold); background: color-mix(in srgb, var(--gold) 14%, transparent); }
+.bud-status.is-over { color: var(--red-l); background: color-mix(in srgb, var(--red-l) 12%, transparent); }
 
 /* Ajouter un revenu / un poste (ouvre l'écran dédié) */
 .add-reveal { margin: 4px 0 6px; }

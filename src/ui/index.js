@@ -1,8 +1,8 @@
 import { initDonutResizeObserver } from './charts.js';
 import { fmt } from '../currency.js';
-import { calcTotalIncomes, calcUnallocated } from '../budget.js';
+import { calcTotalIncomes, calcUnallocated, categoryAlerts } from '../budget.js';
 import { calcTotalExpenses, calcTotalPunctualIncomes } from '../transactions.js';
-import { MONTHS } from '../utils.js';
+import { MONTHS, esc } from '../utils.js';
 import { renderDashboard } from './dashboard.js';
 
 export function renderAll(state) {
@@ -33,6 +33,11 @@ export function renderAll(state) {
   if (unallocatedEUR < 0)        al += `<div class="alert ab">${warnIco} Tu as alloué <strong>${fmt(Math.abs(unallocatedEUR))}</strong> de plus que tes revenus.</div>`;
   else if (unallocatedEUR > 100) al += `<div class="alert ag">${infoIco} <strong>${fmt(unallocatedEUR)}</strong> non alloués, affecte-les à tes priorités.</div>`;
   if (pct > 90 && totalRevenueEUR > 0) al += `<div class="alert ab">${warnIco} Plus de 90% de tes revenus dépensés ce mois !</div>`;
+  for (const a of categoryAlerts(budget.budgetItems ?? [], transactions)) {
+    if (a.level < 80) continue;
+    const msg = a.level >= 100 ? `budget dépassé (${a.pct} %)` : '80 % du budget atteint';
+    al += `<div class="alert ab">${warnIco} <strong>${esc(a.name)}</strong> : ${msg}</div>`;
+  }
   const budAl = document.getElementById('bud-al');
   if (budAl) budAl.innerHTML = al;
 }
